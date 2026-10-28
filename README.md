@@ -30,8 +30,9 @@
 | 12 | [Quick Reference](chapters/12_Quick_Reference.md) |
 | 13 | [Character Building Guide](chapters/13_Character_Building_Guide.md) |
 | — | [Character Sheet (Markdown)](sheets/Character_Sheet.md) · [Printable HTML](sheets/Character_Sheet.html) |
+| — | **[Character Builder (web app)](https://xenodorian.github.io/BeelzRPG/builder/)** · [offline file](builder/index.html) |
 
-**New to the game?** Read chapters 0, 1, and 12, grab a pregen from chapter 11, and play.
+**New to the game?** Read chapters 0, 1, and 12, grab a pregen from chapter 11, and play. **Making your own?** Use the [Character Builder](https://xenodorian.github.io/BeelzRPG/builder/) or follow [chapter 13](chapters/13_Character_Building_Guide.md).
 
 ## Contributing
 Start with [Current_Work.md](Current_Work.md): task list, design log, style guide, glossary, and known issues. One chapter per file, so you can work in parallel without conflicts.

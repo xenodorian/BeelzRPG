@@ -69,7 +69,7 @@ Build **3 Surges** (4 for a Lab Escapee) and write them in Sequence slots **1–
 
 **The Surge recipe:**
 1. **Shape:** any base Shape (**Strike, Bolt, Infuse**) or one your Roots unlocked.
-2. **Effect:** a **damage Effect** (base: **Kinetic**) for Strike/Bolt/Burst/Wave/Pulse, **or** an **Infuse Effect** for Infuse. Never mix.
+2. **Effect:** a **damage Effect** (base: **Kinetic**) for Strike/Bolt/Burst/Wave/Pulse, **or** an **Infuse Effect** for Infuse. Never mix. There is no base Infuse Effect: Infuse needs Mend, Shell, Haste, Veil, or Link from a tree.
 3. **Twist** (optional): **one** at Rank 1–2, **two different** from Rank 3. Each must match the Shape (*Chain*: Strike/Bolt; *Linger*: area Shapes; *Leech*, *Overcharge*: damage only; *Sure*, *Reach*, *Hush*: any).
 4. **Cost:** 1 Flux + 1 per Twist.
 5. **Name it and describe it** in your Form's look.

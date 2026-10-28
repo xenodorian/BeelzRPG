@@ -35,6 +35,8 @@
 | `sheets/Character_Sheet.md` / `.html` | Fillable/printable sheet | |
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
 | `tools/balance_sim.py` | Monte Carlo combat sim | Re-run after number changes |
+| `builder/index.html` | Character builder web app (single offline file; GitHub Pages: https://xenodorian.github.io/BeelzRPG/builder/) | **Game data lives in the `MUTAGEN` object in the first `<script>`**; update it with any rule change in ch 2–8 |
+| `tools/builder_test.js` | Headless builder test (jsdom) | Run after editing the builder or its data |
 | `tools/tree_compare.py` | Per-tree expected DPR / HP lost / Flux per fight at L1, L5, L10 | Re-run after node changes |
 
 ## Style Guide
@@ -122,7 +124,7 @@
 - [x] Character sheet (Markdown + printable HTML)
 - [x] 13 Character Building Guide (2026-10-28)
 - [x] Guide sanity check (2026-10-28; see *Guide Sanity Check*)
-- [ ] HTML character builder (`builder/index.html`)
+- [x] HTML character builder (`builder/index.html`, 2026-10-28; see *Character Builder*)
 
 ### Quality
 - [x] Math pass: hit/defense odds per level, damage vs HP, encounter budget (see Balance)
@@ -206,6 +208,7 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - **Findings:** Wild rule gap, Spore Bloom self-hit, and Blood Price spike fixed. Single-target burst at L5+ (Strike + Kinetic + Overcharge ≈ 7d10+stat for 2 Flux, ~42) is high but can't one-shot a same-level Soldier (46 HP) on average; **watch in live play.** Brutes melt fast under focused Surges. That's intended as the payoff, but GMs can add Shielded/Armored.
 
 ## Issues Log
+- 2026-10-28 — **Rules gap found by the builder's random generator:** there is no base Infuse Effect, so a character whose only trees are Limbs can't build any Infuse Surge (every Infuse Effect is unlocked by Hide, Senses, Glands, Wiring, or Mind). Legal as written; ch 13 now says so. Open question: add a base Infuse Effect?
 - 2026-10-28 — **Guide (ch 13) rules calls** where chapters 2–8 were ambiguous; ch 13 now states them, the builder implements them: (a) Flux Limit minimum 4 applies *before* the Splice −1 (a Splice can have Limit 3). (b) A Splice keeps each tree's Form rules: Knit counts Bio trees, Firmware counts Chrome-tree parts, Chrome trees still cost Upkeep and give disadvantage vs Shock. (c) You wear one armor (Light *or* Heavy) plus an optional Shield. (d) Natural Weapons are a Frame and can take a Mod; Spit and Mind Spike can't. (e) Knacks: 3 at L1, +1 at L4 and L8 (5 total), plus Blossoms. (f) Thick = +2 × level total.
 - 2026-10-28 — `git commit` failed: no author identity on the box. Set the repo-local identity to the owner's GitHub noreply address.
 - 2026-10-28 — Homebrew `.docx` files were read via python-docx (text + tables). The 15.6 MB 4M doc is mostly images; only text was used. Takeaways: d20 + modifiers, player Dodge rolls instead of AC, simultaneous enemy turns, "Required" root boons in subdomains, grievous injury tables, GM reward tokens (Dimes → **Juice**), levels per mission, cap level 10, corporate dispatcher premise (ATRaC, M.O.T.H. → **GRAFT**).
@@ -281,6 +284,17 @@ Cold reread of ch 13 against a checklist of every character component in ch 1–
 
 **Worked example verified:** Dree L1: HP 12, Limit 6 (4+1+2−1), Dodge +4/Endure +1/Resist +3, Speed 40, 3 legal Surges (base + Wiring/Glands parts, no Twists) + 1 Wild, 25 Scrip after a Medkit. Dree L5: 6 nodes (2 Roots + 4 non-Apex nodes), HP 34 (12+2+20), Limit 9, Dodge +6/Endure +4/Resist +6, 7 Surges on a d8 (1 Wild), Twists legal (≤2, different, Shape-compatible), Jolt 6d8+3, Burning 6, Stim Gland 3d6+1, Purge 4. Guide is ~2,800 words, about half of it tables.
 
+## Character Builder (builder/index.html)
+A single self-contained HTML file (inline CSS/JS, no CDNs, no build step). Works from `file://` and GitHub Pages; uses `../art/cover.jpg` for the header.
+
+**Updating it when rules change.** All game data is in one object, `const MUTAGEN = {...}`, in the **first `<script>` block**, between the `MUTAGEN GAME DATA` and `END OF GAME DATA` banners: stat array, level table, Origins, Forms, trees and nodes (text + `fx` keys), Shapes, Effects, Twists, Wild table, sample Surges, gear frames/mods/armor/items/kits, Scars/Faults, and the ch 13 worked example with its expected numbers. Node text supports tokens `{R}`, `{2R}`, `{R1}`, `{GUM}`, `{GRIT}`, `{ADR}`. Numbers that need logic (HP, Armor, Speed, Limit, attack lines, Surge dice) are computed in `derive()` / `surgeCalc()` / `attackLine()` in the second script; `fx` keys they read are listed in the data block's header comment. If you add a node whose effect changes a derived number, add an `fx` key and handle it in `derive()`. Keep ids stable (saved characters store them).
+
+**Features:** 8-step wizard following ch 13 (Start, Stats, Origin & Knacks, Augments, Surges, Gear, Extras & Drive, Sheet) with per-step error/warning badges; level 1–10 selector driving Rank, HP, defenses, Limit, Sequence die, Prime, Surges known, node picks, Twist count, Apex gating, Plating, Knack count, stat boosts, Final Form; stat array validation; Origin cards (+ d6 roll) and Knacks with examples; tree picker enforcing Root-first, Apex rules, Bio/Chrome per tree, Splice detection, Knit/Firmware/Upkeep; Surge builder limited to unlocked parts with Twist compatibility, live Flux, dice, attack and rider text, Firmware (⚙) marking, reorder/remove, sample list, harvested Samples, Wild slots; gear with kits, kit weapon choices, Mods (100), buying weapons/items/armor/Shield, Scrip ledger with mission-pay estimate, Upkeep; Scars/Faults (with number effects), Patch Applied, Drive, notes; live summary panel; printable sheet laid out like `sheets/Character_Sheet.html` (print hides the app); autosave + named saves in localStorage, JSON export/import; Random legal character at any level; Example menu (Dree L1/L5).
+
+**Tested 2026-10-28:** `tools/builder_test.js` (jsdom): 0 JS errors; Dree L1 and L5 match ch 13 exactly (HP 12/34, Armor 1, Speed 40, Dodge/Endure/Resist +4/+1/+3 and +6/+4/+6, Limit 6/9, Scrip 25 at L1, d4/d8, Prime 2/3, 1 Wild); 3,000 random characters (300 per level) all legal; 13 illegal builds correctly rejected; Sample and Lab Escapee slot rules; Splice Limit floor; DOM events (node click, stat select, Random, Save). Headless Chrome from `file://`: no console errors, localStorage works, print-to-PDF produces only the sheet (2 pages for a level 5 character), mobile layout at 390 px.
+
+**Builder decisions (also in ch 13):** Splice Limit floor (min 4, then −1); one armor + Shield; Mods allowed on Natural Weapons but not Spit/Mind Spike; Knacks over the allowed count are a warning (Blossoms), not an error; Scrip after level 1 is a manual ledger with an "estimate from missions" button (pay 200 + 100 × level minus current Upkeep per mission), since campaign spending varies.
+
 ## Open Questions (owner / future contributors)
 1. Should Bio vs Chrome have a social dimension (e.g. "Humanity" or faction reactions)? Currently only Scars/Faults touch it.
 2. Is a d4 Sequence at level 1 too swingy, or not swingy enough? (3 Surges + 1 Wild, Prime 2.)
@@ -293,3 +307,4 @@ Cold reread of ch 13 against a checklist of every character component in ch 1–
 9. **Nerve** is the most loaded stat (ranged attacks, Bolt/Burst Surges, Resist, Flux Limit). Should Flux Limit use the higher of Nerve or Grit?
 10. **Glands unlocks 4 Surge parts** (incl. the only Mend and the only ranged area Shape) vs 2 for Limbs/Senses/Mind. Move Burst elsewhere, or keep Glands as the "toolkit" tree?
 11. **Mind** has the lowest personal damage (Mind Spike ignoring Armor is its edge). Is a support tree with high utility enough, or should Mind Spike scale better?
+12. **No base Infuse Effect.** A Limbs-only freelancer can't build an Infuse Surge. Fine (Limbs is the melee tree), or add a base Infuse Effect (e.g. a weak *Steady*: +Rank to the target's next roll)?
