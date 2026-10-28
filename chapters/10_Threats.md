@@ -70,7 +70,7 @@ T runs 1–10, matching the party level it's meant for.
 | Easy | ×¾ | ~15% of party HP lost |
 | Standard | ×1 | ~25% of party HP lost, rare Downs |
 | Hard | ×1¼ | ~35–45%, someone probably goes Down |
-| Deadly | ×1½ | ~50–75%, real risk of death |
+| Deadly | ×1½ | ~45–70%, real risk of death |
 
 - Enemies **2+ levels below** the party cost **half**. Enemies **2+ above** cost **double**. Avoid T more than 3 above the party.
 - Plan **2–3 Standard fights between Breathers**. The party has two Breathers per Lockdown.

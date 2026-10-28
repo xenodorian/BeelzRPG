@@ -22,8 +22,8 @@ HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve · Speed 30 · Armor ma
 **Damage:** Rank × weapon die + stat. Armor −X per hit (min 1). Area: miss/successful defense = half.
 
 ## Surges
-**Prime** at combat start: roll Sequence die × Prime (2; 3 at L5+). Doubles = **Amped** (0 Flux). Wild slot = roll Wild table.
-**Unleash** (Action): pay 1 Flux + 1 per Twist. **Churn** (Quick): +1 Flux, roll once more (max Prime + 1 held).
+**Prime** at combat start: roll Sequence die × Prime (2; 3 at L5+). Doubles = **Amped** (0 Flux). Wild slot = roll Wild table (each separately, never doubles).
+**Unleash** (Action): pay 1 Flux + 1 per Twist; a missed Strike/Bolt stays Primed. **Churn** (Quick): +1 Flux, roll once more (max Prime + 1 held).
 **Juice:** reroll a d20 · choose a Prime · end a condition.
 
 | Shape | Target | Stat | Dice |

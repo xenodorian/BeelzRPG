@@ -19,7 +19,7 @@ You don't pick a race or a class. You pick **how you carry yourself** (Stats), *
 | Number | Value |
 |---|---|
 | **Rank** | 1 |
-| **Max HP** | 12 + (2 × Grit). Gain **+5** each level after 1st. |
+| **Max HP** | 12 + (2 × Grit) + 5 per level after 1st. Recalculate if Grit changes. |
 | **Armor** | From gear and the Hide tree (max 4) |
 | **Speed** | 30 ft |
 | **Flux Limit** | 4 + Rank + Nerve (minimum 4) |
@@ -45,8 +45,8 @@ Stats are attitudes, not body parts. A gangly kid can have huge Grit; it means t
 | 1 | **Spill-Born** — raised in the flooded Wards. | *Scavenging* | Advantage on Endure against poison, disease, and anything that adds Flux to you. |
 | 2 | **Corporate Washout** — ex-Ostrander staff, fired or fled. | *Corporate Protocol* | Start with +100 Scrip. Once per mission, name an old contact who can open one door. |
 | 3 | **Lab Escapee** — you were the experiment. | *Lab Science* | You know **one extra Surge** at every level (it fills a Wild slot; no effect once your Sequence has no Wild slots). |
-| 4 | **Clinic Rat** — a street surgeon raised you, or still owns you. | *Street Medicine* | Your Patch action heals +Rank extra HP, and Augment installs cost you nothing (the doc wants a favour). |
-| 5 | **Ward Militia** — you held the barricades. | *Squad Tactics* | +2 to group initiative checks. Once per combat, take Brace as a Quick action. |
+| 4 | **Clinic Rat** — a street surgeon raised you, or still owns you. | *Street Medicine* | Your Patch action heals +Rank extra HP, and removing Scars or Faults costs you half (the doc wants favours instead). |
+| 5 | **Ward Militia** — you held the barricades. | *Squad Tactics* | +2 to your roll in group initiative checks. Once per combat, take Brace as a Quick action. |
 | 6 | **Bloom Convert** — the Children took you in. | *Bloom Lore* | Once per Lockdown, reroll an Overload result and choose either result. |
 
 ## Knack Examples

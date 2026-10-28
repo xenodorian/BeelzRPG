@@ -42,7 +42,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Thick.** +2 Max HP per level (count past levels too).
 - **Barbs.** When an enemy's melee attack damages you, it takes **2 × Rank** damage.
 - **Adaptive.** When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old.
-- **Bulwark.** *Reaction:* when an ally within 10 ft is targeted by an attack, you become the target instead and roll your own defense. **Push:** roll it with advantage.
+- **Bulwark.** *Reaction:* when an ally within 10 ft is targeted by a Single attack, you become the target instead and roll your own defense. **Push:** roll it with advantage.
 - **Apex — Unbreakable.** Once per round, when you fail a defense roll, **Push** to succeed instead. You can't be knocked Prone or moved against your will.
 
 ## LIMBS
@@ -61,7 +61,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 **Unlocks:** Glare, Veil.
 
 - **Root — Keen.** See in darkness out to 60 ft. Advantage on checks to notice hidden things. Bright light can't Blind you.
-- **Target Lock.** *Quick:* mark a creature you can see. Once per turn, your attack against it deals **+1 damage die**. The mark lasts until combat ends or you mark another.
+- **Target Lock.** *Quick:* mark a creature you can see. Once per turn, your attack against it deals **+1 damage die** (one more of that attack's dice). The mark lasts until combat ends or you mark another.
 - **Threat Sense.** You and your group can't be surprised. *Reaction:* when an ally within 30 ft makes a defense roll, add your Nerve to it (declare before rolling).
 - **Analyzer.** You can **Analyze** as a Quick action once per turn.
 - **Long Sight.** Double the range of your ranged attacks and ranged Surges. Ignore partial cover. Read lips at 300 ft.
@@ -84,7 +84,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 
 - **Root — Quickened.** +10 ft speed. You can **Dash** as a Quick action. Your group has advantage on initiative checks.
 - **Reflex Spike.** *Reaction:* when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker.
-- **Capacitor.** Once per turn when you hit with a melee attack, deal **+1 damage die** as Shock. **Push:** the target is also Dazed.
+- **Capacitor.** Once per turn when you hit with a melee attack, deal **+1 damage die** (one more of that attack's dice) as Shock. **Push:** the target is also Dazed.
 - **Slipstream.** You never provoke Opportunity Strikes, can move through enemies' spaces, and take **no** damage when you succeed on a Dodge against an area attack.
 - **Overclock.** Once per combat, take one extra Action on your turn, then gain 1 Flux.
 - **Apex — Blur.** You get two Moves each turn. If you've moved 20+ ft this turn, roll Dodge with advantage until your next turn.

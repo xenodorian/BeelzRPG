@@ -27,7 +27,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 | **Pulse** | Hide | Any creatures you choose within 10 ft of you | Grit | (Rank+1)**d6** |
 | **Infuse** | base | You or one ally within 30 ft | — (no roll) | Uses an Infuse Effect |
 
-**Area Shapes** (Burst, Wave, Pulse): roll one attack and compare it to each target's Guard. **Hit:** full damage + Effect. **Miss:** half damage, no Effect. Allies in a Burst or Wave are hit too (they roll Dodge against your attack total; success = no damage).
+**Area Shapes** (Burst, Wave, Pulse): roll one attack and compare it to each target's Guard. **Hit:** full damage + Effect. **Miss:** half damage, no Effect. Allies in a Burst or Wave are hit too (they roll Dodge against your attack total; success = half damage, no rider).
 
 **Dread** Surges may use **Chutzpah** in place of the listed attack stat.
 
@@ -87,7 +87,7 @@ You can leave a slot Wild on purpose. When you gain a level, you may **rewrite**
 At the start of each combat (after initiative), each freelancer rolls their **Sequence die** once per point of **Prime**. Each result's Surge is **Primed**: ready to Unleash this fight. Mark them.
 
 - **Doubles:** if two dice show the same Surge, it is Primed once and **Amped**: it costs **0 Flux** when Unleashed.
-- **Wild:** if a die shows a Wild slot, roll on the **Wild Surge table** right away. That result is Primed.
+- **Wild:** if a die shows a Wild slot, roll on the **Wild Surge table** right away. That result is Primed. Each Wild die rolls separately; Wild results never count as doubles.
 - **Juice:** spend 1 Juice to set one Sequence die to any result before you check for doubles.
 - **Chrome Firmware** (see [Augment Trees](03_Augment_Trees.md)) lets you swap one Primed Surge after rolling.
 
@@ -95,6 +95,8 @@ Unused Primed Surges fade when combat ends.
 
 ## Unleashing
 **Unleash** is an Action. Choose a Primed Surge, pay its **Flux** (1 + 1 per Twist; 0 if Amped), and resolve it. It is no longer Primed.
+
+**Missed?** If a Strike or Bolt Surge misses, the Flux is still paid but the Surge **stays Primed** (still Amped, if it was). Your body tried; it'll try again.
 
 ## Churning
 **Churn** is a Quick action: gain **1 Flux** and roll your Sequence die once; that Surge is Primed (doubles with an already Primed Surge make it Amped). You can't hold more Primed Surges than **Prime + 1**; if you would, choose which to drop.
@@ -109,18 +111,18 @@ When a Wild slot is Primed, roll here. Unless it says otherwise, it costs 1 Flux
 
 | d12 | Wild Surge |
 |---|---|
-| 1 | **Misfire.** Nothing happens when Unleashed, but it costs 0 Flux and you may Churn for free. |
-| 2 | **Spore Bloom.** Burst + Toxin with +2 dice, centred on **you**. Allies in it roll Dodge. |
+| 1 | **Misfire.** Your body sputters. This slot isn't Primed; instead, immediately Churn once for free (no Flux, no action). |
+| 2 | **Spore Bloom.** Burst + Toxin with +2 dice, centred on **you** (you're unaffected). Allies in it roll Dodge. |
 | 3 | **Arc Storm.** Bolt + Shock that hits up to three targets at full damage. You are Dazed afterward. |
 | 4 | **Hardening.** Shell on you and every ally within 10 ft. Your speed is 0 until your next turn. |
-| 5 | **Blood Price.** Strike + Kinetic with +3 dice. You take Rank d6 damage (ignores Armor). |
+| 5 | **Blood Price.** Strike + Kinetic with +2 more dice. You take Rank d6 damage (ignores Armor). |
 | 6 | **Echo.** Unleash a copy of any Surge an ally currently has Primed (it stays Primed for them). |
 | 7 | **Mitosis.** A shuddering copy of you appears adjacent. It acts on your turn (Move + one weapon attack, using your numbers). When an enemy attacks it, you roll Dodge for it; any failure destroys it. It melts at the end of combat. |
 | 8 | **Phase Step.** Teleport up to 60 ft, then Strike + Kinetic a creature next to you. |
 | 9 | **Gravity Knot.** Burst with both Quake and Snare riders. |
-| 10 | **Feedback.** Pulse + Dread with a 30-ft radius. Costs 2 Flux. |
+| 10 | **Feedback.** Pulse + Dread with a 20-ft radius. Costs 2 Flux. |
 | 11 | **Flush.** Costs 0 Flux. Set your Flux to 0 and regain Rank d8 HP. |
-| 12 | **Perfect Expression.** Costs 0 Flux and takes no Action: Prime any two of your Surges as Amped. |
+| 12 | **Perfect Expression.** Unleash it as a Quick action for 0 Flux: Prime any two of your Surges as Amped (this can exceed your Primed maximum). |
 
 ---
 

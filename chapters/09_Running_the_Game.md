@@ -44,7 +44,7 @@ Each freelancer picks **one**:
 
 ## Rewards
 - **Levels:** one per mission ([Advancement](07_Advancement.md)).
-- **Scrip:** 100 × mission level each, plus bonuses for style or recovered Samples.
+- **Scrip:** 200 + (100 × mission level) each, plus bonuses for style or recovered Samples.
 - **Samples:** from Bosses and some Elites.
 - **Juice:** in the moment.
 

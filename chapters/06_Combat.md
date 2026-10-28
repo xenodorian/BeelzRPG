@@ -48,7 +48,7 @@ Draw or stow an item, open a door, drink a stim, speak a few sentences, **Churn*
 
 ## Attacking
 Roll **d20 + stat + Rank** against the target's **Guard**.
-- **Melee:** Grit (Heavy and power weapons) or Moxie (finesse weapons and claws). See [Gear](08_Gear.md).
+- **Melee:** the stat listed for the weapon in [Gear](08_Gear.md) (Grit for heavy hitting, Moxie for finesse; many weapons allow either).
 - **Ranged:** Nerve. You can shoot to double the listed range with disadvantage. Shooting while an enemy is adjacent to you is at disadvantage.
 - **Crit** on a natural 20: roll the damage dice twice.
 

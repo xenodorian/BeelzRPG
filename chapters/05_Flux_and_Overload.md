@@ -1,5 +1,7 @@
 # 5. Flux & Overload
 
+![A Splice freelancer](../art/char_splice.jpg)
+
 Every Surge, every Push, every Churn floods your cells (or circuits) with Mutagen. **Flux** measures how close you are to losing control.
 
 ## Flux
