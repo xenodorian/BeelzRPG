@@ -53,3 +53,4 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 | 10 | [Threats](10_Threats.md) | Threat builder and sample foes |
 | 11 | [Starter Mission](11_Starter_Mission.md) | *Pumpstation 9* |
 | 12 | [Quick Reference](12_Quick_Reference.md) | Everything on one page |
+| 13 | [Character Building Guide](13_Character_Building_Guide.md) | Step-by-step build, leveling, archetypes, worked example |

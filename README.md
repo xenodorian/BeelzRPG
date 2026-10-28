@@ -28,6 +28,7 @@
 | 10 | [Threats](chapters/10_Threats.md) |
 | 11 | [Starter Mission: *Pumpstation 9*](chapters/11_Starter_Mission.md) |
 | 12 | [Quick Reference](chapters/12_Quick_Reference.md) |
+| 13 | [Character Building Guide](chapters/13_Character_Building_Guide.md) |
 | — | [Character Sheet (Markdown)](sheets/Character_Sheet.md) · [Printable HTML](sheets/Character_Sheet.html) |
 
 **New to the game?** Read chapters 0, 1, and 12, grab a pregen from chapter 11, and play.

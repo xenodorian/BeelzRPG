@@ -31,6 +31,7 @@
 | `chapters/10_Threats.md` | Threat table, roles, traits, budget, 12 threats + 1 boss | |
 | `chapters/11_Starter_Mission.md` | *Pumpstation 9* + 4 pregens | |
 | `chapters/12_Quick_Reference.md` | One-page cheat sheet | Update when rules change |
+| `chapters/13_Character_Building_Guide.md` | Step-by-step build (L1), leveling 1–10, archetypes, common mistakes, worked example (Dree, L1 + L5) | Player-facing summary; rules chapters win on conflict. Update its tables if ch 2–8 numbers change |
 | `sheets/Character_Sheet.md` / `.html` | Fillable/printable sheet | |
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
 | `tools/balance_sim.py` | Monte Carlo combat sim | Re-run after number changes |
@@ -119,6 +120,9 @@
 - [x] 11 Starter Mission (+4 pregens)
 - [x] 12 Quick Reference
 - [x] Character sheet (Markdown + printable HTML)
+- [x] 13 Character Building Guide (2026-10-28)
+- [ ] Guide sanity check
+- [ ] HTML character builder (`builder/index.html`)
 
 ### Quality
 - [x] Math pass: hit/defense odds per level, damage vs HP, encounter budget (see Balance)
@@ -202,6 +206,7 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - **Findings:** Wild rule gap, Spore Bloom self-hit, and Blood Price spike fixed. Single-target burst at L5+ (Strike + Kinetic + Overcharge ≈ 7d10+stat for 2 Flux, ~42) is high but can't one-shot a same-level Soldier (46 HP) on average; **watch in live play.** Brutes melt fast under focused Surges. That's intended as the payoff, but GMs can add Shielded/Armored.
 
 ## Issues Log
+- 2026-10-28 — **Guide (ch 13) rules calls** where chapters 2–8 were ambiguous; ch 13 now states them, the builder implements them: (a) Flux Limit minimum 4 applies *before* the Splice −1 (a Splice can have Limit 3). (b) A Splice keeps each tree's Form rules: Knit counts Bio trees, Firmware counts Chrome-tree parts, Chrome trees still cost Upkeep and give disadvantage vs Shock. (c) You wear one armor (Light *or* Heavy) plus an optional Shield. (d) Natural Weapons are a Frame and can take a Mod; Spit and Mind Spike can't. (e) Knacks: 3 at L1, +1 at L4 and L8 (5 total), plus Blossoms. (f) Thick = +2 × level total.
 - 2026-10-28 — `git commit` failed: no author identity on the box. Set the repo-local identity to the owner's GitHub noreply address.
 - 2026-10-28 — Homebrew `.docx` files were read via python-docx (text + tables). The 15.6 MB 4M doc is mostly images; only text was used. Takeaways: d20 + modifiers, player Dodge rolls instead of AC, simultaneous enemy turns, "Required" root boons in subdomains, grievous injury tables, GM reward tokens (Dimes → **Juice**), levels per mission, cap level 10, corporate dispatcher premise (ATRaC, M.O.T.H. → **GRAFT**).
 - 2026-10-28 — Tree unlock counts are uneven (Glands unlocks 4 parts, Limbs/Senses/Mind 2). Accepted: Glands nodes are utility-heavy. Revisit after playtest.
