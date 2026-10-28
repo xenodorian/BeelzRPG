@@ -121,7 +121,7 @@
 - [x] 12 Quick Reference
 - [x] Character sheet (Markdown + printable HTML)
 - [x] 13 Character Building Guide (2026-10-28)
-- [ ] Guide sanity check
+- [x] Guide sanity check (2026-10-28; see *Guide Sanity Check*)
 - [ ] HTML character builder (`builder/index.html`)
 
 ### Quality
@@ -263,6 +263,23 @@ The core loop (d20 + Stat + Rank, player-facing defense, T/Role/Trait threats) w
 **No must-take or trap remains:** every tree now adds at least one of damage, toughness, or party support by level 5. Mind (lowest personal damage) and Glands (no personal damage) are deliberate support trees. Their healing, control, and stat-sharing isn't in the model.
 
 **Dominant combos checked:** Wiring + Limbs + Senses melee (Capacitor + Extra Arm + Target Lock = +3 dice/turn) is the highest damage build. It's capped by the "once per turn" wording on all three, and the six L5 nodes it needs leave no room for Reflex Spike. It lands at ~27 DPR at L5 (+52%), about the same as pure Wiring, with no defense. Hide + Glands (Regenerate + Armor + Thick) is the toughest build but deals baseline damage. No infinite loops found: Haste can't grant Unleash, Overclock is per Breather, Misfire's Churn chain ends on a non-Misfire, and Perfect Expression/Echo are bounded single uses.
+
+## Guide Sanity Check 2026-10-28 (ch 13)
+Cold reread of ch 13 against a checklist of every character component in ch 1–8, a hand recompute of every number in the worked example, and a link/anchor check (all resolve except `../builder/index.html`, added in the next commit).
+
+**Component checklist (all ✓ in ch 13):** concept · stat array · stat→role guidance · 6 Origins + numeric perks · Knacks (3 / +1 L4 / +1 L8, Blossom) · node count · Root-first · Form per tree · Bio/Chrome/Splice perks and costs · Push · Root unlocks (all 6) · Root attacks (Natural Weapons, Spit, Mind Spike) · Apex gating · respec · Surge Shape/Effect/Twist rules, Twist compatibility, Twist count by Rank, Flux cost, dice formulas, Kinetic/Overcharge dice, Dread→Chutzpah, allies in areas · Sequence die, Surges known, Wild slots, Wild table, Prime, rewrite, leaving slots Wild · Lab Escapee extra Surge · Hive Mind Prime · starting kits + common items · Scrip (50, Washout, Face) · Mods (one per weapon) · armor (one suit + Shield, max 4) · Upkeep (incl. Smart-Link, prepaid first) · Rank, HP (Grit, Thick), Armor (Plating scaling), Speed (Quickened, Spring Legs, Heavy, Hollow Bones), defenses, Flux Limit (Splice) · Juice · trackers (Flux, Death marks, Breathers, Last Gasp) · Drive · level table 1–10 · stat boosts (two different, max +5) · Final Form · Scars/Faults that change numbers · Injuries · Samples · mission pay.
+
+| # | Finding | Fix |
+|---|---|---|
+| 1 | Archetype table repeated 3 of ch 3's six pairs (Hide+Limbs, Wiring+Glands, Senses+Mind) under new names. | Replaced with the **nine pairs ch 3 doesn't cover**, so the two tables together list all 15 two-tree pairs. |
+| 2 | Area Shapes' attack stats were crammed into one ambiguous row ("Nerve / Grit or Nerve / Grit"). | One row per Shape, with area size and range. |
+| 3 | Push, the Wild table, Final Form, and allies being hit by Burst/Wave weren't mentioned. | One line each, with links. |
+| 4 | "Don't fill Wild slots" contradicted Lab Escapee, Samples, and the rule that you may leave slots Wild on purpose. | Reworded as "Surges known = level + 2 (exceptions); you may leave slots Wild." |
+| 5 | Splice row implied Splices skip Chrome's costs. | States that Splices keep Upkeep and Shock disadvantage for their Chrome trees (decision logged in Issues Log). |
+| 6 | Worked example *Toxic Cloud* applied Reach to both range and radius ("double range **or** area"). | Reach doubles the radius only. |
+| 7 | Stat advice "your lowest defense fails about half the time" was vague. | Rewritten as one concrete line about the −1 stat. |
+
+**Worked example verified:** Dree L1: HP 12, Limit 6 (4+1+2−1), Dodge +4/Endure +1/Resist +3, Speed 40, 3 legal Surges (base + Wiring/Glands parts, no Twists) + 1 Wild, 25 Scrip after a Medkit. Dree L5: 6 nodes (2 Roots + 4 non-Apex nodes), HP 34 (12+2+20), Limit 9, Dodge +6/Endure +4/Resist +6, 7 Surges on a d8 (1 Wild), Twists legal (≤2, different, Shape-compatible), Jolt 6d8+3, Burning 6, Stim Gland 3d6+1, Purge 4. Guide is ~2,800 words, about half of it tables.
 
 ## Open Questions (owner / future contributors)
 1. Should Bio vs Chrome have a social dimension (e.g. "Humanity" or faction reactions)? Currently only Scars/Faults touch it.

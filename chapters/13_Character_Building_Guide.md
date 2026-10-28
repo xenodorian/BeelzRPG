@@ -39,7 +39,7 @@ Assign **+3, +2, +1, +0, −1**, one each. Put +3 in the stat you'll **attack wi
 | Heal, hack, poison | Gumption (Spit, Patch, Analyze) | Nerve |
 | Talk, scare, lead | Chutzpah (Mind Spike, Dread, Taunt, Rally) | Nerve |
 
-Don't dump Nerve unless you plan to Surge rarely: −1 Nerve means a Limit of 4. Your lowest defense will fail about half the time.
+Your −1 stat is also a weak defense (or, for Nerve, a Flux Limit of 4), so dump the one you'll be tested on least.
 
 ### 3. Origin
 Roll d6 or choose. Write its **Knack** and **Perk**. Perks with numbers: *Corporate Washout* +100 Scrip; *Lab Escapee* +1 Surge known; *Clinic Rat* +Rank to Patch; *Ward Militia* +2 on group initiative.
@@ -52,7 +52,7 @@ Take **two nodes**. A tree's **Root** must come first, so you take either:
 - **Two Roots** (two trees, more Surge parts), or
 - **one Root + one node** in the same tree (deeper, fewer parts).
 
-For **each tree**, pick its **Form** when you take the Root. Every later node in that tree shares it.
+For **each tree**, pick its **Form** when you take the Root. Every later node in that tree shares it. Nodes marked **Push** let you take 1 Flux for an extra effect in play.
 
 | You have | You are | Perk | Cost |
 |---|---|---|---|
@@ -65,7 +65,7 @@ For **each tree**, pick its **Form** when you take the Root. Every later node in
 Three Roots give you a weapon-like attack: **Natural Weapons** (Limbs, d8 melee, Grit/Moxie), **Spit** (Glands, d8, 30 ft, Nerve/Gumption) and **Mind Spike** (Mind, d8, 60 ft, Nerve/Chutzpah).
 
 ### 6. Surges and the Sequence
-Build **3 Surges** (4 for a Lab Escapee) and write them in Sequence slots **1–3**. Your **Sequence die is d4**, so slot **4 is Wild** (a Lab Escapee fills it). Prime is **2**.
+Build **3 Surges** (4 for a Lab Escapee) and write them in Sequence slots **1–3**. Your **Sequence die is d4**, so slot **4 is Wild**: when it's Primed, you roll on the [Wild Surge table](04_Surges.md#wild-surge-table-d12) instead (a Lab Escapee fills it). Prime is **2**.
 
 **The Surge recipe:**
 1. **Shape:** any base Shape (**Strike, Bolt, Infuse**) or one your Roots unlocked.
@@ -78,12 +78,14 @@ Build **3 Surges** (4 for a Lab Escapee) and write them in Sequence slots **1–
 
 | Shape | Attack | Damage |
 |---|---|---|
-| Strike | Grit or Moxie + Rank | (Rank+1)d10 + stat |
-| Bolt | Nerve + Rank | (Rank+1)d8 + stat |
-| Burst / Wave / Pulse | Nerve / Grit or Nerve / Grit + Rank | (Rank+1)d6 (no stat) |
-| Infuse | no roll | per Effect |
+| Strike (melee) | Grit or Moxie + Rank | (Rank+1)d10 + stat |
+| Bolt (60 ft) | Nerve + Rank | (Rank+1)d8 + stat |
+| Burst (10-ft radius, 60 ft) | Nerve + Rank | (Rank+1)d6, no stat |
+| Wave (15-ft cone / 30-ft line) | Grit or Nerve + Rank | (Rank+1)d6, no stat |
+| Pulse (10 ft around you) | Grit + Rank | (Rank+1)d6, no stat |
+| Infuse (you or an ally, 30 ft) | no roll | per Effect |
 
-Add **+1 die** for Kinetic and **+2 dice** for Overcharge. **Dread** Surges may attack with Chutzpah.
+Add **+1 die** for Kinetic and **+2 dice** for Overcharge. **Dread** Surges may attack with Chutzpah. Burst and Wave hit allies in the area too.
 
 **A good first three:** one **reliable damage** Surge in your best stat, one **control** Surge (a rider that fits your trees), and one **Infuse** or **area** Surge for the team. Avoid three that all need the same situation.
 
@@ -100,7 +102,7 @@ Take one **Starting Kit** ([Ch 8](08_Gear.md#starting-kits)). All include Light 
 | **Rank** | ⌈level ÷ 2⌉ (1 at level 1) |
 | **Max HP** | 12 + 2 × Grit + 5 × (level − 1); Hide *Thick* +2 × level |
 | **Armor** | Light 1 / Heavy 2, Shield +1, *Plating* +1 (+2 from Rank 3); max 4 |
-| **Speed** | 30 ft; +10 *Quickened*, +10 *Spring Legs*, −5 Heavy armor |
+| **Speed** | 30 ft; +10 *Quickened*, +10 *Spring Legs*, −5 Heavy armor (+5 *Hollow Bones*) |
 | **Defenses** | Dodge = Moxie + Rank · Endure = Grit + Rank · Resist = Nerve + Rank |
 | **Flux Limit** | 4 + Rank + Nerve, minimum 4; then −1 if Splice |
 | **Attack** | stat + Rank; damage Rank × die + stat |
@@ -135,6 +137,8 @@ One mission = one level ([Ch 7](07_Advancement.md)). Each level, in order:
 | 9 | 5 | 10 | 11 | d12 | 1 | 3 | Stat boost |
 | 10 | 5 | 11 | 12 | d12 | 0 | 3 | Final Form |
 
+**Final Form:** once per Lockdown at the start of a combat: every Surge you Unleash is Amped and you Prime two extra.
+
 - **Stat boost:** +1 to **two different** stats, max +5. Raising Grit raises HP for every level; raising Nerve raises your Limit.
 - **Lab Escapee** has one fewer Wild slot (none at level 10). Hive Mind adds +1 Prime.
 - **In play** you may also gain: **Scars/Faults** from Overloads (some change numbers: *Hollow Bones*, *Drained Cell*, *Brittle Shell*, *Sticky Relay*), a **Blossom** Knack, *Patch Applied* (+1 Limit), **Injuries** until Lockdown, and **Samples** (a Surge spliced into a Wild slot for 100 Scrip; it may use the Boss's parts).
@@ -145,21 +149,21 @@ One mission = one level ([Ch 7](07_Advancement.md)). Each level, in order:
 ---
 
 ## Mix-and-Match Archetypes
-Pick a **pair of trees**, choose each tree's Form, then add any Origin and kit. Six pairs are in [Ch 3](03_Augment_Trees.md#building-with-trees-sample-archetypes); here are more, with a signature Surge from their unlocks.
+Pick a **pair of trees**, choose each tree's Form, then add any Origin and kit. Six pairs are in [Ch 3](03_Augment_Trees.md#building-with-trees-sample-archetypes); these are the other nine, each with a signature Surge from its unlocks.
 
 | Archetype | Trees (suggested Form) | Best stat | Kit | Signature Surge |
 |---|---|---|---|---|
-| **Bouncer** | Hide + Limbs (Bio) | Grit | Bruiser | Pulse + Quake: everyone around you falls down |
-| **Duelist** | Limbs + Wiring (Chrome) | Moxie | Sneak | Strike + Shock + Chain |
-| **Sniper** | Senses + Wiring (Chrome) | Nerve | Gunhand | Bolt + Glare + Sure |
-| **Plague Doc** | Glands (Bio) + Mind | Gumption | Medic | Burst + Toxin + Linger |
-| **Sparkplug** | Wiring (Chrome) + Glands (Bio), Splice | Nerve | Gunhand | Burst + Blaze + Linger |
-| **Preacher** | Mind (Bio) + Hide | Chutzpah | Face | Bolt + Dread (Chutzpah) |
-| **Wall** | Hide (Chrome) + Senses | Grit | Wardrunner | Infuse + Shell + Sure |
-| **Ghost** | Senses + Mind (Chrome) | Nerve | Sneak | Bolt + Kinetic + Hush |
-| **Wrangler** | Limbs + Glands | Grit | Bruiser | Wave + Snare |
+| **Wall** | Hide + Senses (Chrome) | Grit | Wardrunner | Infuse + Shell + Sure |
+| **Mender** | Hide + Glands (Bio) | Gumption | Medic | Infuse + Mend + Sure |
+| **Juggernaut** | Hide + Wiring (Chrome) | Grit | Bruiser | Pulse + Shock |
+| **Ghost** | Limbs + Senses (Chrome) | Moxie | Sneak | Strike + Kinetic + Hush |
+| **Wrangler** | Limbs + Glands (Bio) | Grit | Bruiser | Wave + Snare |
+| **Enforcer** | Limbs + Mind (Bio) | Chutzpah + Grit | Face | Strike + Dread (Chutzpah) |
+| **Plague Hunter** | Senses + Glands (Bio) | Nerve | Gunhand | Burst + Glare + Reach |
+| **Sniper** | Senses + Wiring (Chrome) | Nerve | Gunhand | Bolt + Shock + Sure |
+| **Netrunner** | Wiring + Mind (Chrome) | Nerve | Face | Bolt + Dread + Chain |
 
-**Three-tree builds** (third Root at level 2–4) trade depth for Surge variety. One deep tree reaches its Apex soonest.
+**Three-tree builds** (third Root at level 2–4) trade depth for Surge variety. One deep tree reaches its Apex soonest. Mixing Forms (Splice) is legal in any pair.
 
 ## Common Mistakes
 - **Taking a non-Root node first.** Every tree starts at its Root.
@@ -169,7 +173,7 @@ Pick a **pair of trees**, choose each tree's Form, then add any Origin and kit. 
 - **Adding the stat to area damage.** Burst, Wave and Pulse roll dice only.
 - **Forgetting Splice −1 Limit** or **Chrome Upkeep** (and disadvantage vs Shock).
 - **Armor over 4,** or wearing Light and Heavy together.
-- **Filling Wild slots.** You can't know more Surges than the table says; Wild slots are supposed to be there (Lab Escapee and Samples aside).
+- **Knowing too many Surges.** Surges known = level + 2 (Lab Escapee +1, Samples extra); the rest are Wild, on purpose. You may also leave a slot Wild by choice.
 - **Recalculating HP from the new level only.** Grit and *Thick* count for every level.
 - **Taking an Apex early.** Level 7+ and three other nodes in that tree.
 
