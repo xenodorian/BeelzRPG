@@ -36,7 +36,9 @@
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
 | `tools/balance_sim.py` | Monte Carlo combat sim | Re-run after number changes |
 | `builder/index.html` | Character builder web app (single offline file; GitHub Pages: https://xenodorian.github.io/BeelzRPG/builder/) | **Game data lives in the `MUTAGEN` object in the first `<script>`**; update it with any rule change in ch 2–8 |
-| `tools/builder_test.js` | Headless builder test (jsdom) | Run after editing the builder or its data |
+| `tools/builder_test.js` | Headless builder test (jsdom), incl. regression tests R1–R14 | Run after editing the builder or its data (`npm i jsdom`) |
+| `tools/check_builder_data.js` | Cross-checks the builder data block against chapter tables (320 checks) | Run after any rules change; no dependencies |
+| `tools/builder_flows.js` | Real-browser flow tests (Playwright + Chrome) | `npm i playwright-core`; set `CHROME=/path/to/chrome` |
 | `tools/tree_compare.py` | Per-tree expected DPR / HP lost / Flux per fight at L1, L5, L10 | Re-run after node changes |
 
 ## Style Guide
@@ -296,6 +298,50 @@ A single self-contained HTML file (inline CSS/JS, no CDNs, no build step). Works
 **GitHub Pages:** enabled 2026-10-28 (branch `main`, root, legacy Jekyll build). Live at https://xenodorian.github.io/BeelzRPG/builder/ and verified in headless Chrome (loads, art loads, example legal, no errors). On Pages, the builder's chapter links point to GitHub's rendered `.md`; offline they're relative. The first Pages build errored (it overlapped a second push) and the next one succeeded; if a build fails, check `gh api repos/xenodorian/BeelzRPG/pages/builds`.
 
 **Builder decisions (also in ch 13):** Splice Limit floor (min 4, then −1); one armor + Shield; Mods allowed on Natural Weapons but not Spit/Mind Spike; Knacks over the allowed count are a warning (Blossoms), not an error; Scrip after level 1 is a manual ledger with an "estimate from missions" button (pay 200 + 100 × level minus current Upkeep per mission), since campaign spending varies.
+
+## Builder Sanity Check 2026-10-28
+A skeptical second pass over `builder/index.html`: a rules cross-check script, real user flows in headless Chrome (Playwright, from `file://`), a keyboard/label/contrast audit, and malformed-input fuzzing. **Verdict:** the rules data and core maths were right. The serious problems were robustness (a bad import or save could break the page) and accessibility (keyboard focus was lost on every change). Both are fixed, along with 6 smaller rules gaps.
+
+**Rules fidelity.** New `tools/check_builder_data.js` (no dependencies) parses the chapter tables and compares them to the data block: level table (ch 7 and ch 13), Origins and Knacks, HP/Flux/Scrip/stat-array constants, tree stats/roles/unlocks, every node name with its Root/Apex and Push flags, Shapes (unlock, target, stats, die, adds stat), Effects (unlock, type, kind), Twists (names, "works with"), Wild table, sample Surges (build and Flux), Frames (die, stats, range, cost), Mods, Armor, Items, Kits, Scars/Faults, Juice, pay, Final Form. **320 checks, 0 mismatches.** A word-level text diff of all 36 node texts found two dropped clauses (below). Every printable field in `sheets/Character_Sheet` is on the builder's sheet.
+
+| # | Severity | Bug / mismatch | Fix |
+|---|---|---|---|
+| 1 | **High** | Importing a malformed or old JSON (e.g. `"surges":"abc"`, `"knacks":"k"`, string `twists`, an unknown Form) threw on render. The page went blank, and a damaged autosave or save could break it on reload. | `normalize()` now rebuilds every field with type checks and drops unknown ids. Import only accepts objects that look like characters, `replaceState()` rolls back on any error, and a corrupt autosave falls back to a blank character. (R1) |
+| 2 | **High** (a11y) | Every select/checkbox change re-rendered the panel and dropped keyboard focus to `<body>`. Keyboard users couldn't fill the form. | Focus is restored to the same control after each render, and step changes move focus to the step heading. (R11) |
+| 3 | Med | An imported `trees` value went unescaped into a `class` attribute (attribute injection), and `D.forms[bad]` crashed. | Forms must be `bio` or `chrome`. Class and name lookups are guarded. (R1) |
+| 4 | Med | Lowering the level flagged stale picks but gave no way to fix them except hand-editing. | A **"Fit picks to level N"** button appears when needed. It drops extra or early-Apex nodes (newest first; a Root stays while its tree has nodes), extra Surges from the end, extra Twists and Knacks, and later stat boosts. (R7) |
+| 5 | Med | A page refresh reset you to step 1, and the browser Back button left the app. | The step lives in the URL (`#step-N`). Back/Forward move between steps and a refresh keeps your place. (R12) |
+| 6 | Med | When storage was full or disabled, Save failed silently and autosave was off without any notice. | Save shows an alert, and the header shows "Autosave off… use Export". (R13) |
+| 7 | Med | A very long name (300 chars) stretched the page to 4,483 px wide. | Text wraps everywhere (`overflow-wrap:anywhere`), and inputs have `maxlength`. |
+| 8 | Med | 30+ form controls had no accessible name (stat selects, boosts, Knacks, Surge name/Shape/Effect, kit and mod selects, armor). | All controls are labelled (`aria-label`/`title`). Summary messages are focusable buttons, and there's a visible `:focus-visible` ring. (R14) |
+| 9 | Rules | Extra Arm and Capacitor bonus dice weren't shown on Unarmed, though the rules say "a melee attack". | Fixed. (R2) |
+| 10 | Rules | Deadeye's 18–20 Crit (which covers "ranged Surges") wasn't shown on Bolt/Burst Surges. | Shown on ranged Surge lines. (R3) |
+| 11 | Rules | Grapnel's 10-ft reach wasn't shown on Strike Surges. | Shown. (R4) |
+| 12 | Rules | Sample splice cost (100 Scrip, ch 7) wasn't charged. | Charged in the Scrip ledger. (R5) |
+| 13 | Rules | Injuries (ch 6) weren't modelled, though the sheet has an Injuries field. | Injury checkboxes on step 7; Cracked Ribs −5 HP, Ruptured Gland −2 Limit, Torn Limb (leg) −10 speed; printed on the sheet. (R6) |
+| 14 | Rules | Node text dropped clauses from ch 3: Adaptive "a new type replaces the old", Puppet "no rider", Spit "choose each time". | Restored. |
+| 15 | Low | The armor-cap warning badged the wrong step (Extras instead of Gear). | Fixed. (R8) |
+| 16 | Low | The sheet showed only 5 Knacks, so Blossom Knacks were lost. | It shows all of them. (R9) |
+| 17 | Low | Changing a Surge's Shape wiped all its Twists, even ones that still fit. | Twists that still fit are kept. (R10) |
+| 18 | Low | You couldn't buy a weapon or mod Natural Weapons until you'd picked a kit. | The weapons table always shows. |
+| 19 | Low | Even a level 1 sheet printed on 2 pages (1,184 px tall). | A compact print stylesheet. |
+| 20 | Low | The sheet's Sequence header note was #555 on #222 (unreadable), and the "sample list" dropdown was confused with harvested Samples. | Contrast fixed. Renamed to "Example Surge (ch 4)", with a tooltip on "Harvested Sample". |
+| 21 | Low | (Found by the new 400-case stress test.) The first version of "Fit picks" could drop a lone Root whose tree still unlocked a kept Surge's Shape/Effect, leaving the character illegal. | It now trims non-Roots first, then unused lone Roots, and then removes Surges whose parts lost their unlock. (R7) |
+
+**UX improvements:** a plain-language intro on step 1, tooltips on every summary number giving its formula, the Fit-to-level button, a Heavy armor/Shield cost and speed note in the picker and on the sheet, and export files tagged `app`/`rules` version. Checked and fine: 375 px mobile (no horizontal overflow on any step), performance (~1 ms per full render), switching Bio/Chrome and Splice on/off (Limit, Upkeep and ⚙ Firmware marks update), removing a Root (its nodes go and Surges using its parts are flagged), reordering, and overspending (flagged).
+
+**Tests:** `tools/builder_test.js` (jsdom) adds regression tests R1–R14 above, on top of the earlier suite (worked example, 3,000 random characters, 13 illegal builds). `tools/check_builder_data.js` checks the rules against the data block. `tools/builder_flows.js` (Playwright + Chrome) covers real user flows: keyboard focus, level down + fit, Root removal, Form switching, reordering, overspending, hostile imports, reload persistence, Back button, long names, 375 px layout, storage disabled/full, unlabelled controls, print page counts at L1/L5/L10, and console errors. **Status:** the jsdom suite and the data check pass (ALL TESTS PASSED, 0 JS errors; 320 checks, 0 mismatches). The flow probe ran in Chrome *before* the fixes and found bugs 1–2, 5–8 and 19. `builder_flows.js` was written afterwards, but the build sandbox then blocked Chrome launches, so it has **not yet been run against this build**. Next contributor with a browser: run it and log the result here. Any failures are more likely selector drift than app bugs.
+
+### Builder backlog (bigger ideas, not done)
+- [ ] **Play mode:** Prime/Churn roller, Flux tracker with Overload prompts, HP/Juice/Death-mark counters on the saved character.
+- [ ] **Level history:** record which node and Surge came at which level, so respecs and "level down" are exact instead of newest-first.
+- [ ] **Shareable link:** compress the character into the URL hash (no server).
+- [ ] **Hands check:** warn on a two-handed weapon plus Shield, or more held items than hands (Extra Arm adds one).
+- [ ] **Pregens as examples:** add the four ch 11 pregens to the Example menu (and test their numbers like Dree's).
+- [ ] **Single data source:** move the `MUTAGEN` block to `data/mutagen.json`, used by the builder (inlined at release), `tree_compare.py`, and the checker, so rules live in one place.
+- [ ] **Party view:** load several saves side by side for the GM (defenses, Limits, roles).
+- [ ] **Undo/redo** and a "changes since last save" indicator.
+- [ ] **Optional explicit Form choice:** today a new Root defaults to Bio. A setting could force an explicit choice for teaching.
 
 ## Open Questions (owner / future contributors)
 1. Should Bio vs Chrome have a social dimension (e.g. "Humanity" or faction reactions)? Currently only Scars/Faults touch it.

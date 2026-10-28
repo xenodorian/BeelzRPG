@@ -66,19 +66,26 @@ details{margin-top:10px}summary{cursor:pointer;color:var(--acid)}
 .sheet .g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.sheet .small{font-size:10px;color:#222}.sheet small{color:#555}.sheet tr.off td{background:#f3f3f3;color:#bbb}
 .sheet .bx{display:inline-block;width:11px;height:11px;border:1px solid #333;margin-right:2px;vertical-align:middle}.sheet .feats{margin:2px 0;padding-left:16px}.sheet p{margin:2px 0}
 #printArea{display:none}
+:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
+aside h3,.card,.node,.slot .line,.msgs button,.sheet td,.sheet p,.formbox{overflow-wrap:anywhere}
+.intro{background:var(--pan2);border-left:3px solid var(--acid2);padding:8px 10px;border-radius:6px;font-size:14px}
+.msgs li button{all:unset;display:block;width:100%;cursor:pointer;padding:1px 0}.msgs li button:focus-visible{outline:2px solid var(--acid)}
+.btn.trim{width:100%;margin:4px 0;border-color:var(--warn);color:var(--warn)}
+#saveNote{color:var(--warn);font-size:12px}
+.sheet h2 small{color:#cfd8d3}
 @media (max-width:860px){header{position:static}main{grid-template-columns:1fr}aside{position:static;order:-1}.nums{grid-template-columns:repeat(4,1fr)}header h1{font-size:18px}.msgs{max-height:none}}
-@media print{@page{size:letter;margin:.4in}body{background:#fff}#app{display:none!important}#printArea{display:block!important}.sheet h2{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+@media print{@page{size:letter;margin:.35in}body{background:#fff}.sheet{font-size:9.5px;max-width:none}.sheet td,.sheet th{padding:1px 3px}.sheet h1{font-size:18px}.sheet h2{font-size:10.5px;margin:5px 0 2px;padding:1px 5px}.sheet .small{font-size:9px}.sheet tr.off td{padding:0 3px;font-size:8px}#app{display:none!important}#printArea{display:block!important}.sheet h2{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
 <body>
 <div id="app">
 <header><h1>MUTAGEN<small>Character Builder · v0.1.1</small></h1>
 <div class="tools">
-<select id="lvlTop" aria-label="Level"></select>
+<select id="lvlTop" aria-label="Character level"></select>
 <button id="btnRandom" title="Random legal character at this level">⚄ Random</button>
 <select id="exSel" aria-label="Load example"><option value="">Example…</option><option value="dree1">Dree, level 1 (guide)</option><option value="dree5">Dree, level 5 (guide)</option></select>
 <button id="btnNew">New</button><button id="btnSave">Save</button><select id="loadSel" aria-label="Load saved"></select>
-<button id="btnExport">Export</button><button id="btnImport">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden>
+<button id="btnExport" title="Download this character as a .json file">Export</button><button id="btnImport" title="Load a character from an exported .json file">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden aria-label="Import character file"><span id="saveNote" role="status"></span>
 </div></header>
 <nav id="steps"></nav>
 <main><section><div id="panel"></div><div class="nav"><button id="prevB">← Back</button><button id="nextB" class="btn pri">Next →</button></div></section><aside id="summary"></aside></main>
@@ -149,7 +156,7 @@ const MUTAGEN = {
         { id: "plating", name: "Plating", root: true, text: "+1 Armor (+2 from Rank 3). Armor from all sources maxes at 4.", fx: { armor: 1, armorRank3: 2 } },
         { id: "thick", name: "Thick", text: "+2 Max HP per level (count past levels too).", fx: { hpPerLevel: 2 } },
         { id: "barbs", name: "Barbs", text: "When an enemy's melee attack damages you, it takes {2R} damage." },
-        { id: "adaptive", name: "Adaptive", text: "When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time." },
+        { id: "adaptive", name: "Adaptive", text: "When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old." },
         { id: "bulwark", name: "Bulwark", push: true, text: "Reaction: when an ally within 10 ft is targeted by a Single attack, you become the target and roll your own defense. Push: roll it with advantage." },
         { id: "unbreakable", name: "Unbreakable", apex: true, push: true, text: "Once per round, when you fail a defense roll, Push to take half damage and ignore its rider. You can't be knocked Prone or moved against your will." }
       ] },
@@ -176,7 +183,7 @@ const MUTAGEN = {
     { id: "glands", name: "Glands", stats: "Gumption / Grit", role: "Chemist, healer, attrition", unlocks: ["burst", "toxin", "corrode", "mend"],
       bio: "venom sacs, acid glands, healing bile, spore pods", chrome: "chem injectors, nanite reservoirs, drug pumps, nozzle ports",
       nodes: [
-        { id: "spit", name: "Spit", root: true, text: "A ranged natural attack (d8, 30 ft, Nerve or Gumption), Toxin or Corrode damage. Advantage on Endure against poison.", fx: { attack: { name: "Spit", die: 8, stats: ["nerve", "gumption"], range: 30, ranged: true, note: "Toxin or Corrode" } } },
+        { id: "spit", name: "Spit", root: true, text: "A ranged natural attack (d8, 30 ft, Nerve or Gumption), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.", fx: { attack: { name: "Spit", die: 8, stats: ["nerve", "gumption"], range: 30, ranged: true, note: "Toxin or Corrode" } } },
         { id: "regenerate", name: "Regenerate", text: "At the start of your turn, if you're at half HP or less (and not Down), regain {R1} HP." },
         { id: "stimgland", name: "Stim Gland", push: true, text: "Action (or Quick with Push): you or a creature you touch regains {R}d6 + Gumption ({R}d6+{GUM}) HP and ends Burning or Poisoned. Twice per Breather." },
         { id: "adrenaldump", name: "Adrenal Dump", text: "The first time each combat you drop to half HP or less, gain 2 x Rank + Grit ({ADR}) temporary HP and advantage on your next attack." },
@@ -198,7 +205,7 @@ const MUTAGEN = {
       nodes: [
         { id: "uplink", name: "Uplink", root: true, text: "Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. Mind Spike: a ranged attack (d8, 60 ft, Nerve or Chutzpah), Psychic damage.", fx: { attack: { name: "Mind Spike", die: 8, stats: ["nerve", "chutzpah"], range: 60, ranged: true, note: "Psychic (ignores Armor)" } } },
         { id: "intrude", name: "Intrude", text: "Action: Gumption or Chutzpah + Rank vs a creature's TN (or a device's DC): read surface thoughts, or seize an unattended device for 1 minute. In combat, a Mook machine obeys you until the end of next round; any other machine is Dazed." },
-        { id: "puppet", name: "Puppet", push: true, text: "Action, Push: Chutzpah + Rank vs the TN of a non-Boss creature. On success it moves up to its speed where you choose, or makes one attack against a target you choose (an enemy target takes the attack's Damage, no roll; a player defends)." },
+        { id: "puppet", name: "Puppet", push: true, text: "Action, Push: Chutzpah + Rank vs the TN of a non-Boss creature. On success it moves up to its speed where you choose, or makes one attack against a target you choose (an enemy target simply takes the attack's Damage, no roll, no rider; a player target defends normally)." },
         { id: "ironwill", name: "Iron Will", text: "Advantage on Resist, and you can't be Shaken. Allies within 30 ft get +1 to Resist." },
         { id: "precog", name: "Precog", push: true, text: "Reaction, Push: when you or an ally within 30 ft is about to make a d20 roll (declare before rolling), they roll it with advantage." },
         { id: "hivemind", name: "Hive Mind", apex: true, text: "Prime one extra Surge at the start of each combat. Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll.", fx: { primeBonus: 1 } }
@@ -321,6 +328,16 @@ const MUTAGEN = {
     { id: "stickyrelay", name: "Sticky Relay", text: "Your highest Sequence slot is always Wild.", fx: { stickyRelay: true } },
     { id: "feedbackloop", name: "Feedback Loop", text: "+1 Flux at the start of every combat; your first Surge each combat is Amped." }
   ],
+  // Injuries (ch 6): last until your next Lockdown. fx: hp, flux, speed
+  injuries: [
+    { id: "ribs", name: "Cracked Ribs", text: "-5 Max HP.", fx: { hp: -5 } },
+    { id: "concussion", name: "Concussion", text: "Disadvantage on Gumption checks." },
+    { id: "tornarm", name: "Torn Limb (arm)", text: "Disadvantage on attacks with that limb." },
+    { id: "tornleg", name: "Torn Limb (leg)", text: "Speed -10 ft.", fx: { speed: -10 } },
+    { id: "gland", name: "Ruptured Gland / Fried Port", text: "Flux Limit -2.", fx: { flux: -2 } },
+    { id: "shellshock", name: "Shell Shock", text: "Disadvantage on Resist." }
+  ],
+  sampleSpliceCost: 100, // ch 7: a clinic splices a Sample in for 100 Scrip
   names: { first: ["Dree", "Vex", "Juno", "Ozzie", "Rook", "Tamsin", "Cass", "Ivo", "Marrow", "Pike", "Sable", "Wren", "Kit", "Bram", "Nyx", "Lio", "Odette", "Sol"], last: ["Ocampo", "Hale", "Varga", "Okafor", "Lund", "Reyes", "Petrov", "Quill", "Achterberg", "Moss", "Kade", "Ferro"], nick: ["Brownout", "Ratking", "Static", "Pinch", "Sparks", "Lockjaw", "Mothball", "Gristle", "Halfmoon", "Hush"] },
   surgeWords: { strike: ["Lunge", "Slam", "Rend", "Jab"], bolt: ["Spit", "Lance", "Shot", "Dart"], burst: ["Bloom", "Cloud", "Flare", "Pop"], wave: ["Lash", "Sweep", "Gout", "Torrent"], pulse: ["Stomp", "Throb", "Nova", "Shrug"], infuse: ["Gift", "Graft", "Boost", "Kiss"] },
 
@@ -369,6 +386,7 @@ const ITEM = Object.fromEntries(D.items.map(x => [x.id, x]));
 const ORIGIN = Object.fromEntries(D.origins.map(x => [x.id, x]));
 const KIT = Object.fromEntries(D.kits.map(x => [x.id, x]));
 const SCAR = Object.fromEntries(D.scars.concat(D.faults).map(x => [x.id, x]));
+const INJ = Object.fromEntries((D.injuries || []).map(x => [x.id, x]));
 const lvl = L => D.levels[Math.min(10, Math.max(1, L)) - 1];
 const sgn = n => (n >= 0 ? "+" + n : "\u2212" + Math.abs(n));
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -381,16 +399,37 @@ function blank() {
     stats: { grit: null, moxie: null, nerve: null, gumption: null, chutzpah: null }, boosts: {},
     origin: "", knacks: [], trees: {}, nodes: [], surges: [],
     kit: "", kitChoice: "rifle", kitMods: {}, naturalMod: "", armor: "light", shield: false, buyWeapons: [], buy: {}, scripAdj: 0,
-    scars: [], patchApplied: false, drive: { why: "", goal: "", owe: "" }, notes: "" };
+    scars: [], injuries: [], patchApplied: false, drive: { why: "", goal: "", owe: "" }, notes: "" };
 }
+// Coerce any loaded/imported object into a safe, well-typed character (unknown ids dropped).
 function normalize(s) {
-  const b = blank();
-  for (const k in b) if (s[k] === undefined) s[k] = b[k];
-  s.level = Math.min(10, Math.max(1, parseInt(s.level, 10) || 1));
-  s.drive = Object.assign(b.drive, s.drive || {});
-  s.stats = Object.assign(b.stats, s.stats || {});
-  return s;
+  if (!s || typeof s !== "object" || Array.isArray(s)) throw new Error("not a character object");
+  const b = blank(), str = (v, n) => (typeof v === "string" ? v : v == null ? "" : String(v)).slice(0, n || 300);
+  const arr = v => (Array.isArray(v) ? v : []), obj = v => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
+  const o = {};
+  o.v = 1; o.name = str(s.name, 120); o.player = str(s.player, 120); o.concept = str(s.concept, 300); o.notes = str(s.notes, 3000);
+  o.level = Math.min(10, Math.max(1, parseInt(s.level, 10) || 1));
+  o.stats = {}; STAT_IDS.forEach(id => { const v = obj(s.stats)[id]; o.stats[id] = v === null || v === "" || v === undefined || !D.statArray.includes(Number(v)) ? null : Number(v); });
+  o.boosts = {}; D.statBoostLevels.forEach(bl => { const v = arr(obj(s.boosts)[bl]).slice(0, 2).map(x => (STAT_IDS.includes(x) ? x : "")); if (v.length) o.boosts[bl] = v; });
+  o.origin = ORIGIN[s.origin] ? s.origin : "";
+  o.knacks = arr(s.knacks).map(k => str(k, 80)).slice(0, 12);
+  o.trees = {}; for (const t in obj(s.trees)) if (TREE[t] && (s.trees[t] === "bio" || s.trees[t] === "chrome")) o.trees[t] = s.trees[t];
+  o.nodes = [...new Set(arr(s.nodes).filter(id => NODE[id]))];
+  o.surges = arr(s.surges).filter(x => x && typeof x === "object").slice(0, 12).map(x => ({ name: str(x.name, 80), shape: SHAPE[x.shape] ? x.shape : "", effect: EFFECT[x.effect] ? x.effect : "", twists: [...new Set(arr(x.twists).filter(t => TWIST[t]))].slice(0, 3), sample: !!x.sample }));
+  o.kit = KIT[s.kit] ? s.kit : ""; o.kitChoice = FRAME[s.kitChoice] ? s.kitChoice : "rifle";
+  o.kitMods = {}; for (const i in obj(s.kitMods)) if (/^\d$/.test(i) && (s.kitMods[i] === "" || MOD[s.kitMods[i]])) o.kitMods[i] = s.kitMods[i];
+  o.naturalMod = MOD[s.naturalMod] ? s.naturalMod : "";
+  o.armor = D.armors.some(a => a.id === s.armor) ? s.armor : "light"; o.shield = !!s.shield;
+  o.buyWeapons = arr(s.buyWeapons).filter(w => w && FRAME[w.frame] && FRAME[w.frame].buy !== false).slice(0, 10).map(w => ({ frame: w.frame, mod: MOD[w.mod] ? w.mod : "" }));
+  o.buy = {}; for (const id in obj(s.buy)) if (ITEM[id]) o.buy[id] = Math.min(99, Math.max(0, parseInt(s.buy[id], 10) || 0));
+  o.scripAdj = Math.max(-1e6, Math.min(1e6, Math.round(Number(s.scripAdj) || 0)));
+  o.scars = [...new Set(arr(s.scars).filter(id => SCAR[id]))]; o.injuries = [...new Set(arr(s.injuries).filter(id => INJ[id]))];
+  o.patchApplied = !!s.patchApplied;
+  const dr = obj(s.drive); o.drive = { why: str(dr.why), goal: str(dr.goal), owe: str(dr.owe) };
+  for (const k in b) if (o[k] === undefined) o[k] = b[k];
+  return o;
 }
+const looksLikeCharacter = o => o && typeof o === "object" && !Array.isArray(o) && ["stats", "nodes", "surges", "origin", "level", "name"].some(k => k in o);
 function tok(text, c) {
   return text.replace(/\{2R\}/g, 2 * c.R).replace(/\{R1\}/g, c.R + 1).replace(/\{R\}/g, c.R)
     .replace(/\{GUM\}/g, c.st.gumption).replace(/\{GRIT\}/g, c.st.grit).replace(/\{ADR\}/g, 2 * c.R + c.st.grit);
@@ -446,17 +485,18 @@ function derive(s) {
     if (isFault && !chromeN) warn(6, `${SCAR[id].name} is a Chrome Fault, but you have no Chrome trees.`);
     if (!isFault && !bioN) warn(6, `${SCAR[id].name} is a Bio Scar, but you have no Bio trees.`);
   });
-  const sfx = k => scars.reduce((a, id) => a + ((SCAR[id].fx || {})[k] || 0), 0);
+  const injuries = s.injuries.filter(id => INJ[id]);
+  const sfx = k => scars.reduce((a, id) => a + ((SCAR[id].fx || {})[k] || 0), 0) + injuries.reduce((a, id) => a + ((INJ[id].fx || {})[k] || 0), 0);
   const sticky = scars.includes("stickyrelay");
   // HP, Armor, Speed, Limit
-  const hp = D.baseHP + D.hpPerGrit * st.grit + D.hpPerLevel * (s.level - 1) + (has("thick") ? 2 * s.level : 0) + sfx("hpPerRank") * R;
+  const hp = D.baseHP + D.hpPerGrit * st.grit + D.hpPerLevel * (s.level - 1) + (has("thick") ? 2 * s.level : 0) + sfx("hpPerRank") * R + sfx("hp");
   const armorSrc = []; const suit = D.armors.find(a => a.id === s.armor) || D.armors[0];
   armorSrc.push([suit.name, suit.armor]);
   if (s.shield) armorSrc.push(["Shield", D.shield.armor]);
   if (has("plating")) armorSrc.push(["Plating", R >= 3 ? 2 : 1]);
   if (sfx("armor")) armorSrc.push(["Scars/Faults", sfx("armor")]);
   const armorRaw = armorSrc.reduce((a, x) => a + x[1], 0);
-  if (armorRaw > D.armorMax) warn(6, `Armor ${armorRaw} is capped at ${D.armorMax}.`);
+  if (armorRaw > D.armorMax) warn(5, `Armor ${armorRaw} is capped at ${D.armorMax}.`);
   const armor = Math.max(0, Math.min(D.armorMax, armorRaw));
   const speed = D.baseSpeed + (fx.speed || []).reduce((a, b) => a + b, 0) + (suit.speed || 0) + sfx("speed");
   const limit = Math.max(D.fluxMin, D.fluxBase + R + st.nerve) + (form === "splice" ? D.spliceFlux : 0) + sfx("flux") + (s.patchApplied ? 1 : 0);
@@ -480,7 +520,7 @@ function derive(s) {
   const gear = gearCalc(s, c, E, W, err);
   const upkeep = D.upkeepPerChrome * chromeN + gear.smartlinks * 25;
   return { s, L, R, st, origin, knacks, knReq, nodes, owned, form, bioN, chromeN, hp, armor, armorRaw, armorSrc, speed, limit, def,
-    prime, maxPrimed: prime + 1, die: L.die, slots, known, wild, sticky, surges, unlocked, gear, upkeep, scars,
+    prime, maxPrimed: prime + 1, die: L.die, slots, known, wild, sticky, surges, unlocked, gear, upkeep, scars, injuries, suit,
     knit: R * bioN, errors: E, warnings: W, legal: E.length === 0, partOk };
 }
 
@@ -515,11 +555,12 @@ function surgeCalc(sg, i, c) {
     const dice = R + 1 + (ef.extraDice || 0) + tw.reduce((a, t) => a + (TWIST[t].extraDice || 0), 0);
     out.atk = c.st[stat] + R; out.stat = stat;
     out.dmg = `${dice}d${sh.die}` + (sh.addStat ? (c.st[stat] ? sgn(c.st[stat]) : "") : "");
-    let rng = sh.id === "strike" ? (tw.includes("reach") ? "reach 15 ft" : "melee") : sh.target;
+    let rng = sh.id === "strike" ? (tw.includes("reach") ? "reach 15 ft" : c.has("grapnel") ? "reach 10 ft" : "melee") : sh.target;
     if (sh.id === "bolt") { let r = 60 * (c.fx.rangedDouble ? 2 : 1) * (tw.includes("reach") ? 2 : 1); rng = `${r} ft`; }
     if (sh.id === "burst") { rng = `10-ft radius within ${60 * (c.fx.rangedDouble ? 2 : 1)} ft` + (tw.includes("reach") ? " (Reach: double range or radius)" : ""); }
     if ((sh.id === "wave" || sh.id === "pulse") && tw.includes("reach")) rng += " (Reach: doubled)";
     out.range = rng;
+    if (sh.ranged && c.fx.critRanged) rng += " \u00b7 Crit 18\u201320";
     out.line = `${sgn(out.atk)} (${STAT_NAME[stat]}) \u00b7 ${out.dmg} ${ef.type} \u00b7 ${tok(ef.rider, c)} \u00b7 ${rng}` + (sh.area ? " \u00b7 Area: miss = half, no rider" : "") + (sh.hitsAllies ? "; allies in it Dodge" : "");
   } else if (sh.kind === "infuse" && ef.kind === "infuse") {
     out.line = tok(ef.text, c) + (tws.includes("Sure") ? " (Sure: +1 ally)" : "");
@@ -563,6 +604,8 @@ function gearCalc(s, c, E, W, err) {
   const items = {}; for (const id in D.commonKit.items) items[id] = D.commonKit.items[id];
   if (k) for (const id in k.items) items[id] = (items[id] || 0) + k.items[id];
   for (const id in s.buy) { const q = Math.max(0, parseInt(s.buy[id], 10) || 0); if (q && ITEM[id]) { items[id] = (items[id] || 0) + q; spent += q * ITEM[id].cost; lines.push([`${q} \u00d7 ${ITEM[id].name}`, q * ITEM[id].cost]); } }
+  const nSamples = s.surges.filter(x => x.sample).length;
+  if (nSamples) { spent += nSamples * D.sampleSpliceCost; lines.push([`${nSamples} \u00d7 Sample splice`, nSamples * D.sampleSpliceCost]); }
   const scrip = start + (Number(s.scripAdj) || 0) - spent;
   if (scrip < 0) err(5, `Not enough Scrip: ${scrip} after purchases.`);
   let smartlinks = 0;
@@ -587,7 +630,7 @@ function attackLine(name, die, stats, range, ranged, melee, mod, c, natural, not
   const n = [];
   if (notes) n.push(notes);
   if (mod && !mod.crit && !mod.attack) n.push(mod.text);
-  if (melee && name !== "Unarmed") (c.fx.meleeDie || []).forEach(x => n.push(`+1 die once/turn (${x})`));
+  if (melee) (c.fx.meleeDie || []).forEach(x => n.push(`+1 die once/turn (${x})`));
   if (c.fx.anyDie) n.push("+1 die vs Target Lock mark");
   if (natural && c.has("crushergrip")) n.push("Crusher Grip: Held");
   if (natural && c.has("flurry")) n.push(`Flurry: 2nd attack ${Math.ceil(c.R / 2)}d${die}`);
@@ -658,16 +701,27 @@ function fromExample(key) {
 let S = blank(), step = 0;
 const STEPS = ["Start", "Stats", "Origin & Knacks", "Augments", "Surges", "Gear", "Extras & Drive", "Sheet"];
 const LS = "mutagen.builder.";
-function store(k, v) { try { localStorage.setItem(LS + k, JSON.stringify(v)); } catch (e) {} }
+function store(k, v) { try { localStorage.setItem(LS + k, JSON.stringify(v)); return true; } catch (e) { return false; } }
 function load(k) { try { return JSON.parse(localStorage.getItem(LS + k)); } catch (e) { return null; } }
 function getPath(o, p) { return p.split(".").reduce((a, k) => (a == null ? a : a[k]), o); }
 function setPath(o, p, v) { const ks = p.split("."); let a = o; ks.slice(0, -1).forEach((k, i) => { if (a[k] == null) a[k] = /^\d+$/.test(ks[i + 1]) ? [] : {}; a = a[k]; }); a[ks[ks.length - 1]] = v; }
-const sel = (path, opts, val, extra) => `<select data-k="${path}" ${extra || ""}>${opts.map(o => `<option value="${esc(o[0])}"${String(o[0]) === String(val) ? " selected" : ""}>${esc(o[1])}</option>`).join("")}</select>`;
+const sel = (path, opts, val, extra, label) => `<select data-k="${path}" ${label ? `aria-label="${esc(label)}" ` : ""}${extra || ""}>${opts.map(o => `<option value="${esc(o[0])}"${String(o[0]) === String(val) ? " selected" : ""}>${esc(o[1])}</option>`).join("")}</select>`;
 const levelOpts = D.levels.map(l => [l.lv, "Level " + l.lv]);
 
+const cssq = v => String(v).replace(/"/g, "");
+function focusKey(el) {
+  if (!el || el === document.body) return null;
+  for (const a of ["k", "node", "twist", "scar", "inj"]) if (el.dataset && el.dataset[a] !== undefined) return `[data-${a}="${cssq(el.dataset[a])}"]` + (el.value && (a === "twist" || el.type === "radio") ? `[value="${cssq(el.value)}"]` : "");
+  if (el.dataset && el.dataset.act) return `[data-act="${el.dataset.act}"]` + (el.dataset.i !== undefined ? `[data-i="${el.dataset.i}"]` : "");
+  if (el.dataset && el.dataset.step !== undefined) return `.stp[data-step="${el.dataset.step}"]`;
+  return el.id ? "#" + cssq(el.id) : null;
+}
+let storageOk = true;
 function render() {
-  normalize(S);
+  const fk = focusKey(document.activeElement);
+  S = normalize(S);
   const d = derive(S);
+  if (location.hash !== "#step-" + (step + 1)) { try { history.replaceState(null, "", "#step-" + (step + 1)); } catch (e) {} }
   document.getElementById("lvlTop").value = S.level;
   document.getElementById("steps").innerHTML = STEPS.map((n, i) => {
     const bad = d.errors.some(e => e.step === i), w = d.warnings.some(e => e.step === i);
@@ -676,23 +730,30 @@ function render() {
   document.getElementById("panel").innerHTML = [pStart, pStats, pOrigin, pAug, pSurges, pGear, pExtras, pSheet][step](d);
   document.getElementById("summary").innerHTML = summary(d);
   document.getElementById("printArea").innerHTML = sheet(d);
-  store("autosave", S);
+  storageOk = store("autosave", S);
+  document.getElementById("saveNote").textContent = storageOk ? "" : "\u26a0 Autosave off: this browser blocks storage. Use Export.";
+  document.getElementById("prevB").disabled = step === 0; document.getElementById("nextB").disabled = step === STEPS.length - 1;
+  if (fk) { const el = document.querySelector(fk); if (el) el.focus({ preventScroll: true }); }
 }
 function summary(d) {
-  const msgs = d.errors.map(e => `<li class="e" data-step="${e.step}">\u2716 ${esc(e.m)}</li>`).concat(d.warnings.map(e => `<li class="w" data-step="${e.step}">\u26a0 ${esc(e.m)}</li>`)).join("");
+  const msgs = d.errors.map(e => `<li class="e"><button data-step="${e.step}" title="Go to step ${e.step + 1}">\u2716 ${esc(e.m)}</button></li>`).concat(d.warnings.map(e => `<li class="w"><button data-step="${e.step}" title="Go to step ${e.step + 1}">\u26a0 ${esc(e.m)}</button></li>`)).join("");
+  const overLevel = d.errors.concat(d.warnings).some(e => /Too many nodes|max \d Twist|You know \d+ Surges|Sequence has|is an Apex|over the \d+ allowed|needs \d other/.test(e.m));
+  const N = (label, val, tip) => `<div title="${esc(tip)}"><span>${label}</span><b>${val}</b></div>`;
   return `<h3>${esc(S.name || "Unnamed freelancer")}</h3>
   <div class="mini">Level ${S.level} \u00b7 Rank ${d.R} \u00b7 <span class="form ${d.form}">${d.form === "none" ? "No trees" : D.forms[d.form].name}</span></div>
   <div class="nums">
-   <div><span>HP</span><b>${d.hp}</b></div><div><span>Armor</span><b>${d.armor}</b></div><div><span>Speed</span><b>${d.speed}</b></div><div><span>Flux Limit</span><b>${d.limit}</b></div>
-   <div><span>Dodge</span><b>${sgn(d.def.dodge)}</b></div><div><span>Endure</span><b>${sgn(d.def.endure)}</b></div><div><span>Resist</span><b>${sgn(d.def.resist)}</b></div><div><span>Sequence</span><b>d${d.die}</b></div>
-   <div><span>Prime</span><b>${d.prime}</b></div><div><span>Surges</span><b>${S.surges.length}/${d.known}</b></div><div><span>Nodes</span><b>${d.nodes.length}/${d.L.nodes}</b></div><div><span>Scrip</span><b>${d.gear.scrip}</b></div>
+   ${N("HP", d.hp, "Max HP = 12 + 2 \u00d7 Grit + 5 per level after 1st (+2/level with Thick)")}${N("Armor", d.armor, "Armor (max 4): " + d.armorSrc.map(a => a[0] + " " + sgn(a[1])).join(", "))}${N("Speed", d.speed, "30 ft, +10 Quickened, +10 Spring Legs, \u22125 Heavy armor")}${N("Flux Limit", d.limit, "4 + Rank + Nerve (min 4), \u22121 if Splice. Go over it and you Overload.")}
+   ${N("Dodge", sgn(d.def.dodge), "Moxie + Rank: claws, bullets, things you see coming")}${N("Endure", sgn(d.def.endure), "Grit + Rank: gas, blasts, disease, grabs")}${N("Resist", sgn(d.def.resist), "Nerve + Rank: fear, psychic, hacking your wetware")}${N("Sequence", "d" + d.die, "Your Sequence die: roll it Prime times at the start of each fight")}
+   ${N("Prime", d.prime, "Surges you roll ready at the start of each fight")}${N("Surges", S.surges.length + "/" + d.known, "Surges built / Surges known at this level; empty slots are Wild (" + d.wild + " Wild)")}${N("Nodes", d.nodes.length + "/" + d.L.nodes, "Augment nodes taken / allowed (level + 1)")}${N("Scrip", d.gear.scrip, "Money left after purchases")}
   </div>
   <div class="mini">${STAT_IDS.map(id => `${STAT_NAME[id]} ${sgn(d.st[id])}`).join(" \u00b7 ")}</div>
   <div class="status ${d.legal ? "ok" : "no"}">${d.legal ? "\u2714 Legal character" : `\u2716 ${d.errors.length} problem(s)`}</div>
+  ${overLevel ? `<button class="btn trim" data-act="trim" title="Drop the picks this level doesn't allow: extra nodes (newest first), early Apexes, extra Surges (from the end), extra Twists and Knacks, and later stat boosts">\u2702 Fit picks to level ${S.level}</button>` : ""}
   <ul class="msgs">${msgs}</ul>`;
 }
 function pStart(d) {
   return `<h2>1. Concept & Level</h2>
+  <p class="intro">New to Mutagen? You'll pick five <b>Stats</b>, an <b>Origin</b>, <b>Augments</b> from six body-part skill trees (each grown <b>Bio</b> or installed <b>Chrome</b>), and build <b>Surges</b>, the random combat powers your body offers each fight. The panel on the right updates live and lists anything that isn't legal yet; click a message to jump to its step.</p>
   <p class="hint">One sentence: a job, a body change, and a flaw. Then pick a level; everything that scales follows it. <a href="${DOC}13_Character_Building_Guide.md">Guide</a> \u00b7 <a href="${DOC}02_Character_Creation.md">Ch 2</a></p>
   <div class="row"><label>Name<input data-k="name" value="${esc(S.name)}" placeholder="Dree \u201cBrownout\u201d Ocampo"></label><label>Player<input data-k="player" value="${esc(S.player)}"></label></div>
   <label>Concept<input data-k="concept" value="${esc(S.concept)}" placeholder="Ex-cop with a shotgun arm who can't stop apologising"></label>
@@ -707,14 +768,14 @@ function pStats(d) {
   let h = `<h2>2. Stats</h2><p class="hint">Assign +3, +2, +1, +0, \u22121, one each. Put +3 in the stat you'll attack with.</p><div class="cards">`;
   D.stats.forEach(x => {
     const v = S.stats[x.id]; const dup = v !== null && v !== "" && used.filter(u => String(u) === String(v)).length > 1;
-    h += `<div class="card${dup ? " badc" : ""}"><b>${x.name}</b> <i>\u201c${x.tag}\u201d</i><div class="small">${x.does}</div>${sel("stats." + x.id, opts, v == null ? "" : v, 'data-num="1"')} <span class="tot">= ${sgn(d.st[x.id])}</span></div>`;
+    h += `<div class="card${dup ? " badc" : ""}"><b>${x.name}</b> <i>\u201c${x.tag}\u201d</i><div class="small">${x.does}</div>${sel("stats." + x.id, opts, v == null ? "" : v, 'data-num="1"', x.name + " value")} <span class="tot">= ${sgn(d.st[x.id])}</span></div>`;
   });
   h += `</div><button class="btn" data-act="autostats">Fill in order (+3 Grit \u2192 \u22121 Chutzpah)</button>`;
   const bl = D.statBoostLevels.filter(b => b <= S.level);
   if (bl.length) {
     h += `<h3>Stat boosts</h3><p class="hint">+1 to two <b>different</b> stats at levels 3, 6, 9 (max +5).</p>`;
     const so = [["", "\u2014"]].concat(D.stats.map(x => [x.id, x.name]));
-    bl.forEach(b => { const v = S.boosts[b] || []; h += `<div class="row"><b class="lbl">Level ${b}</b>${sel(`boosts.${b}.0`, so, v[0] || "")}${sel(`boosts.${b}.1`, so, v[1] || "")}</div>`; });
+    bl.forEach(b => { const v = S.boosts[b] || []; h += `<div class="row"><b class="lbl">Level ${b}</b>${sel(`boosts.${b}.0`, so, v[0] || "", "", `Level ${b} boost, first stat`)}${sel(`boosts.${b}.1`, so, v[1] || "", "", `Level ${b} boost, second stat`)}</div>`; });
   }
   return h;
 }
@@ -724,7 +785,7 @@ function pOrigin(d) {
   D.origins.forEach((o, i) => { h += `<label class="card pickc${S.origin === o.id ? " on" : ""}"><input type="radio" name="origin" data-k="origin" value="${o.id}"${S.origin === o.id ? " checked" : ""}> <b>${i + 1}. ${o.name}</b><div class="small"><i>${o.blurb}</i><br>Knack: <b>${o.knack}</b><br>${o.perk}</div></label>`; });
   h += `</div><h3>Knacks (${d.knacks.length}/${d.knReq})</h3><p class="hint">Origin Knack: <b>${esc(d.origin ? d.origin.knack : "\u2014")}</b>. Write ${d.knReq - 1} more (3 at level 1, +1 at 4 and 8; a Bloom <i>Blossom</i> adds one).</p>`;
   const n = Math.max(d.knReq - 1, S.knacks.length);
-  for (let i = 0; i < n; i++) h += `<input list="knackList" data-k="knacks.${i}" value="${esc(S.knacks[i] || "")}" placeholder="e.g. ${esc(D.knackExamples[i % D.knackExamples.length])}">`;
+  for (let i = 0; i < n; i++) h += `<input list="knackList" maxlength="80" aria-label="Knack ${i + 2}" data-k="knacks.${i}" value="${esc(S.knacks[i] || "")}" placeholder="e.g. ${esc(D.knackExamples[i % D.knackExamples.length])}">`;
   h += `<button class="btn" data-act="addknack">+ Blossom Knack</button><datalist id="knackList">${D.knackExamples.map(k => `<option value="${esc(k)}">`).join("")}</datalist>`;
   return h;
 }
@@ -745,7 +806,7 @@ function pAug(d) {
   <div class="formbox">${d.form === "none" ? "Take a Root to begin." : `<b class="form ${d.form}">${D.forms[d.form].name}</b>: ${D.forms[d.form].perk} <i>${D.forms[d.form].cost}</i>`}${d.bioN ? ` <b>Knit ${d.knit} HP.</b>` : ""}${d.upkeep ? ` <b>Upkeep ${d.upkeep}/mission.</b>` : ""}</div><div class="trees">`;
   D.trees.forEach(t => {
     const own = d.owned.includes(t.id), f = S.trees[t.id];
-    h += `<div class="tree${own ? " own " + (f || "") : ""}"><div class="th"><b>${t.name}</b> <span class="small">${t.stats} \u00b7 ${t.role}</span>
+    h += `<div class="tree${own && D.forms[f] ? " own " + f : own ? " own" : ""}"><div class="th"><b>${t.name}</b> <span class="small">${t.stats} \u00b7 ${t.role}</span>
     <div class="small">Unlocks: ${t.unlocks.map(u => (SHAPE[u] || EFFECT[u]).name).join(", ")}</div>
     ${own ? `<div class="formsel">${["bio", "chrome"].map(x => `<label class="${x}"><input type="radio" name="form_${t.id}" data-k="trees.${t.id}" value="${x}"${f === x ? " checked" : ""}> ${D.forms[x].name}</label>`).join("")}</div><div class="small look">${f ? t[f] : "Choose Bio or Chrome"}</div>` : ""}</div>`;
     t.nodes.forEach(n => {
@@ -770,10 +831,10 @@ function pSurges(d) {
     const sh = SHAPE[sg.shape];
     const efOpts = [["", "Effect\u2026"]].concat(D.effects.filter(p => (sg.sample || d.partOk(p)) && (!sh || p.kind === sh.kind)).map(p => [p.id, p.name + (p.unlock ? " (" + TREE[p.unlock].name + ")" : "")]));
     const twOk = t => sh && (t.works === "any" || (t.works === "strikebolt" && (sh.id === "strike" || sh.id === "bolt")) || (t.works === "area" && sh.area) || (t.works === "damage" && sh.kind === "damage"));
-    h += `<div class="slot${x.errs.length ? " bads" : ""}"><div class="row"><b class="num">${i + 1}</b><input data-k="surges.${i}.name" value="${esc(sg.name)}" placeholder="Name it">
-      ${sel(`surges.${i}.shape`, shOpts, sg.shape || "")}${sel(`surges.${i}.effect`, efOpts, sg.effect || "")}
+    h += `<div class="slot${x.errs.length ? " bads" : ""}"><div class="row"><b class="num">${i + 1}</b><input data-k="surges.${i}.name" maxlength="80" aria-label="Slot ${i + 1} Surge name" value="${esc(sg.name)}" placeholder="Name it">
+      ${sel(`surges.${i}.shape`, shOpts, sg.shape || "", "", `Slot ${i + 1} Shape`)}${sel(`surges.${i}.effect`, efOpts, sg.effect || "", "", `Slot ${i + 1} Effect`)}
       <span class="flux">${x.flux} Flux${x.fw ? " \u2699" : ""}</span>
-      <span class="ctl"><button class="ib" data-act="up" data-i="${i}" title="Move up">\u2191</button><button class="ib" data-act="down" data-i="${i}" title="Move down">\u2193</button><button class="ib" data-act="del" data-i="${i}" title="Remove">\u2715</button></span></div>
+      <span class="ctl"><button class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move slot ${i + 1} up">\u2191</button><button class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move slot ${i + 1} down">\u2193</button><button class="ib" data-act="del" data-i="${i}" title="Remove" aria-label="Remove slot ${i + 1}">\u2715</button></span></div>
       <div class="tw">${D.twists.map(t => { const on = (sg.twists || []).includes(t.id); const can = on || (twOk(t) && (sg.twists || []).length < maxT); return `<label class="${can ? "" : "dis"}" title="${esc(tok(t.text, { R: d.R, st: d.st }))}"><input type="checkbox" data-twist="${i}" value="${t.id}"${on ? " checked" : ""}${can ? "" : " disabled"}>${t.name}</label>`; }).join("")}
       <label class="smp" title="Harvested Sample (ch 7): may use parts you haven't unlocked; fills a Wild slot"><input type="checkbox" data-k="surges.${i}.sample" data-bool="1"${sg.sample ? " checked" : ""}>Sample</label></div>
       <div class="small line">${esc(x.line)}</div>${x.errs.map(m => `<div class="small err">\u2716 ${esc(m)}</div>`).join("")}</div>`;
@@ -781,8 +842,8 @@ function pSurges(d) {
   const nonSample = S.surges.filter(x => !x.sample).length;
   const room = S.surges.length < d.slots;
   h += `<div class="row"><button class="btn" data-act="addsurge"${room && nonSample < d.known ? "" : " disabled"}>+ New Surge</button>
-  ${sel("_sample", [["", "+ From sample list\u2026"]].concat(D.sampleSurges.map((x, i) => [i, `${x[0]} (${[SHAPE[x[1]].name, EFFECT[x[2]].name].concat(x[3].map(t => TWIST[t].name)).join(" + ")})`])), "", room && nonSample < d.known ? 'data-act="samplepick"' : "disabled")}
-  <button class="btn" data-act="addsample"${room ? "" : " disabled"}>+ Harvested Sample</button><button class="btn" data-act="randsurges">Randomize empty</button></div>
+  ${sel("_sample", [["", "+ Example Surge (ch 4)\u2026"]].concat(D.sampleSurges.map((x, i) => [i, `${x[0]} (${[SHAPE[x[1]].name, EFFECT[x[2]].name].concat(x[3].map(t => TWIST[t].name)).join(" + ")})`])), "", room && nonSample < d.known ? 'data-act="samplepick"' : "disabled", "Add an example Surge from chapter 4")}
+  <button class="btn" data-act="addsample"${room ? "" : " disabled"} title="A Boss/Elite Sample spliced in at a clinic (ch 7, 100 Scrip): fills a Wild slot and may use parts you haven't unlocked">+ Harvested Sample</button><button class="btn" data-act="randsurges">Randomize empty</button></div>
   <details><summary>Wild Surge table (d12)</summary><ol class="small">${D.wildTable.map(w => `<li>${esc(w)}</li>`).join("")}</ol></details>`;
   return h;
 }
@@ -792,18 +853,18 @@ function pGear(d) {
   let h = `<h2>6. Gear & Scrip</h2><p class="hint">One Starting Kit + common items (${D.commonKit.text}, 2 rations, 1 Damper). 50 Scrip to spend. One Mod per weapon. One armor + optional Shield; Armor max 4. <a href="${DOC}08_Gear.md">Ch 8</a></p>
   <div class="cards">${D.kits.map(k => `<label class="card pickc${S.kit === k.id ? " on" : ""}"><input type="radio" name="kit" data-k="kit" value="${k.id}"${S.kit === k.id ? " checked" : ""}> <b>${k.name}</b><div class="small">${k.weapons.map(w => typeof w === "string" ? FRAME[w].name : w.choice ? w.choice.map(x => FRAME[x].name).join(" or ") : FRAME[w.frame].name + " + " + MOD[w.mod].name).join(", ")}, ${Object.keys(k.items).map(i => (k.items[i] > 1 ? k.items[i] + " " : "") + ITEM[i].name).join(", ")}${k.scrip ? `, +${k.scrip} Scrip` : ""}</div></label>`).join("")}</div>`;
   const kw = kitWeapons(S);
-  if (kw.length) {
+  {
     h += `<h3>Weapons</h3><table class="t"><tr><th>Weapon</th><th>Mod</th></tr>`;
     kw.forEach((w, i) => {
       const k = KIT[S.kit].weapons[i];
-      const f = typeof k === "object" && k.choice ? sel("kitChoice", k.choice.map(x => [x, FRAME[x].name]), S.kitChoice) : FRAME[w.frame].name;
-      h += `<tr><td>${f} <span class="small">(kit)</span></td><td>${sel("kitMods." + i, modOpts(FRAME[w.frame].ranged ? "ranged" : "melee").map(o => o[0] === w.free && o[0] ? [o[0], MOD[o[0]].name + " (included)"] : o), w.mod || "")}</td></tr>`;
+      const f = typeof k === "object" && k.choice ? sel("kitChoice", k.choice.map(x => [x, FRAME[x].name]), S.kitChoice, "", "Kit weapon choice") : FRAME[w.frame].name;
+      h += `<tr><td>${f} <span class="small">(kit)</span></td><td>${sel("kitMods." + i, modOpts(FRAME[w.frame].ranged ? "ranged" : "melee").map(o => o[0] === w.free && o[0] ? [o[0], MOD[o[0]].name + " (included)"] : o), w.mod || "", "", `Mod for kit ${FRAME[w.frame].name}`)}</td></tr>`;
     });
-    if (d.nodes.includes("naturalweapons")) h += `<tr><td>Natural weapons <span class="small">(Limbs)</span></td><td>${sel("naturalMod", modOpts("melee"), S.naturalMod || "")}</td></tr>`;
-    (S.buyWeapons || []).forEach((w, i) => { h += `<tr><td>${sel(`buyWeapons.${i}.frame`, D.frames.filter(f => f.buy !== false).map(f => [f.id, `${f.name} (${f.cost})`]), w.frame)}</td><td>${sel(`buyWeapons.${i}.mod`, modOpts(FRAME[w.frame] && FRAME[w.frame].ranged ? "ranged" : "melee"), w.mod || "")} <button class="ib" data-act="delweapon" data-i="${i}">\u2715</button></td></tr>`; });
+    if (d.nodes.includes("naturalweapons")) h += `<tr><td>Natural weapons <span class="small">(Limbs)</span></td><td>${sel("naturalMod", modOpts("melee"), S.naturalMod || "", "", "Mod for Natural weapons")}</td></tr>`;
+    (S.buyWeapons || []).forEach((w, i) => { h += `<tr><td>${sel(`buyWeapons.${i}.frame`, D.frames.filter(f => f.buy !== false).map(f => [f.id, `${f.name} (${f.cost})`]), w.frame, "", `Bought weapon ${i + 1}`)}</td><td>${sel(`buyWeapons.${i}.mod`, modOpts(FRAME[w.frame] && FRAME[w.frame].ranged ? "ranged" : "melee"), w.mod || "", "", `Mod for bought weapon ${i + 1}`)} <button class="ib" data-act="delweapon" data-i="${i}" aria-label="Remove bought weapon ${i + 1}">\u2715</button></td></tr>`; });
     h += `</table><button class="btn" data-act="addweapon">+ Buy a weapon</button>`;
   }
-  h += `<h3>Armor</h3><div class="row">${sel("armor", D.armors.map(a => [a.id, `${a.name} (Armor ${a.armor}${a.id === "light" ? ", in kit" : `, ${a.cost} Scrip`})`]), S.armor)}<label class="inl"><input type="checkbox" data-k="shield" data-bool="1"${S.shield ? " checked" : ""}> Shield (+1, 40)</label></div>
+  h += `<h3>Armor</h3><div class="row">${sel("armor", D.armors.map(a => [a.id, `${a.name} (Armor ${a.armor}${a.id === "light" ? ", in kit" : `, ${a.cost} Scrip, speed \u22125, stealth disadvantage`})`]), S.armor, "", "Armor worn")}<label class="inl"><input type="checkbox" data-k="shield" data-bool="1"${S.shield ? " checked" : ""}> Shield (+1 Armor, 40 Scrip, uses a hand)</label></div>
   <p class="small">Armor ${d.armor}: ${d.armorSrc.map(a => `${a[0]} ${sgn(a[1])}`).join(", ")}${d.armorRaw > 4 ? " (capped at 4)" : ""}</p>
   <h3>Buy kit items</h3><div class="items">${D.items.map(it => `<label title="${esc(it.text)}">${it.name} <span class="small">${it.cost}</span><input type="number" min="0" max="20" data-k="buy.${it.id}" data-num="1" value="${S.buy[it.id] || 0}"></label>`).join("")}</div>
   <h3>Scrip</h3><div class="row"><label>Earned / adjustments since creation<input type="number" data-k="scripAdj" data-num="1" value="${Number(S.scripAdj) || 0}"></label><button class="btn" data-act="estimate">Estimate from ${S.level - 1} mission(s)</button></div>
@@ -817,8 +878,9 @@ function pExtras(d) {
   <label>What do you want before the campaign ends?<input data-k="drive.goal" value="${esc(S.drive.goal)}"></label>
   <label>Who in Halcyon do you owe, or hate?<input data-k="drive.owe" value="${esc(S.drive.owe)}"></label>
   ${box(D.scars, "Bio Scars")}${box(D.faults, "Chrome Faults")}
+  <h3>Injuries <span class="small">(from going Down; until your next Lockdown)</span></h3><div class="cards">${(D.injuries || []).map(x => `<label class="card pickc${S.injuries.includes(x.id) ? " on" : ""}"><input type="checkbox" data-inj="${x.id}"${S.injuries.includes(x.id) ? " checked" : ""}> <b>${x.name}</b><div class="small">${x.text}</div></label>`).join("")}</div>
   <label class="inl"><input type="checkbox" data-k="patchApplied" data-bool="1"${S.patchApplied ? " checked" : ""}> Glitch <i>Patch Applied</i>: +1 Flux Limit (once ever)</label>
-  <label>Notes (Injuries, contacts, Samples carried\u2026)<textarea data-k="notes" rows="3">${esc(S.notes)}</textarea></label>`;
+  <label>Notes (contacts, Samples carried, anything else)<textarea data-k="notes" rows="3" maxlength="3000">${esc(S.notes)}</textarea></label>`;
 }
 function pSheet(d) {
   return `<h2>8. Character Sheet</h2><p class="hint">${d.legal ? "Legal and ready to play." : `<b class="errc">${d.errors.length} problem(s) left</b> (see the panel). You can still print.`} Print uses only the sheet.</p>
@@ -834,7 +896,7 @@ function sheet(d) {
     if (!sg || (d.sticky && i === d.die - 1)) { rows.push(`<tr><td>${i + 1}</td><td><i>Wild</i></td><td colspan="2" class="small">Roll d12 on the Wild Surge table</td><td>${boxes(1)}</td></tr>`); continue; }
     rows.push(`<tr><td>${i + 1}</td><td><b>${esc(sg.name)}</b>${sg.sample ? " <i>(Sample)</i>" : ""}${x.fw ? " \u2699" : ""}</td><td class="small">${esc(x.build || "")}<br>${esc(x.line)}</td><td>${x.flux}</td><td>${boxes(1)}</td></tr>`);
   }
-  const trees = d.owned.map(t => `<tr><td>${TREE[t].name}</td><td>${S.trees[t] ? D.forms[S.trees[t]].name : "?"}</td><td>${d.nodes.filter(n => NODE_TREE[n] === t).map(n => NODE[n].name).join(", ")}</td></tr>`).join("") || `<tr><td colspan="3">&nbsp;</td></tr>`;
+  const trees = d.owned.map(t => `<tr><td>${TREE[t].name}</td><td>${D.forms[S.trees[t]] ? D.forms[S.trees[t]].name : "?"}</td><td>${d.nodes.filter(n => NODE_TREE[n] === t).map(n => NODE[n].name).join(", ")}</td></tr>`).join("") || `<tr><td colspan="3">&nbsp;</td></tr>`;
   const feats = d.nodes.map(n => `<li><b>${NODE[n].name}${NODE[n].push ? " (Push)" : ""}:</b> ${esc(tok(NODE[n].text, c))}</li>`).join("");
   const items = Object.keys(d.gear.items).map(i => (d.gear.items[i] > 1 ? d.gear.items[i] + "\u00d7 " : "") + ITEM[i].name);
   return `<div class="sheet"><h1>MUTAGEN</h1>
@@ -849,18 +911,19 @@ function sheet(d) {
   <div><h2>Vitals</h2><table><tr><th>HP</th><td></td><th>Max HP</th><td>${d.hp}</td></tr><tr><th>Temp HP</th><td></td><th>Juice</th><td>\u25cf \u25cb \u25cb</td></tr>
   <tr><th>Flux</th><td colspan="3">${boxes(d.limit)} <small>over = Overload</small></td></tr>
   <tr><th>Limit</th><td>${d.limit}</td><th>Death</th><td>${boxes(3)}</td></tr><tr><th>Breathers</th><td>${boxes(2)}</td><th>Last Gasp</th><td>${boxes(1)}</td></tr></table></div></div>
-  <h2>Knacks</h2><table><tr>${[0, 1, 2, 3, 4].map(i => `<td>${esc(d.knacks[i] || "")}</td>`).join("")}</tr></table>
+  <h2>Knacks</h2><table><tr>${Array.from({ length: Math.max(5, d.knacks.length) }, (_, i) => `<td>${esc(d.knacks[i] || "")}</td>`).join("")}</tr></table>
   <h2>Augments \u2014 ${d.form === "none" ? "" : D.forms[d.form].name}${d.knit ? ` \u00b7 Knit ${d.knit}` : ""}${d.upkeep ? ` \u00b7 Upkeep ${d.upkeep}` : ""}</h2><table><tr><th style="width:18%">Tree</th><th style="width:12%">Bio / Chrome</th><th>Nodes</th></tr>${trees}
   <tr><th>Unlocked parts</th><td colspan="2">Strike, Bolt, Infuse, Kinetic${[...d.unlocked].map(u => ", " + (SHAPE[u] || EFFECT[u]).name).join("")}</td></tr></table>
   <h2>Sequence \u2014 die d${d.die} \u00b7 Prime ${d.prime} <small>(empty slots are Wild; \u2699 Firmware)</small></h2><table><tr><th>#</th><th>Surge</th><th>Build / numbers</th><th>Flux</th><th>Primed</th></tr>${rows.join("")}</table>
   <h2>Attacks</h2><table><tr><th>Weapon</th><th>Attack</th><th>Damage</th><th>Crit</th><th>Range / notes</th></tr>${d.gear.attacks.map(a => `<tr><td>${esc(a.name)}</td><td>${sgn(a.atk)}</td><td>${a.dmg}</td><td>${a.crit}</td><td class="small">${esc(a.range)}${a.notes ? " \u00b7 " + esc(a.notes) : ""}</td></tr>`).join("")}</table>
-  <div class="g2"><div><h2>Gear & Scrip</h2><p class="small"><b>Scrip:</b> ${d.gear.scrip} \u00b7 <b>Upkeep due:</b> ${d.upkeep}<br>${D.armors.find(a => a.id === S.armor).name}${S.shield ? ", Shield" : ""}, GRAFT ID, radio, flashlight, ${items.join(", ")}</p></div>
-  <div><h2>Scars, Faults, Injuries</h2><p class="small">${d.scars.map(id => `<b>${SCAR[id].name}:</b> ${SCAR[id].text}`).join("<br>") || "&nbsp;"}${S.patchApplied ? "<br>Patch Applied (+1 Limit)" : ""}</p></div></div>
+  <div class="g2"><div><h2>Gear & Scrip</h2><p class="small"><b>Scrip:</b> ${d.gear.scrip} \u00b7 <b>Upkeep due:</b> ${d.upkeep}<br>${d.suit.name}${d.suit.notes ? " (" + d.suit.notes.toLowerCase() + ")" : ""}${S.shield ? ", Shield (one hand)" : ""}, GRAFT ID, radio, flashlight, ${items.join(", ")}</p></div>
+  <div><h2>Scars, Faults, Injuries</h2><p class="small">${d.scars.map(id => `<b>${SCAR[id].name}:</b> ${SCAR[id].text}`).concat(d.injuries.map(id => `<b>${INJ[id].name}</b> (injury): ${INJ[id].text}`)).join("<br>") || "&nbsp;"}${S.patchApplied ? "<br>Patch Applied (+1 Limit)" : ""}</p></div></div>
   <h2>Features</h2><ul class="small feats">${d.origin ? `<li><b>${d.origin.name}:</b> ${d.origin.perk}</li>` : ""}${d.bioN ? `<li><b>Knit:</b> regain ${d.knit} HP after each combat and Breather.</li>` : ""}${d.chromeN ? `<li><b>Firmware:</b> once per combat after Priming, swap a Primed Surge for a \u2699 Surge. Disadvantage on defense vs Shock.</li>` : ""}<li><b>Overload:</b> ${d.form === "splice" ? "roll Bloom and Glitch, choose one" : d.form === "chrome" ? "Glitch table" : "Bloom table"}; Rank d6 damage (${d.R}d6), Flux to 0.</li>${feats}${S.level >= 10 ? `<li><b>Final Form:</b> ${D.finalForm}</li>` : ""}</ul>
   <h2>Drive</h2><p class="small"><b>Why the Mutagen?</b> ${esc(S.drive.why)} \u00b7 <b>Goal:</b> ${esc(S.drive.goal)} \u00b7 <b>Owe / hate:</b> ${esc(S.drive.owe)}${S.notes ? "<br><b>Notes:</b> " + esc(S.notes) : ""}</p></div>`;
 }
 
 /* ---------- events ---------- */
+function twistFits(t, sh) { return !!sh && (t.works === "any" || (t.works === "strikebolt" && (sh.id === "strike" || sh.id === "bolt")) || (t.works === "area" && !!sh.area) || (t.works === "damage" && sh.kind === "damage")); }
 function onField(e, rerender) {
   const t = e.target; const k = t.dataset.k; if (!k || k === "_sample") return;
   let v = t.type === "checkbox" ? t.checked : t.value;
@@ -868,10 +931,34 @@ function onField(e, rerender) {
   if (t.dataset.num && v === "" && k.startsWith("stats.")) v = null;
   if (t.type === "radio" && !t.checked) return;
   setPath(S, k, v);
-  if (k.startsWith("surges.") && k.endsWith(".shape")) { const i = +k.split(".")[1]; const sg = S.surges[i]; const sh = SHAPE[sg.shape]; if (sh && EFFECT[sg.effect] && EFFECT[sg.effect].kind !== sh.kind) sg.effect = ""; sg.twists = []; }
+  if (k.startsWith("surges.") && k.endsWith(".shape")) { const i = +k.split(".")[1]; const sg = S.surges[i]; const sh = SHAPE[sg.shape]; if (sh && EFFECT[sg.effect] && EFFECT[sg.effect].kind !== sh.kind) sg.effect = ""; sg.twists = (sg.twists || []).filter(x => twistFits(TWIST[x], sh)); }
   if (k.startsWith("buyWeapons.") && k.endsWith(".frame")) { const i = +k.split(".")[1]; S.buyWeapons[i].mod = ""; }
   if (k === "kit") S.kitMods = {};
-  if (rerender) render(); else { const d = derive(S); document.getElementById("summary").innerHTML = summary(d); document.getElementById("printArea").innerHTML = sheet(d); store("autosave", S); }
+  if (rerender) render(); else { const d = derive(S); document.getElementById("summary").innerHTML = summary(d); document.getElementById("printArea").innerHTML = sheet(d); storageOk = store("autosave", S); }
+}
+// "Fit to level": remove picks the current level doesn't allow (after lowering the level).
+function trimToLevel() {
+  const L = lvl(S.level), maxT = D.twistsByRank(L.rank);
+  for (const b in S.boosts) if (+b > S.level) delete S.boosts[b];
+  const apexOk = id => S.level >= D.apexLevel && S.nodes.filter(x => NODE_TREE[x] === NODE_TREE[id] && x !== id).length >= D.apexNeeds;
+  let guard = 0;
+  while (guard++ < 50) {
+    const badApex = S.nodes.find(id => NODE[id].apex && !apexOk(id));
+    if (badApex) { S.nodes = S.nodes.filter(x => x !== badApex); continue; }
+    if (S.nodes.length <= L.nodes) break;
+    const usedTrees = new Set(); S.surges.forEach(sg => { if (sg.sample) return; [SHAPE[sg.shape], EFFECT[sg.effect]].forEach(p => p && p.unlock && usedTrees.add(p.unlock)); });
+    const lone = id => NODE[id].root && S.nodes.filter(x => NODE_TREE[x] === NODE_TREE[id]).length === 1;
+    const pick = test => { for (let j = S.nodes.length - 1; j >= 0; j--) if (test(S.nodes[j])) return j; return -1; };
+    let idx = pick(id => !NODE[id].root); if (idx < 0) idx = pick(id => lone(id) && !usedTrees.has(NODE_TREE[id])); if (idx < 0) idx = pick(lone);
+    const gone = S.nodes.splice(idx, 1)[0]; if (NODE[gone].root) delete S.trees[NODE_TREE[gone]];
+  }
+  const ownedT = new Set(S.nodes.map(x => NODE_TREE[x]));
+  S.surges = S.surges.filter(sg => sg.sample || [SHAPE[sg.shape], EFFECT[sg.effect]].every(p => !p || !p.unlock || ownedT.has(p.unlock)));
+  const d = derive(S);
+  S.surges.forEach(sg => { sg.twists = (sg.twists || []).slice(0, maxT); });
+  for (let j = S.surges.length - 1; j >= 0 && S.surges.filter(x => !x.sample).length > d.known; j--) if (!S.surges[j].sample) S.surges.splice(j, 1);
+  if (S.surges.length > d.slots) S.surges.length = d.slots;
+  const room = Math.max(0, d.knReq - 1); if (S.knacks.length > room) S.knacks = S.knacks.filter(k => k.trim()).slice(0, room);
 }
 function act(a, el) {
   const i = el.dataset.i !== undefined ? +el.dataset.i : -1;
@@ -882,7 +969,7 @@ function act(a, el) {
     case "addknack": S.knacks.push(""); break;
     case "addsurge": S.surges.push({ name: "", shape: "", effect: "", twists: [] }); break;
     case "addsample": S.surges.push({ name: "Sample", shape: "", effect: "", twists: [], sample: true }); break;
-    case "randsurges": { const r = randomChar(S.level); const owned = d.owned; const okPart = p => !p.unlock || owned.includes(p.unlock); const maxT = D.twistsByRank(d.R);
+    case "randsurges": { const owned = d.owned; const okPart = p => !p.unlock || owned.includes(p.unlock);
       while (S.surges.filter(x => !x.sample).length < d.known && S.surges.length < d.slots) { const sh = pick(D.shapes.filter(p => okPart(p) && D.effects.some(e => okPart(e) && e.kind === p.kind))); const ef = pick(D.effects.filter(e => okPart(e) && e.kind === sh.kind)); S.surges.push({ name: ef.name + " " + pick(D.surgeWords[sh.id]), shape: sh.id, effect: ef.id, twists: [] }); } break; }
     case "up": if (i > 0) [S.surges[i - 1], S.surges[i]] = [S.surges[i], S.surges[i - 1]]; break;
     case "down": if (i < S.surges.length - 1) [S.surges[i + 1], S.surges[i]] = [S.surges[i], S.surges[i + 1]]; break;
@@ -890,34 +977,47 @@ function act(a, el) {
     case "addweapon": S.buyWeapons.push({ frame: "pistol", mod: "" }); break;
     case "delweapon": S.buyWeapons.splice(i, 1); break;
     case "estimate": S.scripAdj = estimateScrip(S); break;
+    case "trim": trimToLevel(); break;
     case "print": window.print(); return;
     case "export": exportJSON(); return;
     default: return;
   }
   render();
 }
+// Replace the whole character safely: if it can't be loaded or rendered, keep the old one.
+function replaceState(next, msg) {
+  const prev = S;
+  try { S = normalize(next); render(); return true; }
+  catch (err) { S = prev; try { render(); } catch (e2) { S = blank(); render(); } alert(msg || "That file isn't a Mutagen character."); return false; }
+}
 function exportJSON() {
-  const blob = new Blob([JSON.stringify(S, null, 2)], { type: "application/json" });
-  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = (S.name || "freelancer").replace(/[^\w-]+/g, "_") + ".mutagen.json"; document.body.appendChild(a); a.click(); a.remove();
+  const blob = new Blob([JSON.stringify(Object.assign({ app: "mutagen-builder", rules: D.version }, S), null, 2)], { type: "application/json" });
+  const a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = (S.name || "freelancer").replace(/[^\w-]+/g, "_").slice(0, 60) + ".mutagen.json"; document.body.appendChild(a); a.click(); a.remove();
 }
 function refreshSaves() {
   const list = load("saves") || {};
   document.getElementById("loadSel").innerHTML = `<option value="">Load\u2026</option>` + Object.keys(list).map(n => `<option>${esc(n)}</option>`).join("");
 }
+function stepFromHash() { const m = /^#step-(\d)$/.exec(location.hash); return m ? Math.min(STEPS.length - 1, Math.max(0, +m[1] - 1)) : null; }
+function setStep(i) { step = Math.min(STEPS.length - 1, Math.max(0, i)); try { history.pushState(null, "", "#step-" + (step + 1)); } catch (e) {} render(); window.scrollTo(0, 0); const h = document.querySelector("#panel h2"); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
 function init() {
-  const auto = load("autosave"); if (auto) S = normalize(auto);
+  const auto = load("autosave");
+  if (auto) { try { S = normalize(auto); } catch (e) { S = blank(); } }
+  const hs = stepFromHash(); if (hs !== null) step = hs;
   document.getElementById("lvlTop").innerHTML = levelOpts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join("");
+  window.addEventListener("popstate", () => { const h = stepFromHash(); if (h !== null && h !== step) { step = h; render(); } });
   const app = document.getElementById("app");
   app.addEventListener("input", e => { if (e.target.matches("input[type=text],input:not([type]),textarea")) onField(e, false); });
   app.addEventListener("change", e => {
     const t = e.target;
     if (t.id === "lvlTop") { S.level = +t.value; render(); return; }
-    if (t.id === "loadSel") { const l = load("saves") || {}; if (l[t.value]) { S = normalize(l[t.value]); render(); } t.value = ""; return; }
+    if (t.id === "loadSel") { const l = load("saves") || {}; if (l[t.value]) replaceState(l[t.value], "That save is damaged and couldn't be loaded."); t.value = ""; return; }
     if (t.id === "exSel") { if (t.value) { S = fromExample(t.value); step = 7; render(); } t.value = ""; return; }
-    if (t.id === "importFile") { const f = t.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { try { S = normalize(JSON.parse(r.result)); render(); } catch (err) { alert("Not a Mutagen character file."); } }; r.readAsText(f); t.value = ""; return; }
+    if (t.id === "importFile") { const f = t.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { let o = null; try { o = JSON.parse(r.result); } catch (err) {} if (!looksLikeCharacter(o)) alert("That file isn't a Mutagen character (expected an exported .mutagen.json)."); else replaceState(o); }; r.readAsText(f); t.value = ""; return; }
     if (t.dataset.node) { const id = t.dataset.node; if (t.checked) S.nodes.push(id); else { S.nodes = S.nodes.filter(x => x !== id); if (NODE[id].root) { const tr = NODE_TREE[id]; S.nodes = S.nodes.filter(x => NODE_TREE[x] !== tr); delete S.trees[tr]; } } if (t.checked && NODE[id].root && !S.trees[NODE_TREE[id]]) S.trees[NODE_TREE[id]] = "bio"; render(); return; }
     if (t.dataset.twist !== undefined) { const sg = S.surges[+t.dataset.twist]; sg.twists = sg.twists || []; if (t.checked) sg.twists.push(t.value); else sg.twists = sg.twists.filter(x => x !== t.value); render(); return; }
     if (t.dataset.scar) { if (t.checked) S.scars.push(t.dataset.scar); else S.scars = S.scars.filter(x => x !== t.dataset.scar); render(); return; }
+    if (t.dataset.inj) { if (t.checked) S.injuries.push(t.dataset.inj); else S.injuries = S.injuries.filter(x => x !== t.dataset.inj); render(); return; }
     if (t.dataset.act === "samplepick") { const x = D.sampleSurges[+t.value]; if (x) S.surges.push({ name: x[0], shape: x[1], effect: x[2], twists: x[3].slice() }); render(); return; }
     if (t.dataset.k) onField(e, true);
   });
@@ -925,18 +1025,18 @@ function init() {
     const b = e.target.closest("[data-step],[data-act],#btnRandom,#btnNew,#btnSave");
     if (!b) return;
     if (b.id === "btnRandom") { S = randomChar(S.level); render(); return; }
-    if (b.id === "btnNew") { if (confirm("Start a new blank character? (Unsaved changes are lost.)")) { const L = S.level; S = blank(); S.level = L; step = 0; render(); } return; }
-    if (b.id === "btnSave") { const n = prompt("Save as:", S.name || "Freelancer"); if (n) { const l = load("saves") || {}; l[n] = JSON.parse(JSON.stringify(S)); store("saves", l); refreshSaves(); } return; }
-    if (b.dataset.step !== undefined && b.tagName !== "SELECT") { step = +b.dataset.step; render(); window.scrollTo(0, 0); return; }
+    if (b.id === "btnNew") { if (confirm("Start a new blank character? (Unsaved changes are lost.)")) { const L = S.level; S = blank(); S.level = L; setStep(0); } return; }
+    if (b.id === "btnSave") { const n = prompt("Save as:", S.name || "Freelancer"); if (n) { const l = load("saves") || {}; l[n.slice(0, 80)] = JSON.parse(JSON.stringify(S)); if (!store("saves", l)) alert("Couldn't save: this browser's storage is full or disabled. Use Export to keep a file instead."); refreshSaves(); } return; }
+    if (b.dataset.step !== undefined && b.tagName !== "SELECT") { setStep(+b.dataset.step); return; }
     if (b.dataset.act && b.tagName !== "SELECT") act(b.dataset.act, b);
   });
-  document.getElementById("prevB").onclick = () => { step = Math.max(0, step - 1); render(); window.scrollTo(0, 0); };
-  document.getElementById("nextB").onclick = () => { step = Math.min(STEPS.length - 1, step + 1); render(); window.scrollTo(0, 0); };
+  document.getElementById("prevB").onclick = () => setStep(step - 1);
+  document.getElementById("nextB").onclick = () => setStep(step + 1);
   document.getElementById("btnImport").onclick = () => document.getElementById("importFile").click();
   document.getElementById("btnExport").onclick = exportJSON;
   refreshSaves(); render();
 }
-window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render };
+window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render, normalize, trimToLevel };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 
