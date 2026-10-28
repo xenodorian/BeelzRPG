@@ -352,6 +352,8 @@ const MUTAGEN = {
 (function () {
 "use strict";
 const D = MUTAGEN;
+// Chapter links: relative offline, GitHub-rendered online (Pages turns .md into .html).
+const DOC = location.protocol === "file:" ? "../chapters/" : "https://github.com/xenodorian/BeelzRPG/blob/main/chapters/";
 const STAT_IDS = D.stats.map(s => s.id);
 const STAT_NAME = Object.fromEntries(D.stats.map(s => [s.id, s.name]));
 const NODE = {}, NODE_TREE = {};
@@ -690,7 +692,7 @@ function summary(d) {
 }
 function pStart(d) {
   return `<h2>1. Concept & Level</h2>
-  <p class="hint">One sentence: a job, a body change, and a flaw. Then pick a level; everything that scales follows it. <a href="../chapters/13_Character_Building_Guide.md">Guide</a> \u00b7 <a href="../chapters/02_Character_Creation.md">Ch 2</a></p>
+  <p class="hint">One sentence: a job, a body change, and a flaw. Then pick a level; everything that scales follows it. <a href="${DOC}13_Character_Building_Guide.md">Guide</a> \u00b7 <a href="${DOC}02_Character_Creation.md">Ch 2</a></p>
   <div class="row"><label>Name<input data-k="name" value="${esc(S.name)}" placeholder="Dree \u201cBrownout\u201d Ocampo"></label><label>Player<input data-k="player" value="${esc(S.player)}"></label></div>
   <label>Concept<input data-k="concept" value="${esc(S.concept)}" placeholder="Ex-cop with a shotgun arm who can't stop apologising"></label>
   <label>Level ${sel("level", levelOpts, S.level, 'data-num="1"')}</label>
@@ -716,7 +718,7 @@ function pStats(d) {
   return h;
 }
 function pOrigin(d) {
-  let h = `<h2>3. Origin & Knacks</h2><p class="hint">Pick or roll an Origin: it gives one Knack and a Perk. Knacks are narrow specialties that add Rank to checks. <a href="../chapters/01_Core_Rules.md#knacks">Ch 1</a></p>
+  let h = `<h2>3. Origin & Knacks</h2><p class="hint">Pick or roll an Origin: it gives one Knack and a Perk. Knacks are narrow specialties that add Rank to checks. <a href="${DOC}01_Core_Rules.md#knacks">Ch 1</a></p>
   <button class="btn" data-act="rollorigin">Roll d6</button><div class="cards">`;
   D.origins.forEach((o, i) => { h += `<label class="card pickc${S.origin === o.id ? " on" : ""}"><input type="radio" name="origin" data-k="origin" value="${o.id}"${S.origin === o.id ? " checked" : ""}> <b>${i + 1}. ${o.name}</b><div class="small"><i>${o.blurb}</i><br>Knack: <b>${o.knack}</b><br>${o.perk}</div></label>`; });
   h += `</div><h3>Knacks (${d.knacks.length}/${d.knReq})</h3><p class="hint">Origin Knack: <b>${esc(d.origin ? d.origin.knack : "\u2014")}</b>. Write ${d.knReq - 1} more (3 at level 1, +1 at 4 and 8; a Bloom <i>Blossom</i> adds one).</p>`;
@@ -738,7 +740,7 @@ function nodeState(n, t, d) {
 }
 function pAug(d) {
   const c = { R: d.R, st: d.st };
-  let h = `<h2>4. Augments</h2><p class="hint">Picks: <b>${d.nodes.length}/${d.L.nodes}</b>. Root first; choose each tree's Form when you take its Root. Apex: level 7+ and 3 other nodes. <a href="../chapters/03_Augment_Trees.md">Ch 3</a></p>
+  let h = `<h2>4. Augments</h2><p class="hint">Picks: <b>${d.nodes.length}/${d.L.nodes}</b>. Root first; choose each tree's Form when you take its Root. Apex: level 7+ and 3 other nodes. <a href="${DOC}03_Augment_Trees.md">Ch 3</a></p>
   <div class="formbox">${d.form === "none" ? "Take a Root to begin." : `<b class="form ${d.form}">${D.forms[d.form].name}</b>: ${D.forms[d.form].perk} <i>${D.forms[d.form].cost}</i>`}${d.bioN ? ` <b>Knit ${d.knit} HP.</b>` : ""}${d.upkeep ? ` <b>Upkeep ${d.upkeep}/mission.</b>` : ""}</div><div class="trees">`;
   D.trees.forEach(t => {
     const own = d.owned.includes(t.id), f = S.trees[t.id];
@@ -757,7 +759,7 @@ function pAug(d) {
 function pSurges(d) {
   const c = { R: d.R };
   const maxT = D.twistsByRank(d.R);
-  let h = `<h2>5. Surges & Sequence</h2><p class="hint">Sequence <b>d${d.die}</b> \u00b7 Prime <b>${d.prime}</b> (hold up to ${d.maxPrimed}) \u00b7 Surges known <b>${d.known}</b> \u00b7 Twists per Surge <b>${maxT}</b>${maxT > 1 ? " (different)" : ""}. Shape + Effect (+ Twist); 1 Flux + 1 per Twist. Empty slots are Wild. \u2699 = Firmware can swap it in. <a href="../chapters/04_Surges.md">Ch 4</a></p>
+  let h = `<h2>5. Surges & Sequence</h2><p class="hint">Sequence <b>d${d.die}</b> \u00b7 Prime <b>${d.prime}</b> (hold up to ${d.maxPrimed}) \u00b7 Surges known <b>${d.known}</b> \u00b7 Twists per Surge <b>${maxT}</b>${maxT > 1 ? " (different)" : ""}. Shape + Effect (+ Twist); 1 Flux + 1 per Twist. Empty slots are Wild. \u2699 = Firmware can swap it in. <a href="${DOC}04_Surges.md">Ch 4</a></p>
   <div class="small">Unlocked parts: <b>${["Strike", "Bolt", "Infuse", "Kinetic"].concat([...d.unlocked].map(u => (SHAPE[u] || EFFECT[u]).name)).join(", ")}</b></div>`;
   for (let i = 0; i < d.die; i++) {
     const sg = S.surges[i], x = d.surges[i];
@@ -786,7 +788,7 @@ function pSurges(d) {
 function pGear(d) {
   const g = d.gear;
   const modOpts = only => [["", "No mod"]].concat(D.mods.filter(m => !m.only || m.only === only).map(m => [m.id, `${m.name} (100)`]));
-  let h = `<h2>6. Gear & Scrip</h2><p class="hint">One Starting Kit + common items (${D.commonKit.text}, 2 rations, 1 Damper). 50 Scrip to spend. One Mod per weapon. One armor + optional Shield; Armor max 4. <a href="../chapters/08_Gear.md">Ch 8</a></p>
+  let h = `<h2>6. Gear & Scrip</h2><p class="hint">One Starting Kit + common items (${D.commonKit.text}, 2 rations, 1 Damper). 50 Scrip to spend. One Mod per weapon. One armor + optional Shield; Armor max 4. <a href="${DOC}08_Gear.md">Ch 8</a></p>
   <div class="cards">${D.kits.map(k => `<label class="card pickc${S.kit === k.id ? " on" : ""}"><input type="radio" name="kit" data-k="kit" value="${k.id}"${S.kit === k.id ? " checked" : ""}> <b>${k.name}</b><div class="small">${k.weapons.map(w => typeof w === "string" ? FRAME[w].name : w.choice ? w.choice.map(x => FRAME[x].name).join(" or ") : FRAME[w.frame].name + " + " + MOD[w.mod].name).join(", ")}, ${Object.keys(k.items).map(i => (k.items[i] > 1 ? k.items[i] + " " : "") + ITEM[i].name).join(", ")}${k.scrip ? `, +${k.scrip} Scrip` : ""}</div></label>`).join("")}</div>`;
   const kw = kitWeapons(S);
   if (kw.length) {
@@ -809,7 +811,7 @@ function pGear(d) {
 }
 function pExtras(d) {
   const box = (list, title) => `<h3>${title}</h3><div class="cards">${list.map(x => `<label class="card pickc${S.scars.includes(x.id) ? " on" : ""}"><input type="checkbox" data-scar="${x.id}"${S.scars.includes(x.id) ? " checked" : ""}> <b>${x.name}</b><div class="small">${x.text}</div></label>`).join("")}</div>`;
-  return `<h2>7. Drive & Extras</h2><p class="hint">Answer three questions. Then record anything play has done to you: Scars/Faults are permanent Overload results (<a href="../chapters/05_Flux_and_Overload.md">Ch 5</a>); new characters have none.</p>
+  return `<h2>7. Drive & Extras</h2><p class="hint">Answer three questions. Then record anything play has done to you: Scars/Faults are permanent Overload results (<a href="${DOC}05_Flux_and_Overload.md">Ch 5</a>); new characters have none.</p>
   <label>Why did you take the Mutagen?<input data-k="drive.why" value="${esc(S.drive.why)}"></label>
   <label>What do you want before the campaign ends?<input data-k="drive.goal" value="${esc(S.drive.goal)}"></label>
   <label>Who in Halcyon do you owe, or hate?<input data-k="drive.owe" value="${esc(S.drive.owe)}"></label>
