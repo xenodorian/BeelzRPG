@@ -13,6 +13,7 @@
 5. Check the box, log what you did, commit with a descriptive message.
 
 ## File Map
+
 | Path | Contents | Owner notes |
 |---|---|---|
 | `README.md` | Cover, pitch, table of contents | Keep the TOC in sync with `chapters/` |
@@ -46,6 +47,7 @@
 - **Art:** placeholder images are AI-generated; no real people; keep files < 500 KB (JPG quality ~80).
 
 ## Glossary
+
 | Term | Meaning | Defined in |
 |---|---|---|
 | **Action / Quick / Move / Reaction** | The four parts of a turn (Reaction is once per round) | Ch 6 |
@@ -97,7 +99,7 @@
 ## Task List
 ### Setup
 - [x] Read owner's homebrew (4M, Spectrum, Mech Suit Panic, Survive the Anomalies) and note style preferences
-- [x] Survey public SRDs for structure (D&D 5e SRD, Blades in the Dark SRD, Cypher, PbtA, Fate, Into the Odd/Cairn, Mothership, Lancer)
+- [x] Use public SRDs as structural models (D&D 5e SRD: d20 + bonus, advantage, conditions; Blades in the Dark: clocks → Spill Clock; Cypher/Into the Odd: player-facing rolls, fixed enemy damage; PbtA/Fate: Knacks as free-form aspects; Lancer: modular builds). *Drawn from existing knowledge of those public rules; no fresh web survey this pass. A contributor could do a deeper comparison.*
 - [x] Repo layout: `README.md`, `Current_Work.md`, `chapters/`, `sheets/`, `art/`, `tools/`
 - [x] Generate placeholder art (8 images, 130–305 KB each)
 

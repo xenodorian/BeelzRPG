@@ -6,6 +6,7 @@ Every enemy is built from three parts: **Threat level (T)**, **Role**, and **Tra
 
 ## 1. Threat Level
 T runs 1–10, matching the party level it's meant for.
+
 | T | TN | HP | Damage |
 |---|---|---|---|
 | 1 | 12 | 18 | 7 |
@@ -25,6 +26,7 @@ T runs 1–10, matching the party level it's meant for.
 - **Damage** is fixed, no rolling. Area attacks deal it to everyone who fails (half to those who succeed).
 
 ## 2. Role
+
 | Role | Guard | HP | Damage | Special | Cost |
 |---|---|---|---|---|---|
 | **Mook** | TN −1 | Dies to any damage | ½ | Come in groups | ½ |
@@ -37,6 +39,7 @@ T runs 1–10, matching the party level it's meant for.
 | **Boss** | TN +1 | ×1 per PC | ×1 | One action in the Enemy Phase **plus one Interrupt** (an action right after any player's turn, once per round). Ends one condition on itself each Enemy Phase. Has a **Shift** at half HP. | 1 per PC |
 
 ## 3. Traits (pick 1–3)
+
 | Trait | Effect |
 |---|---|
 | **Armored** | Armor 1 (T1–4) or 2 (T5+). |
@@ -65,6 +68,7 @@ T runs 1–10, matching the party level it's meant for.
 
 ## Building an Encounter
 **Budget = number of players.** Spend it on enemy Costs at T = party level.
+
 | Difficulty | Budget | Expect |
 |---|---|---|
 | Easy | ×¾ | ~15% of party HP lost |
@@ -82,54 +86,55 @@ T runs 1–10, matching the party level it's meant for.
 > **Traits:** ... · **Tactics:** one sentence.
 
 ## Example Threats
-**Spill Rats** — T1 Mook · Guard 11 · TN 12 · HP — · Speed 30 (climb)
+**Spill Rats** — T1 Mook · Guard 11 · TN 12 · HP — · Speed 30 (climb)  
 **Attack:** Bite (Dodge, Single, melee) — 3. **Traits:** Mover (climb), Mutagenic 1. **Tactics:** Pour out of pipes in fours; swarm whoever is bleeding.
 
-**Scrapjack Picker** — T1 Skirmisher · Guard 13 · TN 12 · HP 13 · Speed 40
+**Scrapjack Picker** — T1 Skirmisher · Guard 13 · TN 12 · HP 13 · Speed 40  
 **Attack:** Hook-blade (Dodge, Single, melee) or Rivet Gun (Dodge, Single, 60 ft) — 7. **Traits:** Pack. **Tactics:** Hit, retreat, and gang up on anyone with visible chrome.
 
-**Ward Tough** — T1 Soldier · Guard 12 · TN 12 · HP 18 · Speed 30
+**Ward Tough** — T1 Soldier · Guard 12 · TN 12 · HP 18 · Speed 30  
 **Attack:** Pipe or Pistol (Dodge, Single, melee/60 ft) — 7. **Traits:** — . **Tactics:** Wants to be paid, not killed. Surrenders at half HP.
 
-**Bloomhound** — T2 Skirmisher · Guard 13 · TN 12 · HP 18 · Speed 50
+**Bloomhound** — T2 Skirmisher · Guard 13 · TN 12 · HP 18 · Speed 50  
 **Attack:** Split-Jaw (Dodge, Single, melee) — 9, Held. **Traits:** Pack, Grabby. **Tactics:** Hunts in pairs; one holds, one bites.
 
-**Turret Drone** — T2 Artillery · Guard 12 · TN 12 · HP 18 · Speed 30 (fly)
+**Turret Drone** — T2 Artillery · Guard 12 · TN 12 · HP 18 · Speed 30 (fly)  
 **Attack:** Flechette Spray (Dodge, Area 10 ft, 90 ft) — 6. **Traits:** Mover (fly), Armored, Explosive. **Tactics:** Hovers out of reach; targets clustered players.
 
-**Drain Beast** — T2 Brute · Guard 11 · TN 12 · HP 50 · Speed 30 (swim)
+**Drain Beast** — T2 Brute · Guard 11 · TN 12 · HP 50 · Speed 30 (swim)  
 **Attack:** Crush (Endure, Single, reach 10 ft) — 13, Held. **Traits:** Huge, Grabby, Regenerating, Vulnerable (Blaze). **Tactics:** Drags one victim under water and sits on them.
 
-**Ostrander Cleaner** — T3 Soldier · Guard 13 · TN 13 · HP 32 · Speed 30
+**Ostrander Cleaner** — T3 Soldier · Guard 13 · TN 13 · HP 32 · Speed 30  
 **Attack:** Purge Rifle (Dodge, Single, 120 ft) — 10, or Foam Sprayer (Endure, Area 15-ft cone) — 10. **Traits:** Armored, Purger. **Tactics:** Advances in pairs behind cover; foams anyone mid-Surge.
 
-**Sporecaller** — T3 Controller · Guard 13 · TN 13 · HP 32 · Speed 30
+**Sporecaller** — T3 Controller · Guard 13 · TN 13 · HP 32 · Speed 30  
 **Attack:** Spore Hymn (Endure, Area 10 ft, 60 ft) — 5, Poisoned. **Traits:** Venomous, Mutagenic 1, Leader. **Tactics:** A Bloom priest; stays behind its flock and sings.
 
-**Mirrormaw** — T4 Elite · Guard 13 · TN 13 · HP 78 · Speed 30 (climb)
+**Mirrormaw** — T4 Elite · Guard 13 · TN 13 · HP 78 · Speed 30 (climb)  
 **Attack ×2:** Glass Teeth (Dodge, Single, melee) — 12, Exposed. **Traits:** Mimic, Corrosive, Sample (*Bolt + Corrode*). **Tactics:** Looks like a vending machine, a door, or your friend.
 
-**Glasshide** — T5 Brute · Guard 13 · TN 14 · HP 92 · Speed 30
+**Glasshide** — T5 Brute · Guard 13 · TN 14 · HP 92 · Speed 30  
 **Attack:** Crystal Maul (Endure, Single, reach 10 ft) — 19, Prone. **Traits:** Huge, Armored, Vulnerable (Shock). **Tactics:** A bear grown into a cathedral of quartz. Charges the loudest thing.
 
-**Hunter-Killer Unit** — T6 Elite · Guard 14 · TN 14 · HP 106 · Speed 40
+**Hunter-Killer Unit** — T6 Elite · Guard 14 · TN 14 · HP 106 · Speed 40  
 **Attack ×2:** Mono-wire (Dodge, Single, reach 10 ft) or Arc Pistol (Dodge, Single, 60 ft) — 15, Dazed. **Traits:** Shocking, Armored, Sample (*Wave + Shock*). **Tactics:** Ostrander's chrome assassin. Kills the medic first.
 
-**The Drowned Choir** — T8 Controller · Guard 15 · TN 15 · HP 67 · Speed 20 (swim)
+**The Drowned Choir** — T8 Controller · Guard 15 · TN 15 · HP 67 · Speed 20 (swim)  
 **Attack:** Undertow Song (Resist, Area 30 ft around it) — 9, Shaken. **Traits:** Terrifying, Mutagenic 2, Swarm. **Tactics:** Fifty drowned voices fused into one. Pulls the Shaken toward the water.
 
 ### Boss: The Brood Matriarch
-**The Brood Matriarch** — T1 Boss · Guard 13 · TN 12 · HP 18 × players · Speed 0 (rooted) → 30 after Shift
+**The Brood Matriarch** — T1 Boss · Guard 13 · TN 12 · HP 18 × players · Speed 0 (rooted) → 30 after Shift  
 **Actions** (one per Enemy Phase + one Interrupt):
 - *Brood-Lash* (Dodge, Single, reach 15 ft) — 7, Held.
 - *Screech* (Resist, Area 30 ft around her) — 7, Shaken.
 - *Birth:* 2 Spill Rats crawl out of her (max 6 on the field).
-**Traits:** Huge, Mutagenic 1, Sample (*Burst + Snare*: "Brood Web").
-**Shift (half HP):** She tears free of the wall. Speed 30, and *Brood-Lash* hits everyone within 15 ft (**Area**).
+**Traits:** Huge, Mutagenic 1, Sample (*Burst + Snare*: "Brood Web").  
+**Shift (half HP):** She tears free of the wall. Speed 30, and *Brood-Lash* hits everyone within 15 ft (**Area**).  
 **Tactics:** Holds the strongest freelancer, Births when she has fewer than 3 rats, Screeches when 2+ players are near.
 
 ## Quick Reskins (d6)
 Need a monster now? Pick a stat block above and roll a new look.
+
 | d6 | Bio twist | Chrome twist |
 |---|---|---|
 | 1 | Fused from several animals | Built from a dead vehicle |

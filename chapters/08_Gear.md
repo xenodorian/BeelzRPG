@@ -10,6 +10,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 **Damage = Rank × die + attack stat.** A level 5 freelancer (Rank 3) with a Heavy weapon and Grit +3 deals 3d10+3.
 
 ### Frames
+
 | Frame | Die | Stat | Range | Hands | Notes | Cost |
 |---|---|---|---|---|---|---|
 | **Unarmed** | d4 | Grit | Melee | — | Always available | — |
@@ -25,6 +26,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 **Area weapons** work like area Surges: one attack, compare to each Guard, half damage on a miss.
 
 ### Mods (one per weapon, 100 Scrip each)
+
 | Mod | Effect |
 |---|---|
 | **Keen Edge / Hollow-point** | Crit on 19–20. |
@@ -40,6 +42,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 
 ## Armor
 Armor reduces each hit by its value. **Total Armor (gear + Augments) maxes at 4.**
+
 | Armor | Armor | Notes | Cost |
 |---|---|---|---|
 | **Light** (padded jacket, scavenged plates) | 1 | — | 30 |
@@ -47,6 +50,7 @@ Armor reduces each hit by its value. **Total Armor (gear + Augments) maxes at 4.
 | **Shield** (door, riot shield) | +1 | Uses one hand | 40 |
 
 ## Kit
+
 | Item | Effect | Cost |
 |---|---|---|
 | **Medkit** | 3 charges for the Patch action | 25 |
@@ -66,6 +70,7 @@ Armor reduces each hit by its value. **Total Armor (gear + Augments) maxes at 4.
 
 ## Starting Kits
 Every kit includes: **Light armor**, GRAFT ID, radio, flashlight, 2 rations, 1 Damper.
+
 | Kit | Contents |
 |---|---|
 | **Bruiser** | Heavy melee weapon, Medkit, Grapnel |

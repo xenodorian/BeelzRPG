@@ -22,6 +22,7 @@ There are three kinds of roll:
 The GM almost never rolls. Enemies don't roll to hit you; **you roll to avoid them** (see [Combat](06_Combat.md)).
 
 ## Difficulty (DC)
+
 | DC | Difficulty | Example |
 |---|---|---|
 | — | Trivial | No roll. Just do it. |
@@ -62,6 +63,7 @@ To help someone, describe how and use your Action (in combat) or just do it (out
   - **Shrug:** end one condition on yourself.
 
 ## Stats at a Glance
+
 | Stat | It's about | Rolls it covers |
 |---|---|---|
 | **Grit** | Toughness, force, refusal to fall over | Power melee, lifting, breaking, **Endure** defense, Max HP |

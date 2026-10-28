@@ -12,6 +12,7 @@
 - **10 missions, 10 levels.**
 
 ## Read the Game
+
 | # | Chapter |
 |---|---|
 | 0 | [Introduction & Setting](chapters/00_Introduction.md) |

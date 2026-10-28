@@ -26,6 +26,7 @@ Results last **until the end of your next turn** unless they say otherwise. **Sc
 > **Why go over?** Sometimes the fight is worth it. An Overload resets your Flux and the table has a few gifts. Most results hurt, though, and doing it twice in a fight is a good way to end up Down.
 
 ### Bloom Table (Bio)
+
 | d12 | Result |
 |---|---|
 | 1 | **Scar.** A permanent, uncontrolled mutation. Roll on the Scar table below. |
@@ -42,6 +43,7 @@ Results last **until the end of your next turn** unless they say otherwise. **Sc
 | 12 | **Evolution.** One Primed Surge becomes Amped, and gain 1 Juice. |
 
 ### Glitch Table (Chrome)
+
 | d12 | Result |
 |---|---|
 | 1 | **Fault.** A permanent malfunction. Roll on the Fault table below. |
@@ -59,6 +61,7 @@ Results last **until the end of your next turn** unless they say otherwise. **Sc
 
 ## Scars and Faults (d6)
 Permanent, but survivable. A clinic can remove one for **200 Scrip** between missions.
+
 | d6 | Bio Scar | Chrome Fault |
 |---|---|---|
 | 1 | **Weeping Pores.** You leave a trail; disadvantage on stealth checks against smell-trackers. | **Tick.** Your chrome clicks audibly; disadvantage on stealth checks against hearing. |

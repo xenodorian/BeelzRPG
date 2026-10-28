@@ -18,6 +18,7 @@ A Surge = **one Shape + one Effect** (+ optional **Twist**). Name it and describ
 You can use any **base** part, plus parts **unlocked** by trees you have the Root of.
 
 ### Shapes (how it's delivered)
+
 | Shape | Unlock | Target | Attack stat | Damage on hit |
 |---|---|---|---|---|
 | **Strike** | base | One creature in melee reach | Grit or Moxie | (Rank+1)**d10** + stat |
@@ -33,6 +34,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 
 ### Effects (what it does)
 **Damage Effects** go with Strike, Bolt, Burst, Wave, or Pulse. The rider applies on a hit (conditions are in [Combat](06_Combat.md#conditions)).
+
 | Effect | Unlock | Damage type | Rider on hit |
 |---|---|---|---|
 | **Kinetic** | base | Kinetic | +1 damage die, and you may push the target 10 ft |
@@ -46,6 +48,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 | **Dread** | Mind | Psychic | Shaken |
 
 **Infuse Effects** go only with Infuse. No roll, no miss.
+
 | Effect | Unlock | What happens |
 |---|---|---|
 | **Mend** | Glands | Target regains (Rank+1)d8 + Gumption HP and ends Burning and Poisoned. A Down target stands up. |
@@ -56,6 +59,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 
 ### Twists (optional, +1 Flux each)
 A Surge can carry **one Twist** (two from Rank 3). Each Twist adds **+1 Flux** to its cost. Twists are always available.
+
 | Twist | Works with | Effect |
 |---|---|---|
 | **Chain** | Strike, Bolt | After resolving, repeat it against a second target within 15 ft of the first for half damage. |

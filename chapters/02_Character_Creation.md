@@ -16,6 +16,7 @@ You don't pick a race or a class. You pick **how you carry yourself** (Stats), *
 9. **Drive.** Answer three questions: *Why did you take the Mutagen? What do you want before the campaign ends? Who in Halcyon do you owe, or hate?*
 
 ## Derived Numbers (Level 1)
+
 | Number | Value |
 |---|---|
 | **Rank** | 1 |
@@ -40,6 +41,7 @@ Stats are attitudes, not body parts. A gangly kid can have huge Grit; it means t
 > **Which defense?** Attacks you can sidestep (claws, bullets, spit) are **Dodge**. Things you must take on the chin (gas, explosions you can't escape, disease, grabs) are **Endure**. Things that attack your mind (fear, hacking your wetware, psychic screams) are **Resist**. Every threat's stat block names the defense.
 
 ## Origins (roll d6 or choose)
+
 | d6 | Origin | Knack | Perk |
 |---|---|---|---|
 | 1 | **Spill-Born** — raised in the flooded Wards. | *Scavenging* | Advantage on Endure against poison, disease, and anything that adds Flux to you. |

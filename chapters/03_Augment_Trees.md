@@ -23,6 +23,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 | **Splice** (you have both) | Meat and metal fighting for the same body | Overload: roll on **both** tables, then choose one result. | Your Flux Limit is **−1**. |
 
 ## Tree Summary
+
 | Tree | Stats | Role | Unlocks |
 |---|---|---|---|
 | **Hide** | Grit | Tank, protector | Pulse (shape), Quake, Shell |
@@ -35,7 +36,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 ---
 
 ## HIDE
-*Bio: chitin plates, scales, rubbery blubber, bark-skin. Chrome: dermal plating, kinetic mesh, ablative shell.*
+*Bio: chitin plates, scales, rubbery blubber, bark-skin. Chrome: dermal plating, kinetic mesh, ablative shell.*  
 **Unlocks:** Pulse, Quake, Shell.
 
 - **Root — Plating.** +1 Armor (**+2 from Rank 3**). Armor from all sources maxes at 4.
@@ -46,7 +47,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Apex — Unbreakable.** Once per round, when you fail a defense roll, **Push** to succeed instead. You can't be knocked Prone or moved against your will.
 
 ## LIMBS
-*Bio: claws, mantis blades, tentacles, extra arms, digitigrade legs. Chrome: piston arms, mono-blades, grapple lines, servo-arms, hydraulic legs.*
+*Bio: claws, mantis blades, tentacles, extra arms, digitigrade legs. Chrome: piston arms, mono-blades, grapple lines, servo-arms, hydraulic legs.*  
 **Unlocks:** Wave, Snare.
 
 - **Root — Natural Weapons.** Claws, blades, or pistons: a melee weapon (**d8**, Grit or Moxie) that can't be disarmed and doesn't need a free hand.
@@ -57,7 +58,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Apex — Flurry.** When you take the Attack action with natural weapons, make a second attack with half the damage dice (round up).
 
 ## SENSES
-*Bio: compound eyes, pit organs, bat ears, whiskers, a third eye. Chrome: optic suites, targeting HUD, radar, audio filters.*
+*Bio: compound eyes, pit organs, bat ears, whiskers, a third eye. Chrome: optic suites, targeting HUD, radar, audio filters.*  
 **Unlocks:** Glare, Veil.
 
 - **Root — Keen.** See in darkness out to 60 ft. Advantage on checks to notice hidden things. Bright light can't Blind you.
@@ -68,7 +69,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Apex — Deadeye.** Your ranged attacks Crit on 18–20. Once per round, **Push** to reroll a missed attack.
 
 ## GLANDS
-*Bio: venom sacs, acid glands, healing bile, spore pods. Chrome: chem injectors, nanite reservoirs, drug pumps, nozzle ports.*
+*Bio: venom sacs, acid glands, healing bile, spore pods. Chrome: chem injectors, nanite reservoirs, drug pumps, nozzle ports.*  
 **Unlocks:** Burst, Toxin, Corrode, Mend.
 
 - **Root — Spit.** A ranged natural attack (**d8**, 30 ft, Nerve or Grit), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.
@@ -79,7 +80,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Apex — Living Pharmacy.** Stim Gland affects you and every ally within 15 ft at once. Your Mend Surges cost no Flux.
 
 ## WIRING
-*Bio: hyper-fast nerves, eel-organs, adrenal crystals. Chrome: reflex boosters, synthetic muscle, capacitor banks, plasma coils.*
+*Bio: hyper-fast nerves, eel-organs, adrenal crystals. Chrome: reflex boosters, synthetic muscle, capacitor banks, plasma coils.*  
 **Unlocks:** Shock, Blaze, Haste.
 
 - **Root — Quickened.** +10 ft speed. You can **Dash** as a Quick action. Your group has advantage on initiative checks.
@@ -90,7 +91,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Apex — Blur.** You get two Moves each turn. If you've moved 20+ ft this turn, roll Dodge with advantage until your next turn.
 
 ## MIND
-*Bio: swollen cortex, psionic nodules, pheromone glands, a voice that echoes. Chrome: neural coprocessor, wetware deck, voice modulator, antenna crown.*
+*Bio: swollen cortex, psionic nodules, pheromone glands, a voice that echoes. Chrome: neural coprocessor, wetware deck, voice modulator, antenna crown.*  
 **Unlocks:** Dread, Link.
 
 - **Root — Uplink.** Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. **Mind Spike:** a ranged attack (**d8**, 60 ft, Nerve or Chutzpah), Psychic damage.
@@ -103,6 +104,7 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 ---
 
 ## Building With Trees: Sample Archetypes
+
 | Archetype | Trees | Plays like |
 |---|---|---|
 | **Brick** | Hide + Limbs | Stands in the doorway, holds enemies, hits back |

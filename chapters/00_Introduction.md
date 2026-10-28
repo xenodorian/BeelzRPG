@@ -37,6 +37,7 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 7. **One mission, one level:** a campaign runs 10 missions, levels 1 to 10. ([Chapter 7](07_Advancement.md))
 
 ## Chapter Map
+
 | # | Chapter | What's in it |
 |---|---|---|
 | 0 | Introduction | This page |

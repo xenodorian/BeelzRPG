@@ -3,6 +3,7 @@
 **One mission, one level.** When the party completes a GRAFT contract (successfully or not, as long as they survive and learn something), everyone gains a level. A full campaign is **10 missions**: levels 1 to 10, with the finale played at level 10. For shorter games, start at level 3 or 5.
 
 ## Level Table
+
 | Level | Rank | Augment nodes | Surges known | Sequence die | Prime | Other |
 |---|---|---|---|---|---|---|
 | 1 | 1 | 2 | 3 | d4 | 2 | 3 Knacks |

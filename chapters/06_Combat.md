@@ -25,6 +25,7 @@ On your turn you get a **Move**, an **Action**, and a **Quick action**, in any o
 **Move.** Up to your speed (30 ft). Climbing, swimming, crawling, and difficult terrain cost double. Standing from Prone costs half your speed.
 
 ### Actions
+
 | Action | What it does |
 |---|---|
 | **Attack** | Weapon or natural attack: d20 + stat + Rank vs Guard. Damage = **Rank × weapon die + stat**. |
@@ -97,6 +98,7 @@ At **0 HP** you are **Down**: fall Prone, drop what you're holding, and you can 
 - **Last Gasp** ([Chapter 5](05_Flux_and_Overload.md#last-gasp)) can keep you up once per Lockdown.
 
 ### Injury Table (d6)
+
 | d6 | Injury (until Lockdown) |
 |---|---|
 | 1 | **Cracked Ribs.** −5 Max HP. |

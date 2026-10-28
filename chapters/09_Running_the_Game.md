@@ -49,6 +49,7 @@ Each freelancer picks **one**:
 - **Juice:** in the moment.
 
 ## Factions at a Glance
+
 | Faction | Wants | Will pay for | Will kill for |
 |---|---|---|---|
 | **GRAFT** | Contain the Spill cheaply | Samples, clean reports | Leaked internal memos |
@@ -58,6 +59,7 @@ Each freelancer picks **one**:
 | **Drowned Wards** | To be left alone, clean water | Protection, medicine | Anyone who brings the Spill home |
 
 ## Mission Generator (roll d6 four times)
+
 | d6 | Client | Job | Location | Twist |
 |---|---|---|---|---|
 | 1 | GRAFT handler | Recover a lost Sample | Flooded subway | The target is a person |
