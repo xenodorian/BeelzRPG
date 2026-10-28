@@ -10,7 +10,7 @@ You don't pick a race or a class. You pick **how you carry yourself** (Stats), *
 3. **Origin.** Pick or roll one (below). Write down its Knack and Perk.
 4. **Knacks.** Write **two more** Knacks (3 total). Keep them narrow.
 5. **Augments.** Take **two nodes** from the [Augment Trees](03_Augment_Trees.md). Each tree starts with its **Root**, so you'll take either two Roots or one Root plus one node of that tree. For each tree, choose its **Form: Bio or Chrome**.
-6. **Surges.** Build **3 Surges** ([Chapter 4](04_Surges.md)) and number them 1–3 on your Sequence. Slot 4 is Wild.
+6. **Surges.** Build **3 Surges** ([Chapter 4](04_Surges.md)) and number them 1–3 on your Sequence. Slot 4 is Wild (Lab Escapees build a 4th instead).
 7. **Gear.** Take one **Kit** from [Gear](08_Gear.md#starting-kits) and **50 Scrip**.
 8. **Fill in the numbers** (below).
 9. **Drive.** Answer three questions: *Why did you take the Mutagen? What do you want before the campaign ends? Who in Halcyon do you owe, or hate?*

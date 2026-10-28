@@ -18,8 +18,8 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 
 | Form | Looks like | Perk | Cost |
 |---|---|---|---|
-| **Bio** (grown) | Chitin, scales, extra eyes, glands, tentacles, glowing veins | **Knit:** when you take a Breather, regain extra HP equal to **Rank × your number of Bio trees**. | Your Overloads roll on the **Bloom** table. |
-| **Chrome** (installed) | Plates, pistons, optics, ports, wiring, servo-arms | **Firmware:** once per combat, right after you Prime, you may swap one Primed Surge for any Surge you know that uses a part unlocked by a Chrome tree. | Your Overloads roll on the **Glitch** table. You roll defense with **disadvantage against Shock** attacks. **Upkeep:** 25 Scrip per Chrome tree each mission, or start the mission with +1 Flux per unpaid tree. |
+| **Bio** (grown) | Chitin, scales, extra eyes, glands, tentacles, glowing veins | **Knit:** at the end of each combat, and when you take a Breather, regain HP equal to **Rank × your number of Bio trees**. | Your Overloads roll on the **Bloom** table. |
+| **Chrome** (installed) | Plates, pistons, optics, ports, wiring, servo-arms | **Firmware:** once per combat, right after you Prime, you may swap one Primed Surge for any Surge you know that uses a part unlocked by one of your Chrome trees (base parts alone don't count). | Your Overloads roll on the **Glitch** table. You roll defense with **disadvantage against Shock** attacks. **Upkeep:** 25 Scrip per Chrome tree each mission (GRAFT prepays your first), or start the mission with +1 Flux per unpaid tree. |
 | **Splice** (you have both) | Meat and metal fighting for the same body | Overload: roll on **both** tables, then choose one result. | Your Flux Limit is **−1**. |
 
 ## Tree Summary
@@ -44,14 +44,14 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Barbs.** When an enemy's melee attack damages you, it takes **2 × Rank** damage.
 - **Adaptive.** When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old.
 - **Bulwark.** *Reaction:* when an ally within 10 ft is targeted by a Single attack, you become the target instead and roll your own defense. **Push:** roll it with advantage.
-- **Apex — Unbreakable.** Once per round, when you fail a defense roll, **Push** to succeed instead. You can't be knocked Prone or moved against your will.
+- **Apex — Unbreakable.** Once per round, when you fail a defense roll, **Push** to take half damage and ignore its rider. You can't be knocked Prone or moved against your will.
 
 ## LIMBS
 *Bio: claws, mantis blades, tentacles, extra arms, digitigrade legs. Chrome: piston arms, mono-blades, grapple lines, servo-arms, hydraulic legs.*  
 **Unlocks:** Wave, Snare.
 
 - **Root — Natural Weapons.** Claws, blades, or pistons: a melee weapon (**d8**, Grit or Moxie) that can't be disarmed and doesn't need a free hand.
-- **Extra Arm.** A third limb. Hold one more item, and draw, stow, or interact without using your Quick action. Once per turn, when you hit with a melee attack, **Push** to knock the target Prone (not Huge creatures).
+- **Extra Arm.** A third limb. Hold one more item, and draw, stow, or interact without using your Quick action. Once per turn, when you hit with a melee attack, deal **+1 damage die** (one more of that attack's dice); **Push:** also knock the target Prone (not Huge).
 - **Grapnel.** Your melee reach is 10 ft. As your Move, you can pull yourself up to 30 ft to any surface you can see, or yank an unheld object to your hand.
 - **Crusher Grip.** Once per turn when you hit with a natural weapon, the target is **Held**. Huge creatures and Bosses require a **Push**.
 - **Spring Legs.** +10 ft speed. Jump 20 ft long or 10 ft high as part of your move, climb at full speed, and take half falling damage.
@@ -66,13 +66,13 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 - **Threat Sense.** You and your group can't be surprised. *Reaction:* when an ally within 30 ft makes a defense roll, add your Nerve to it (declare before rolling).
 - **Analyzer.** You can **Analyze** as a Quick action once per turn.
 - **Long Sight.** Double the range of your ranged attacks and ranged Surges. Ignore partial cover. Read lips at 300 ft.
-- **Apex — Deadeye.** Your ranged attacks Crit on 18–20. Once per round, **Push** to reroll a missed attack.
+- **Apex — Deadeye.** Your ranged attacks (weapons, Spit, Mind Spike, ranged Surges) Crit on 18–20. Once per round, **Push** to reroll a missed attack.
 
 ## GLANDS
 *Bio: venom sacs, acid glands, healing bile, spore pods. Chrome: chem injectors, nanite reservoirs, drug pumps, nozzle ports.*  
 **Unlocks:** Burst, Toxin, Corrode, Mend.
 
-- **Root — Spit.** A ranged natural attack (**d8**, 30 ft, Nerve or Grit), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.
+- **Root — Spit.** A ranged natural attack (**d8**, 30 ft, Nerve or Gumption), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.
 - **Regenerate.** At the start of your turn, if you're at half HP or less (and not Down), regain **Rank + 1** HP.
 - **Stim Gland.** *Action* (or *Quick* with **Push**): you or a creature you touch regains **Rank d6 + Gumption** HP and ends Burning or Poisoned. Twice per Breather.
 - **Adrenal Dump.** The first time each combat you drop to half HP or less, gain **2 × Rank + Grit** temporary HP and advantage on your next attack.
@@ -84,11 +84,11 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 **Unlocks:** Shock, Blaze, Haste.
 
 - **Root — Quickened.** +10 ft speed. You can **Dash** as a Quick action. Your group has advantage on initiative checks.
-- **Reflex Spike.** *Reaction:* when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker.
+- **Reflex Spike.** *Reaction,* **Push:** when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker with half the damage dice (round up).
 - **Capacitor.** Once per turn when you hit with a melee attack, deal **+1 damage die** (one more of that attack's dice) as Shock. **Push:** the target is also Dazed.
 - **Slipstream.** You never provoke Opportunity Strikes, can move through enemies' spaces, and take **no** damage when you succeed on a Dodge against an area attack.
-- **Overclock.** Once per combat, take one extra Action on your turn, then gain 1 Flux.
-- **Apex — Blur.** You get two Moves each turn. If you've moved 20+ ft this turn, roll Dodge with advantage until your next turn.
+- **Overclock.** Once per Breather, take one extra Action on your turn, then gain 1 Flux.
+- **Apex — Blur.** You get two Moves each turn. If you've moved 20+ ft this turn, roll your first Dodge each round with advantage until your next turn.
 
 ## MIND
 *Bio: swollen cortex, psionic nodules, pheromone glands, a voice that echoes. Chrome: neural coprocessor, wetware deck, voice modulator, antenna crown.*  
@@ -96,9 +96,9 @@ When you take a tree's Root, choose its **Form**. Every node in that tree shares
 
 - **Root — Uplink.** Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. **Mind Spike:** a ranged attack (**d8**, 60 ft, Nerve or Chutzpah), Psychic damage.
 - **Intrude.** *Action:* Gumption or Chutzpah + Rank vs a creature's TN (or a device's DC): read its surface thoughts, or seize an unattended device for 1 minute. In combat, a Mook machine obeys you until the end of next round; any other machine is Dazed.
-- **Puppet.** *Action,* **Push:** Chutzpah + Rank vs the TN of a non-Boss creature. On success, it immediately moves up to its speed where you choose, or makes one attack against a target you choose.
-- **Iron Will.** Advantage on Resist. Allies within 30 ft get +1 to Resist.
-- **Precog.** *Reaction,* **Push:** when you or an ally within 30 ft makes a d20 roll, roll another d20; they choose which to keep.
+- **Puppet.** *Action,* **Push:** Chutzpah + Rank vs the TN of a non-Boss creature. On success, it immediately moves up to its speed where you choose, or makes one attack against a target you choose: an enemy target simply takes the attack's Damage (no roll, no rider); a player target defends normally.
+- **Iron Will.** Advantage on Resist, and you can't be Shaken. Allies within 30 ft get +1 to Resist.
+- **Precog.** *Reaction,* **Push:** when you or an ally within 30 ft is about to make a d20 roll (declare before rolling), they roll it with advantage.
 - **Apex — Hive Mind.** Prime one extra Surge at the start of each combat. Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll.
 
 ---

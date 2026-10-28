@@ -17,7 +17,7 @@ Every Surge, every Push, every Churn floods your cells (or circuits) with Mutage
 
 ## Overload
 The moment your Flux goes **above** your Limit, you **Overload**:
-1. Take **Rank d6** damage (ignores Armor). This can't drop you below 1 HP.
+1. Take **Rank d6** damage (ignores Armor). Overload damage (including Glitch *Short*) can't drop you below 1 HP; if you're already Down, skip it.
 2. Roll **d12** on your Form's table: **Bloom** if all your trees are Bio, **Glitch** if all are Chrome. Splices roll both and pick one.
 3. Set your Flux to **0**.
 

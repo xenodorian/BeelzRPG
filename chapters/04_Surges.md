@@ -58,7 +58,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 | **Link** | Mind | Target and up to Rank other allies within 30 ft get advantage on their next d20 roll before the end of next round. |
 
 ### Twists (optional, +1 Flux each)
-A Surge can carry **one Twist** (two from Rank 3). Each Twist adds **+1 Flux** to its cost. Twists are always available.
+A Surge can carry **one Twist** (two **different** Twists from Rank 3). Each Twist adds **+1 Flux** to its cost. Twists are always available.
 
 | Twist | Works with | Effect |
 |---|---|---|
@@ -103,7 +103,7 @@ Unused Primed Surges fade when combat ends.
 **Missed?** If a Strike or Bolt Surge misses, the Flux is still paid but the Surge **stays Primed** (still Amped, if it was). Your body tried; it'll try again.
 
 ## Churning
-**Churn** is a Quick action: gain **1 Flux** and roll your Sequence die once; that Surge is Primed (doubles with an already Primed Surge make it Amped). You can't hold more Primed Surges than **Prime + 1**; if you would, choose which to drop.
+**Churn** is a Quick action: gain **1 Flux** and roll your Sequence die once; that Surge is Primed (doubles with an already Primed Surge make it Amped). You **can't Churn on a turn you Unleash** (before or after); a Misfire's free Churn is the only exception. You can't hold more Primed Surges than **Prime + 1**; if you would, choose which to drop.
 
 ## Surges Outside Combat
 In any tense scene where the GM calls for initiative-style timing (a chase, a heist gone loud), Surges work the same way. In calm scenes you can't Prime; the Mutagen only answers when you're afraid.

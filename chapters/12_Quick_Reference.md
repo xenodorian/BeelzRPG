@@ -23,7 +23,7 @@ HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve · Speed 30 · Armor ma
 
 ## Surges
 **Prime** at combat start: roll Sequence die × Prime (2; 3 at L5+). Doubles = **Amped** (0 Flux). Wild slot = roll Wild table (each separately, never doubles).  
-**Unleash** (Action): pay 1 Flux + 1 per Twist; a missed Strike/Bolt stays Primed. **Churn** (Quick): +1 Flux, roll once more (max Prime + 1 held).  
+**Unleash** (Action): pay 1 Flux + 1 per Twist; a missed Strike/Bolt stays Primed. **Churn** (Quick): +1 Flux, roll once more; not on a turn you Unleash (max Prime + 1 held).  
 **Juice:** reroll a d20 · choose a Prime · end a condition.
 
 | Shape | Target | Stat | Dice |
@@ -55,7 +55,7 @@ Gain Flux: Unleash, Churn, Push. Over Limit → **Overload:** take Rank d6 (min 
 0 HP: Prone, crawl 5 ft. End of each Enemy Phase: Endure DC 10, fail = Death mark (nat 20: up at 1 HP). Damage while Down = mark. 3 marks = dead. Any healing = up. Roll Injury (d6).
 
 ## Rest
-**Breather** (1 hr, 2 per Lockdown): regain ½ Max HP (+Knit), Flux 0, clear Death marks. **Lockdown** (8 hr safe): full reset.
+**Breather** (1 hr, 2 per Lockdown): regain ½ Max HP (+Knit, which also triggers after each combat), Flux 0, clear Death marks. **Lockdown** (8 hr safe): full reset.
 
 ## Threat Builder
 

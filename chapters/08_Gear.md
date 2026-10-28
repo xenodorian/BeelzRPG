@@ -29,7 +29,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 
 | Mod | Effect |
 |---|---|
-| **Keen Edge / Hollow-point** | Crit on 19–20. |
+| **Keen Edge / Hollow-point** | Crit on 19–20. (Crit ranges don't stack; use the widest.) |
 | **Shock Coil** | Damage becomes Shock; on a Crit, the target is Dazed. |
 | **Incendiary** | Damage becomes Blaze; on a Crit, the target is Burning. |
 | **Venom Channel** | Damage becomes Toxin; on a Crit, the target is Poisoned. |

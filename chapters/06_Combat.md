@@ -5,7 +5,7 @@ Combat is fast because the GM barely rolls. Players attack enemies' **Guard**; p
 ## Starting a Fight
 1. **Who goes first?**
    - If the freelancers start it (ambush, first shot), **players go first**.
-   - If enemies ambush, the group makes a **Nerve** group check (notice) vs the enemies' highest TN. Failure: enemies take a free Enemy Phase first.
+   - If enemies ambush, the group makes a **Nerve** group check (notice) vs the enemies' highest TN. Failure: enemies take a free Enemy Phase first; after it, players go first.
    - Otherwise, the group makes a **Moxie** group check vs the enemies' highest TN. Success: players go first. Failure: enemies go first.
 2. **Prime.** Every freelancer rolls their Sequence dice ([Surges](04_Surges.md#priming)).
 3. Run rounds.
@@ -13,11 +13,11 @@ Combat is fast because the GM barely rolls. Players attack enemies' **Guard**; p
 ## The Round
 Each round has two phases:
 1. **Player Phase.** Players take turns in any order they agree on, one at a time.
-2. **Enemy Phase.** Every enemy acts. The GM declares each enemy's action; targeted players roll defense.
+2. **Enemy Phase.** Every enemy gets a **Move and one action** (usually an attack; Elites attack twice, Bosses see [Threats](10_Threats.md)). The GM declares them all; targeted players roll defense.
 
 Then the next round starts. If enemies went first, the round is Enemy Phase then Player Phase.
 
-**Durations.** "Until the end of its next turn" means the end of that creature's next turn. For enemies, their turn is the Enemy Phase. So a condition you put on an enemy during the Player Phase lasts through the coming Enemy Phase.
+**Durations.** "Until the end of its next turn" means the end of that creature's next turn. For enemies, their turn is the Enemy Phase. So a condition you put on an enemy during the Player Phase lasts through the coming Enemy Phase. **"Until the end of next round"** means through the whole round after the current one.
 
 ## Your Turn
 On your turn you get a **Move**, an **Action**, and a **Quick action**, in any order. You also get **one Reaction** per round (it refreshes at the start of your turn).
@@ -91,7 +91,7 @@ All conditions last **until the end of the affected creature's next turn** unles
 ## Going Down
 At **0 HP** you are **Down**: fall Prone, drop what you're holding, and you can only crawl 5 ft and speak.
 - At the end of each Enemy Phase, roll **Endure (DC 10)**. Failure: mark a **Death mark**. A natural 20: stand up with 1 HP.
-- Taking damage while Down marks a Death mark (two on a Crit or failed defense vs a Boss).
+- You can still be attacked while Down; you defend normally (Prone: disadvantage against melee). Taking damage while Down marks a Death mark (two on a Crit or failed defense vs a Boss).
 - **3 Death marks: you die.**
 - Any healing stands you up with that much HP. Death marks clear on a Breather.
 - When you go Down, roll on the **Injury** table. Injuries last until your next Lockdown.

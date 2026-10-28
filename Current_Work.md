@@ -3,7 +3,7 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-28)
-**Playable v0.1.** All 13 chapters, character sheets, starter mission with 4 pregens, and 8 placeholder images are in. Math pass and two playtest walkthroughs are done (below). Needs real table playtesting.
+**Playable v0.1.1** (sanity check done; see *Sanity Check 2026-10-28*). All 13 chapters, character sheets, starter mission with 4 pregens, and 8 placeholder images are in. Math pass and two playtest walkthroughs are done (below). Needs real table playtesting.
 
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
@@ -34,6 +34,7 @@
 | `sheets/Character_Sheet.md` / `.html` | Fillable/printable sheet | |
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
 | `tools/balance_sim.py` | Monte Carlo combat sim | Re-run after number changes |
+| `tools/tree_compare.py` | Per-tree expected DPR / HP lost / Flux per fight at L1, L5, L10 | Re-run after node changes |
 
 ## Style Guide
 - **Format:** GitHub-flavoured Markdown, one chapter per file, numeric prefixes (`NN_Name.md`). Images via relative paths (`../art/x.jpg`).
@@ -61,7 +62,7 @@
 | **Bio / Chrome / Splice** | Form of a tree; Splice = you have both | Ch 3 |
 | **Bloom / Glitch** | Overload tables for Bio / Chrome | Ch 5 |
 | **Breather / Lockdown** | Short rest (½ HP, Flux 0, 2 per Lockdown) / full rest | Ch 1 |
-| **Churn** | Quick action: +1 Flux, roll one more Prime | Ch 4 |
+| **Churn** | Quick action: +1 Flux, roll one more Prime; not on a turn you Unleash | Ch 4 |
 | **Crit** | Natural 20 on an attack: double damage dice | Ch 1 |
 | **Death mark** | 3 while Down = dead | Ch 6 |
 | **Defense** | Dodge (Moxie), Endure (Grit), Resist (Nerve), + Rank | Ch 1, 6 |
@@ -124,6 +125,7 @@
 - [x] Glossary: every capitalized game term defined
 - [x] Playtest walkthrough: L1 and L5 rounds (see Playtest)
 - [x] Consistency pass: link/anchor check (0 broken), cross-chapter numbers
+- [x] Sanity check 2026-10-28: logic + per-tree balance review (see section below)
 - [ ] **Live playtest** with real players (needs humans)
 
 ### Backlog (unclaimed — pick one!)
@@ -209,9 +211,63 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - 2026-10-28 — Wild #1 *Misfire* and #12 *Perfect Expression* had unclear timing; rewritten.
 - 2026-10-28 — Playtest fixes: missed Strike/Bolt Surges stay Primed; Wild dice never Amp; Spore Bloom spares the user; Blood Price +3 → +2 dice; Feedback 30 → 20 ft; Militia initiative wording.
 
+## Sanity Check 2026-10-28
+A fresh skeptical read of every chapter as a new player/GM, six L1 test builds (one per tree: all legal with base parts + that tree's unlocks), and a new per-tree model (`tools/tree_compare.py`).
+
+### Verdict
+The core loop (d20 + Stat + Rank, player-facing defense, T/Role/Trait threats) was sound and its numbers matched across chapters, the Quick Reference, and the sheets. The real problems were: **(1)** Churn let you Surge on *every* turn, so Flux was the only brake and weapons became the backup; **(2)** several timing holes (Precog, Puppet, Overload while Down, ambush rounds, "end of next round"); **(3)** tree imbalance: Limbs added no damage before level 7, Wiring out-damaged everything, Unbreakable/Precog approached immunity, and Gumption characters had no attack stat. All fixed below; debatable calls are listed as open questions.
+
+### Findings and fixes
+| # | Severity | Finding | Fix (file) |
+|---|---|---|---|
+| 1 | **Breaking** | Churn (Quick) + Unleash (Action) every turn meant a Surge every round after Primes ran out; sims and "Surges are optional spikes" assumed 2–3 per fight. | You can't Churn on a turn you Unleash (Misfire's free Churn excepted). Gives ~3 Surges per 4-round fight. (ch 4, ch 12) |
+| 2 | **Breaking** | Puppet's "makes one attack against a target you choose" had no resolution against an enemy (enemies never roll). | Enemy target takes the attack's Damage, no roll/rider; a player target defends. (ch 3) |
+| 3 | **Breaking/Balance** | Precog could be used after seeing a failed roll, making it a near-free success every round. | Declare before rolling; grants advantage. (ch 3) |
+| 4 | Breaking | Two Twists from Rank 3: could the same Twist (Overcharge) be taken twice? | Two **different** Twists. (ch 4) |
+| 5 | Breaking | Overload while Down (e.g. a Mutagenic hit) and Glitch *Short* had no HP floor rule. | Overload damage, including Short, can't drop you below 1 HP; skipped if already Down. (ch 5) |
+| 6 | Clarity | After an ambush's free Enemy Phase, who goes first was undefined. | Players go first after it. (ch 6) |
+| 7 | Clarity | Enemy action economy was only implied. | Each enemy: Move + one action; Elites attack twice; Bosses per ch 10. (ch 6) |
+| 8 | Clarity | "Until the end of next round" (Shell, Veil, Link, Linger, Intrude) was never defined. | Defined: through the whole round after the current one. (ch 6) |
+| 9 | Clarity | Can a Down character be attacked/defend? | Yes, defends normally (Prone: disadvantage vs melee). (ch 6) |
+| 10 | Clarity | Keen Edge (19–20) + Deadeye (18–20) stacking; did Deadeye cover Surges? | Crit ranges don't stack; Deadeye covers weapons, Spit, Mind Spike, ranged Surges. (ch 3, ch 8) |
+| 11 | Clarity | Two Chrome trees' Upkeep (50) ate a new character's entire 50 Scrip. | GRAFT prepays the first mission's Upkeep. (ch 3) |
+| 12 | Clarity | Firmware: did base-only Surges (e.g. Strike + Kinetic) count as "unlocked by a Chrome tree"? | Base parts alone don't count. (ch 3) |
+| 13 | Clarity | Creation step said "slot 4 is Wild", contradicting Lab Escapee. | Noted the exception. (ch 2) |
+| 14 | **Balance** | **Limbs** (the "melee" tree) added zero damage until its L7 Apex; its Root is just a free Standard weapon. | Extra Arm: +1 damage die once per turn on a melee hit (parity with Capacitor/Target Lock); Push still knocks Prone. (ch 3) |
+| 15 | **Balance** | **Wiring** out-damaged every tree (+68% DPR at L5 vs +12–19%): free Reflex Spike every round + Overclock every fight; Blur gave advantage on *all* Dodges at L10. | Reflex Spike now Push + half damage dice; Overclock once per Breather; Blur = advantage on your first Dodge each round. Wiring stays the top striker but now pays ~7 Flux per fight (near-Overload at L5). (ch 3) |
+| 16 | **Balance** | **Unbreakable** (Hide Apex) turned a failed defense into a success every round for 1 Flux: ~2% HP lost in the model. | Now halves that hit and ignores its rider. (ch 3) |
+| 17 | **Balance** | **Gumption** characters had no attack stat at all. | Glands Spit uses Nerve **or Gumption** (was Grit). Ozzie pregen updated to Spit +4, 1d8+3. (ch 3, ch 11) |
+| 18 | Balance | **Bio Knit** (Breather-only HP) was much weaker than **Chrome Firmware** (a chosen Surge every fight). | Knit also triggers at the end of each combat (~30 HP per Lockdown at L5 with 2 Bio trees). (ch 3, ch 12) |
+| 19 | Balance | Iron Will was the weakest node (Resist attacks are rare). | Also immune to Shaken. (ch 3) |
+
+### Per-tree balance (after fixes)
+`tools/tree_compare.py`: one tree taken as deep as possible, otherwise identical freelancer vs same-level Soldiers. DPR is personal damage per round; HP lost is the % of your HP lost in a 4-round fight taking 1.25 attacks/round (lower = tougher); Flux is per fight (baseline 4 = 3 Surges + 1 Churn).
+
+| Tree | L1 DPR | L5 DPR | L10 DPR | L1 / L5 / L10 HP lost | Flux/fight L5 / L10 | Unlocks | Out of combat | Verdict |
+|---|---|---|---|---|---|---|---|---|
+| (none) | 9.8 | 18.0 | 27.1 | 75 / 58 / 49% | 4 / 4 | — | — | baseline |
+| **Hide** | 9.8 | 20.1 | 30.1 | **56 / 38 / 20%** | 4 / 5.5 | 3 | low | Best tank; Bulwark protects others |
+| **Limbs** | 13.0 | 21.4 | **44.6** | 75 / 58 / 49% | 4 / 4 | 2 | high (climb, reach, jump) | Steady melee; strong Apex; team Prone/Held |
+| **Senses** | 12.2 | 20.5 | 35.6 | 75 / 58 / 49% | 4 / 4.3 | 2 | high (scouting) | Modest personal DPR; Analyzer gives the *whole party* −2 Guard every turn (~+14% party DPR) |
+| **Glands** | 9.8 | 18.0 | 27.1 | 50 / 38 / 33% | 4 / 4 | **4** | medium (chem, medicine) | Sustain + healer; most Surge parts; no personal DPR |
+| **Wiring** | 12.8 | **28.8** | 43.0 | 75 / 58 / 22% | **7.2 / 7.5** | 3 | medium (speed) | Top striker, glass cannon; Flux burn ≈ one Overload per fight at L5 |
+| **Mind** | 9.8 | 17.2 | 25.9 | 75 / 39 / 32% | 6 / 6 | 2 | **very high** (telepathy, hacking, social) | Support/control; Puppet and Hive Mind are team effects the model undercounts |
+
+**Bio vs Chrome (per tree, same nodes):** Bio = Knit sustain (~Rank HP per Bio tree after every fight and Breather), Bloom table, no weakness. Chrome = Firmware (pick one Primed Surge per fight), Glitch table, disadvantage vs Shock, 25 Scrip Upkeep per tree. Bloom and Glitch each have 6 harmful, 3 mixed, and 3 helpful results; Bloom's gifts (Blossom = permanent Knack, Cocoon) are slightly kinder, offsetting Chrome's control. **Splice** (both): best-of-two Overload results plus partial perks for −1 Flux Limit is mildly favoured (see Open Questions).
+
+**No must-take or trap remains:** every tree now adds at least one of damage, toughness, or party support by level 5. Mind (lowest personal damage) and Glands (no personal damage) are deliberate support trees. Their healing, control, and stat-sharing isn't in the model.
+
+**Dominant combos checked:** Wiring + Limbs + Senses melee (Capacitor + Extra Arm + Target Lock = +3 dice/turn) is the highest damage build. It's capped by the "once per turn" wording on all three, and the six L5 nodes it needs leave no room for Reflex Spike. It lands at ~27 DPR at L5 (+52%), about the same as pure Wiring, with no defense. Hide + Glands (Regenerate + Armor + Thick) is the toughest build but deals baseline damage. No infinite loops found: Haste can't grant Unleash, Overclock is per Breather, Misfire's Churn chain ends on a non-Misfire, and Perfect Expression/Echo are bounded single uses.
+
 ## Open Questions (owner / future contributors)
 1. Should Bio vs Chrome have a social dimension (e.g. "Humanity" or faction reactions)? Currently only Scars/Faults touch it.
 2. Is a d4 Sequence at level 1 too swingy, or not swingy enough? (3 Surges + 1 Wild, Prime 2.)
 3. Should Knacks be free-form (current) or a fixed list like 4M's skills? Free-form is more compact; a list is less ambiguous.
 4. Enemy damage is fixed. Some tables like rolling; an optional "roll Damage as Td6"-style variant could go in ch 9.
 5. Level 10 Final Form is a single capstone. 4M gives origin-specific capstones; Mutagen could give tree-specific ones (the Apexes partly do this).
+6. **Splice** gets best-of-two Overload results and both (partial) Form perks for only −1 Flux Limit. Raise the cost to −2, or keep it as a reward for mixing? *(Sanity check: mildly favoured, left as is.)*
+7. **Wiring** is still the top personal-damage tree (+60% at L5) and pays with Flux (≈ one Overload per fight). Is "glass cannon via Flux" enough, or should Capacitor need a Push too?
+8. **Regenerate** (Glands) nearly cancels one Soldier's damage in long fights at L5+. Fine for 4-round fights; watch in long boss fights.
+9. **Nerve** is the most loaded stat (ranged attacks, Bolt/Burst Surges, Resist, Flux Limit). Should Flux Limit use the higher of Nerve or Grit?
+10. **Glands unlocks 4 Surge parts** (incl. the only Mend and the only ranged area Shape) vs 2 for Limbs/Senses/Mind. Move Burst elsewhere, or keep Glands as the "toolkit" tree?
+11. **Mind** has the lowest personal damage (Mind Spike ignoring Armor is its edge). Is a support tree with high utility enough, or should Mind Spike scale better?

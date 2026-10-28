@@ -78,7 +78,7 @@ All have Rank 1, Prime 2, Sequence d4 (slot 4 is Wild), Juice 1, a Damper, and t
 - **Defenses:** Dodge +0, Endure +3, Resist +2
 - **Knacks:** Street Medicine, Chemistry, Black-Market Contacts
 - **Augments:** Glands: *Spit* (Bio) · Hide: *Plating* (Chrome)
-- **Attacks:** Spit +3, 1d8+2 Toxin/Corrode (30 ft) · Pistol +2, 1d6+1
+- **Attacks:** Spit +4 (Gumption), 1d8+3 Toxin/Corrode (30 ft) · Pistol +2, 1d6+1
 - **Surges:** 1 *Field Dressing* (Infuse + Mend: 2d8+3 HP) · 2 *Acid Bloom* (Burst + Corrode: +2 (Nerve), 2d6, Exposed) · 3 *Stomp* (Pulse + Quake: +3, 2d6, Prone) · 4 Wild
 - **Gear:** Medic kit (Pistol, Standard melee, 2 Medkits, 2 Stims), Light armor
 - **Perk:** Patch heals +1 extra. **Splice:** roll both Overload tables and choose. Upkeep 25.
