@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><title>Mutagen Character Sheet</title>
+<style>
+@page{size:letter;margin:0.4in}
+body{font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#111;max-width:7.7in;margin:auto}
+h1{font-size:22px;margin:0 0 4px;letter-spacing:3px;border-bottom:3px solid #4c0;padding-bottom:2px}
+h2{font-size:12px;background:#222;color:#bf0;padding:2px 6px;margin:8px 0 3px;text-transform:uppercase;letter-spacing:1px}
+table{width:100%;border-collapse:collapse}
+td,th{border:1px solid #555;padding:3px 4px;vertical-align:top}
+th{background:#eee;font-size:10px;text-align:left}
+.line td{height:18px}
+.big td{height:24px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.box{display:inline-block;width:11px;height:11px;border:1px solid #333;margin-right:2px}
+small{color:#555}
+</style></head><body>
+<h1>MUTAGEN</h1>
+<table class="line"><tr><th>Name</th><td colspan="3"></td><th>Level</th><td></td><th>Rank</th><td></td></tr>
+<tr><th>Origin</th><td colspan="3"></td><th>Player</th><td colspan="3"></td></tr>
+<tr><th>Concept</th><td colspan="7"></td></tr></table>
+<div class="grid">
+<div><h2>Stats</h2><table class="big">
+<tr><th>Grit</th><td></td><th>Dodge <small>(Moxie+Rank)</small></th><td></td></tr>
+<tr><th>Moxie</th><td></td><th>Endure <small>(Grit+Rank)</small></th><td></td></tr>
+<tr><th>Nerve</th><td></td><th>Resist <small>(Nerve+Rank)</small></th><td></td></tr>
+<tr><th>Gumption</th><td></td><th>Speed</th><td></td></tr>
+<tr><th>Chutzpah</th><td></td><th>Armor <small>(max 4)</small></th><td></td></tr></table></div>
+<div><h2>Vitals</h2><table class="big">
+<tr><th>HP</th><td></td><th>Max HP</th><td></td></tr>
+<tr><th>Temp HP</th><td></td><th>Juice</th><td>○ ○ ○</td></tr>
+<tr><th>Flux</th><td colspan="3"><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span><span class="box"></span></td></tr>
+<tr><th>Limit</th><td><small>4+Rank+Nerve</small></td><th>Death</th><td><span class="box"></span><span class="box"></span><span class="box"></span></td></tr>
+<tr><th>Breathers</th><td><span class="box"></span><span class="box"></span></td><th>Last Gasp</th><td><span class="box"></span></td></tr></table></div>
+</div>
+<h2>Knacks</h2><table class="line"><tr><td></td><td></td><td></td><td></td><td></td></tr></table>
+<h2>Augments</h2><table class="line"><tr><th style="width:18%">Tree</th><th style="width:12%">Bio / Chrome</th><th>Nodes</th></tr>
+<tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr>
+<tr><th>Unlocked parts</th><td colspan="2"></td></tr></table>
+<h2>Sequence — die d__ · Prime __ <small style="color:#bf0">(empty slots are Wild)</small></h2>
+<table class="line"><tr><th style="width:4%">#</th><th style="width:26%">Surge</th><th>Shape + Effect (+ Twist)</th><th style="width:8%">Flux</th><th style="width:8%">Primed</th></tr>
+<tr><td>1</td><td></td><td></td><td></td><td></td></tr><tr><td>2</td><td></td><td></td><td></td><td></td></tr><tr><td>3</td><td></td><td></td><td></td><td></td></tr><tr><td>4</td><td></td><td></td><td></td><td></td></tr><tr><td>5</td><td></td><td></td><td></td><td></td></tr><tr><td>6</td><td></td><td></td><td></td><td></td></tr><tr><td>7</td><td></td><td></td><td></td><td></td></tr><tr><td>8</td><td></td><td></td><td></td><td></td></tr><tr><td>9</td><td></td><td></td><td></td><td></td></tr><tr><td>10</td><td></td><td></td><td></td><td></td></tr><tr><td>11</td><td></td><td></td><td></td><td></td></tr><tr><td>12</td><td></td><td></td><td></td><td></td></tr></table>
+<div class="grid">
+<div><h2>Attacks</h2><table class="line"><tr><th>Weapon</th><th>Atk</th><th>Damage</th><th>Range</th></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td><td></td></tr></table></div>
+<div><h2>Gear · Scrip · Upkeep</h2><table class="line"><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr><tr><td></td></tr></table></div>
+</div>
+<div class="grid">
+<div><h2>Scars · Faults · Injuries</h2><table class="line"><tr><td></td></tr><tr><td></td></tr></table></div>
+<div><h2>Drive</h2><table class="line"><tr><th>Why the Mutagen?</th><td></td></tr><tr><th>Goal</th><td></td></tr><tr><th>Owe / hate</th><td></td></tr></table></div>
+</div>
+<p><small>Roll: d20 + Stat (+ Rank on attacks, defenses, and Knack checks). Prime at combat start; doubles = Amped; Unleash = 1 Flux + Twists; Churn = Quick, +1 Flux.</small></p>
+</body></html>
