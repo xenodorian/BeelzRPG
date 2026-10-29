@@ -13,6 +13,8 @@
 - **Flux & Overload:** power has a price, rolled on the Bloom or Glitch tables.
 - **10 missions, 10 levels.**
 
+**Everything in one file:** [Mutagen.html](https://xenodorian.github.io/BeelzRPG/Mutagen.html) ([download](https://github.com/xenodorian/BeelzRPG/raw/main/dist/Mutagen.html)): the whole rulebook with contents and search, the Character Builder, the Arcade and the printable sheet, in one offline HTML file (about 1.8 MB). See [Single-file edition](#single-file-edition).
+
 ## Read the Game
 
 | # | Chapter |
@@ -61,6 +63,14 @@
 - **Level-up:** the primary node is automatic. You pick the secondary/tertiary nodes, new Surges and Signatures, and Knacks (at 3, 6 and 9). Evolutions come at 4 and 7, and Final Form at 10.
 - **Losing:** in standard mode you can retry a lost fight from its start. Each retry wears the enemies down a little (Mercy), and the dead are recovered at the next Lockdown with a permanent Scar or Fault. **Permadeath** mode allows no retries and the dead stay dead.
 - Runs autosave, mid-battle too: resuming puts every token back where it was. Auto this turn / rest of round / Auto-battle are still there. The design notes and simplifications are in [Current_Work.md](Current_Work.md#arcade-gauntlet-mode-arcade).
+
+## Single-file edition
+`dist/Mutagen.html` (also published as [/Mutagen.html](https://xenodorian.github.io/BeelzRPG/Mutagen.html)) is the whole game in one self-contained HTML file. Open it from disk or a USB stick; it needs no internet.
+- **Tabs:** 📖 Rules (all chapters rendered from the Markdown, a contents sidebar with every section, search with `/`), 🧬 Builder, ⚔ Arcade and 📝 Sheet.
+- Builder and Arcade run in the same page and **share saves** (localStorage), as on the website. Builder share links (`Link` button) point at the file itself.
+- All scripts, styles and art are inside the file (art downscaled to 900 px JPEG).
+- **Rebuild it** after changing chapters, the builder or the arcade: `python3 tools/build_single.py` (Python 3; Pillow optional, for smaller art). It writes `dist/Mutagen.html` and `Mutagen.html`.
+- **Test it:** `CHROME=/usr/bin/google-chrome node tools/single_test.js` (puppeteer-core) opens it from `file://` with the network cut off and checks every section: links, search, builder save, an arcade auto-run that uses the builder's save, share links and the phone layout.
 
 ## Contributing
 Start with [Current_Work.md](Current_Work.md): task list, design log, style guide, glossary, and known issues. One chapter per file, so you can work in parallel without conflicts.
