@@ -673,13 +673,14 @@ def crossing(cv, key, target, invert=False):
     """fractional party level where metric (danger, falling with level) crosses target"""
     Ls = sorted(cv)
     xs = [(1 - cv[L][key]) if invert else cv[L][key] for L in Ls]
-    if xs[0] < target:
-        sl = max(0.05 * (target if target < 0.2 else 1), xs[0] - xs[1]) if len(xs) > 1 else 0.1
+    msl = 0.16 * target if target < 0.2 else 0.08   # minimum slope when extrapolating past L1 / L10 (a typical
+    if xs[0] < target:                              # per-level drop in danger; stops ratings running off to 13)
+        sl = max(msl, xs[0] - xs[1]) if len(xs) > 1 else 0.1
         return max(-2.0, Ls[0] - (target - xs[0]) / sl)
     for i in range(len(Ls) - 1):
         if xs[i] >= target >= xs[i + 1]:
             return Ls[i] + (xs[i] - target) / max(1e-9, xs[i] - xs[i + 1])
-    sl = max(0.01, xs[-2] - xs[-1]) if len(xs) > 1 else 0.1
+    sl = max(msl, xs[-2] - xs[-1]) if len(xs) > 1 else 0.1
     return min(13.0, Ls[-1] + (xs[-1] - target) / sl)
 def rating(cv, key='down', target=0.5, parts=False):
     """BR/MR: the lowest party level at which the fight is inside EVERY fairness ceiling:

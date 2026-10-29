@@ -15,7 +15,7 @@ TARGET = {  # name: (primary mode, target rating)
  'Hunter-Killer Unit': ('boss', 6), 'Warden Krell': ('boss', 5),
  'Feral Evolved': ('boss', 7), 'Razorwing Flock': ('minion', 7), 'Bloom Husks': ('minion', 7), 'Gutter Leviathan': ('boss', 8),
  'Seraph Gunship': ('boss', 8), 'The Drowned Choir': ('boss', 8), 'Ostrander Paladin': ('minion', 8), 'Choir Thralls': ('minion', 8),
- 'Mother of Rust': ('boss', 9), 'Reactor Wraith': ('boss', 10), 'Hollow Saint': ('minion', 9.5), 'The Many': ('minion', 9.5),
+ 'Mother of Rust': ('boss', 9), 'Reactor Wraith': ('boss', 10), 'Hollow Saint': ('minion', 9), 'The Many': ('minion', 10),
  'Patient Zero': ('boss', 10)}
 def spec_with(name, fh, fd):
     tune = json.load(open(TF)) if os.path.exists(TF) else {}
