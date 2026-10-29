@@ -3,7 +3,93 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-28)
-**Playable v0.1.1** (sanity check done; see *Sanity Check 2026-10-28*). **New:** ch 13 Character Building Guide and the web [Character Builder](https://xenodorian.github.io/BeelzRPG/builder/) (`builder/index.html`). All 13 chapters, character sheets, starter mission with 4 pregens, and 8 placeholder images are in. Math pass and two playtest walkthroughs are done (below). Needs real table playtesting.
+**v0.2 in progress: Base Forms & Evolution.** The owner dropped the compactness rule. 5 Base Forms, 10-node trees, Evolutions at L4/L7 and a rebalanced threat table. The spec is *v0.2 Design* below. v0.1.1 history (sanity checks, builder) is kept further down for reference.
+
+## v0.2 Design: Base Forms & Evolution (2026-10-28)
+**Owner request (verbatim summary):** drop "keep it simple". 5 Base Forms, each fixing a primary (+3), secondary (+2) and tertiary (+1) stat, with the +0 and −1 going to the dump stats. Evolution 1: +2 primary and +1 to all others. Evolution 2: +3 primary and +1 to all others. Trees of 10 nodes each. A Form grants 3 primary-tree nodes, 2 secondary and 1 tertiary. Each level adds 1 primary node automatically, plus a choice of a secondary or tertiary node. Form-exclusive unlocks on the primary tree at levels 4 and 7. Each Evolution: +1 Prime, a jump in Sequence die size, and one always-ready Surge. Rebalance all challenges. Update the builder too.
+
+This section is the **spec**. Chapters implement it; when they disagree, fix the chapter and log it.
+
+### D1. The five Base Forms
+Each stat is primary for exactly one Form, secondary for one and tertiary for one (a Latin square, so no stat is everyone's dump). Each Form's primary tree follows its primary stat.
+
+| Form | Primary +3 | Secondary +2 | Tertiary +1 | Dump (+0 / −1, your choice) | Primary tree | Secondary tree | Tertiary tree | L4 exclusive | L7 exclusive | Stages (Base → Evo I → Evo II → Final) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| **Juggernaut** | Grit | Nerve | Moxie | Gumption, Chutzpah | Hide | Limbs | Glands | Siege Hide | Fortress | Juggernaut → Rampart → Colossus → Citadel |
+| **Skitter** | Moxie | Gumption | Nerve | Grit, Chutzpah | Wiring | Limbs | Senses | Mantis Reflex | Lightning Step | Skitter → Mantis → Wraith → Livewire |
+| **Oracle** | Nerve | Chutzpah | Gumption | Grit, Moxie | Senses | Mind | Wiring | Foresight | Thousand Eyes | Oracle → Argus → Seraph → Panopticon |
+| **Alembic** | Gumption | Grit | Chutzpah | Moxie, Nerve | Glands | Hide | Mind | Transmute | Panacea | Alembic → Still → Bloomheart → Wellspring |
+| **Siren** | Chutzpah | Moxie | Grit | Nerve, Gumption | Mind | Wiring | Limbs | Siren Song | Crown of Will | Siren → Diva → Choir → Crowned |
+
+- **5 Forms vs 6 trees:** each of the five stat-trees (Hide/Grit, Wiring/Moxie, Senses/Nerve, Glands/Gumption, Mind/Chutzpah) is one Form's primary tree. **Limbs** (Grit *or* Moxie) is the shared body tree. It is never primary, but it's secondary or tertiary for three Forms (Juggernaut, Skitter, Siren), so it has no Form-exclusive nodes. Every tree appears 1–3 times as secondary or tertiary.
+- **Every Form can build Infuse Surges** (Juggernaut: Shell/Mend; Skitter: Haste/Veil; Oracle: Veil/Link/Haste; Alembic: Mend/Shell/Link; Siren: Link/Haste). This closes v0.1 open question 12 (no base Infuse Effect).
+- **You only take nodes from your Form's three trees.** That is what makes a Form a Form.
+
+### D2. Stats by stage
+
+| Stage | Levels | Primary | Secondary | Tertiary | Dump A | Dump B |
+|---|---|---|---|---|---|---|
+| Base | 1–3 | +3 | +2 | +1 | +0 | −1 |
+| Evolution I | 4–6 | +5 | +3 | +2 | +1 | +0 |
+| Evolution II | 7–10 | **+8** | +4 | +3 | +2 | +1 |
+| Final Form (active, once per Lockdown) | 10 | +10 | +4 | +3 | +2 | +1 |
+
+- **The old stat boosts at levels 3/6/9 are removed** (they would double-dip with Evolutions). Levels 3, 6 and 9 give **+1 Knack** instead (6 Knacks by level 9).
+- **Stat cap:** the old +5 cap is gone. Stats come only from your Form's stages (max +8, +10 during Final Form).
+
+### D3. Trees: 10 nodes, tiers, and progression
+- Every tree has **10 nodes**: **Root**, **4 Tier I**, **4 Tier II** and an **Apex**. A Form's **primary tree** also has its **2 Evolution nodes** (Form-exclusive), so it holds 12 in all.
+- **Gates:** Root first. Tier I needs the Root. **Tier II** needs **level 4+** and **3 nodes already in that tree**. **Apex** needs **level 7+** and **6 other nodes in that tree**, and can only be taken in your **primary or secondary** tree.
+- **Level 1:** 3 primary-tree nodes, 2 secondary-tree nodes and 1 tertiary-tree node (6 nodes, 3 Roots).
+- **Each level after 1:** **+1 primary-tree node** (automatic: you always get it, and you choose which node) **and +1 node in your secondary *or* tertiary tree** (your choice).
+- **Evolution nodes** are granted on top at level 4 and level 7 (not chosen, and they don't use a pick).
+- **When the primary tree is full:** primary picks = level + 2, and the tree's 10 standard nodes fill at **level 8**. At levels 9 and 10, the primary pick **overflows** into your secondary or tertiary tree. Checked: secondary + tertiary picks reach 14 at level 10, against 19 legal slots (Apex only in the secondary).
+- **Totals:** nodes = 2 × level + 4, plus Evolution nodes (6 at L1, 13 at L4 with Siege Hide etc., 20 at L7, 26 at L10).
+- **Respec:** on level-up you may swap one node for another in the same tree (or the same pick type) that you qualify for.
+- **Material (was "Form" in v0.1):** Bio vs Chrome is still chosen **per tree** when you take its Root. Knit, Firmware, Upkeep and Splice are unchanged. *Renamed because "Form" now means Base Form.*
+
+### D4. Evolution
+- **Evolution I (level 4)** and **Evolution II (level 7)** each give:
+  - the stat jump (D2);
+  - **+1 Prime** (Prime 2 → 3 → 4; the old "Prime 3 at level 5" is removed);
+  - a **Sequence die jump** (d6 → **d8** at Evo I, d8 → **d12** at Evo II, skipping d10);
+  - **one Signature Surge** (always ready);
+  - the Form's **Evolution node** on its primary tree;
+  - the Form's **new look** (each Form has a described Base / Evo I / Evo II / Final look, with Bio and Chrome readings).
+- **Sequence die track:** L1 d4, L2–3 d6, **L4–6 d8**, **L7–10 d12**. With Surges known = level + 2, this gives Wild slots of 1,2,1 → **2**,1,0 → **3**,2,1,0. *Right after each Evolution your body offers unfamiliar powers (more Wild slots), and you learn to fill them.* No d20 (it would be mostly Wild).
+- **Signature Surge:** build it from your parts like any Surge (Twists allowed by your Rank) and write it in a Signature box, **not on the Sequence**. It doesn't count toward Surges known, Prime or the Primed maximum. It is **Primed at the start of every combat**, costs its normal Flux, can't be Amped (except during Emergence and Final Form) and, after you Unleash it, is **Primed again at the start of your next turn**. So it's available once per round. A missed Strike/Bolt Signature is still ready next turn. **Evo II adds a second Signature** (each once per round). You may rebuild one Signature when you level up.
+- **Why this is safe:** you still have one Action per turn, so a Signature means "you can always Surge". **Flux is the throttle.** One Flux per round adds up to roughly one Overload every 2 fights, unless you pace yourself or are a high-Nerve Form.
+- **Emergence (the mid-mission moment):** the level and its numbers arrive at the debrief as usual (the sheet and builder use the new stage at once). The **metamorphosis plays out on screen**. At the start of your first turn in the **first combat** of the next mission (or an earlier moment of terror the GM and you agree on), you **Emerge**: describe the change, gain **temporary HP = 2 × level**, every enemy within 30 ft that sees you is **Shaken** (Bosses ignore this), and your new Signature Surge is **Amped** the first time you Unleash it. Optional *Chrysalis* downtime scene in ch 9.
+- **Final Form (level 10)** is framed as the **third stage**. You permanently take your Form's Final look. Once per Lockdown, at the start of a combat, you enter Final Form until the combat ends: **primary stat +2**, **Prime two extra Surges**, and **every Surge you Unleash is Amped** (Signatures too).
+
+### D5. Other rules touched
+- **Rank** (⌈level/2⌉) is unchanged and still added to attacks and defenses. **Defenses** = stat + Rank. **HP** = 12 + 2 × Grit + 5 per level after 1st (Grit now grows, so HP spikes at each Evolution). **Flux Limit** = 4 + Rank + Nerve (min 4, Splice −1). Because Nerve grows it ranges from about 7 (dump Nerve) to 16 (Oracle L7). That's the Oracle's identity: the most stable mutant.
+- **Surge attack stat (new, general):** a Surge may use its **Shape's** stat **or the stat of the tree that unlocked its Effect** (Hide Grit, Limbs Grit/Moxie, Senses Nerve, Glands Gumption, Wiring Moxie, Mind Chutzpah). This replaces v0.1's single special case "Dread may use Chutzpah", and lets every Form Surge with its primary stat.
+- **Twists:** 1 per Surge, 2 from Rank 3 (unchanged). **Primed maximum** = Prime + 1 (Signatures not counted).
+- **Lab Escapee:** still +1 Surge known (fills a Wild slot; no extra Signatures).
+- **Hive Mind** (Mind Apex): "Prime one extra Surge" is now "**one ally** Primes one extra Surge" (Prime already grows at the Evolutions).
+- **Unbreakable** (Hide Apex) gives up "can't be knocked Prone/moved" to the new Tier I node **Anchor**, and gains "Armor max 5".
+- **Armor max** 4 (5 with Unbreakable; 6 with the Juggernaut's Siege Hide).
+- **Knacks:** 3 at L1, +1 at L3, L6, L9.
+- **Old (v0.1) saves:** the builder migrates identity fields (name, concept, drive, origin, Knacks, gear, notes) and asks you to pick a Base Form; stats and nodes are reset. Surges are kept but re-validated.
+
+### D6. Challenge rebalance (Threat table v0.2)
+Guard and TN are now separate columns. **Guard** tracks player attack bonuses, which rise fast with the primary stat. **TN** tracks player defenses, which rise slowly. Each column stalls at the Evolution levels and catches up after, so every Evolution is a felt spike.
+
+| T | Guard | TN | HP | Damage |
+|---|---|---|---|---|
+| 1 | 12 | 12 | 18 | 7 |
+| 2 | 13 | 12 | 22 | 8 |
+| 3 | 14 | 13 | 30 | 10 |
+| 4 | 14 | 13 | 40 | 12 |
+| 5 | 15 | 14 | 48 | 14 |
+| 6 | 16 | 15 | 56 | 16 |
+| 7 | 17 | 16 | 72 | 18 |
+| 8 | 18 | 17 | 84 | 21 |
+| 9 | 19 | 18 | 92 | 24 |
+| 10 | 20 | 18 | 100 | 27 |
+
+The role multipliers and encounter budget are unchanged. Results are in **Balance v0.2** below.
 
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
