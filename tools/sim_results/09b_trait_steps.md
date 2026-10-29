@@ -19,3 +19,5 @@ Base fair counts: soldier L2 3.85, soldier L5 4.38, soldier L8 3.96, brute L2 2.
 | Area 20 ft | 3.85 → 2.52 | 4.38 → 2.21 | 3.96 → 2.40 | +1.5 |
 | Heavy (vs Brute) | 2.09 → 1.00 | 1.76 → 1.00 | 1.67 → 1.00 | +1.7 |
 | Heavy + Bulky (vs Brute) | 2.09 → 1.00 | 1.76 → 1.00 | 1.67 → 1.00 | +1.7 |
+
+*Note: the two Heavy rows were measured with the earlier Engulf (4 × Bonus, uncapped) and are floored at 1 creature (one Heavy alone is already past fair), so they carry no information; see `09_builder_traits.md` for the Heavy package at the final Engulf (2 × Bonus, max +2).*

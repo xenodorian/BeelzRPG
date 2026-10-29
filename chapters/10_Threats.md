@@ -158,8 +158,8 @@ Value at most **one** creature per encounter by BR (the centrepiece); everything
 ## 6. Party Size
 Use the budget table above, plus three adjustments the sims found:
 - **Bosses:** HP ×1 per freelancer and Damage × (freelancers ÷ 4), summoned creatures' Damage too. With 3 freelancers: ×¾; with 5: ×1¼. Without this, a Boss fair for 4 is a near-TPK for 3 (Matriarch: 77% win, 16% death) and a walkover for 5 (13% Down).
-- **Heavies vs 5+ freelancers** count **×1½** units. More bodies means more of them inside every Area, and Engulf punishes it: against 5 a Heavy's rating drops only ~½, other creatures' drop ~1.
-- **Quick shift:** if you'd rather move ratings than budgets, a creature's BR and MR are about **+1 against 3 freelancers, −1 against 5** (+2 / −1½ for 2 / 6). Heavies: +1 / −½.
+- **Heavies vs 5+ freelancers** count **×1½** units. More bodies means more of them inside every Area, and Engulf punishes it: against 5 a Heavy's ratings drop only ~½–¾, other creatures' drop ~1.
+- **Quick shift:** if you'd rather move ratings than budgets, a creature's BR and MR are about **+1 against 3 freelancers, −1 against 5** (+2 / −1½ for 2 / 6). Heavies: +1 / −½ to −¾ (as minions vs 3: only +½).
 
 ## 7. At the Table
 - **From Evolution II, lone big targets melt.** Four L7 freelancers can deal 150+ damage a round. Elites and Bosses rated for them already account for that, but anything rated in the previous stage dies before it acts. Use the stage rule above.

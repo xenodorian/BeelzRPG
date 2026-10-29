@@ -3,6 +3,8 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-28)
+**Enemy calibration done (2026-10-28, owner request):** every enemy now has a **Boss Rating** and a **Minion Rating** from simulated fights with real builder characters (party sizes 2–6), the threat table was recalibrated (v0.3), the roster is 30 creatures + 3 Bosses with Heavies (AoE) and Packs, and the encounter budget, party-size and difficulty rules come from the sims. See *Enemy Calibration* below; the v0.2 table in D6 is superseded.
+
 **v0.2 done (2026-10-28): Base Forms & Evolution.** The owner dropped the compactness rule. Five Base Forms, 10-node trees, Evolutions at L4/L7, Signature Surges, a Final Form stage and a rebalanced threat table. Every chapter, the sheets, the builder (v0.2) and the tools are updated. The spec is *v0.2 Design* below; results are in *Balance v0.2* and *Playtest v0.2*. The v0.1.1 history (sanity checks, builder) is kept further down for reference.
 
 ## v0.2 Design: Base Forms & Evolution (2026-10-28)
@@ -91,6 +93,8 @@ Guard and TN are now separate columns. **Guard** tracks player attack bonuses, w
 
 The role multipliers and encounter budget are unchanged. Results are in **Balance v0.2** below.
 
+> **Superseded 2026-10-28 by threat table v0.3** (see *Enemy Calibration*): the v0.2 table was too soft against real builder characters.
+
 ## Balance v0.2 (2026-10-28)
 `tools/balance_sim.py` (seed 7; 4 freelancers: Juggernaut, Skitter, Oracle, Siren; 2,000 fights per cell, starting each fight at 35% Flux; it ignores riders, healing, Wild Surges and tactics, so treat it as a floor for the players). Read each pair of columns as **before → after** an Evolution: L3 → L4 (Evolution I), L6 → L7 (Evolution II), L9 → L10 (Final Form).
 
@@ -155,6 +159,106 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 4. **Signature riders every round** (*Lockdown Shot* re-Blinds the same Elite each round) can lock one non-Boss for a whole fight. Bosses shed a condition each Enemy Phase. See Open Question 14.
 5. **L7 alpha strike** vs lone big targets (above): guidance added to ch 10.
 
+## Enemy Calibration (2026-10-28)
+**Owner request (verbatim):** "Create a series of enemies for these characters to fight at different levels. Create a Boss Rating for your enemies based around 1 creature vs a party of 4 fully rested players, and a Minion Rating based around 4 fully rested players vs 4 enemies of this rating. Give some enemies big AOE attacks that make them lethal to large parties but less effective as part of a horde of minions, and other enemies perks that give them advantages that only apply when in groups to increase their effectiveness when used as minions. then run simulated battles for a party of 3, 4, and 5 players, battle test your assumptions, and then recalibrate from there."
+
+### Definitions
+- **Boss Rating (BR N):** one creature alone is a fair fight for 4 fully rested level-N freelancers. **Minion Rating (MR N):** four of them are.
+- **Fair band** (used everywhere: rating, tuning, validation): party win ≥ 90%, P(at least one freelancer Down) 40–60% (target 50% for 4; for P freelancers the same per-freelancer risk, 1 − 0.5^(P/4)), P(any death) ≤ 5%, 3–7 rounds; HP lost is reported (typically 30–45%). A rating is the fractional party level where the fight first satisfies the Down, death and win limits (linear interpolation between levels; past L1/L10 extrapolated with a minimum slope, so <1 and 10+ are "off the scale").
+- **Fully rested:** full HP, Flux 0, Medkits/Stims full, Prime rolled; Last Gasp, Emergence and Final Form off.
+
+### The simulator (`tools/encounter_sim.py`)
+- **Party:** P characters of distinct random Forms (a 6th repeats one) drawn from `sim_data/pcs.json` (ch 11/13 examples + the better half of 3,000 random legal builder characters per Form and level, exported by `export_pcs.js`).
+- **PC AI:** best Primed Surge or Signature by expected value (hit × damage × targets caught, minus a Flux cost), else best weapon; heals Down allies first; Churn when nothing is Primed; never Overloads by choice. Form exclusives modelled (Fortress, Lightning Step, Foresight, Panacea, Siren Song, Crown of Will, Transmute, Siege Hide/Thousand Eyes via builder numbers).
+- **Positioning (abstract):** an enemy Area catches its target plus each other freelancer with probability 0.30 / 0.45 / 0.65 (10 / 20 / 30 ft), +8% per freelancer above 4 (crowding); Down freelancers can be caught (Death marks). Friendly fire catches each melee ally with the same odds. PC Areas catch each extra enemy 35–45%.
+- **Friction:** 15% of PC turns and 10% of enemy actions do nothing (moving, line of sight).
+- **Not modelled:** terrain, objectives, retreat, Juice, Last Gasp, Knacks, Help/Rally, GM targeting beyond "focus/pack/random", Breathers between fights.
+
+### Expectations vs results
+Written before the roster sims (`tools/sim_results/00_expectations.md`).
+
+| # | Expectation | Result | Verdict |
+|---|---|---|---|
+| E1 | Soldier MR ≈ T, BR ≈ T − 3 | MR = T + 0.1, BR = T − 3.1 (T2/5/8) | **Confirmed** |
+| E2 | Boss BR ≈ T, MR ≈ T + 3 | BR = T + 0.8, MR = T + 4.5 | Confirmed (BR one higher than T, written as T + 1) |
+| E3 | Heavies get relatively deadlier vs 5 than vs 3 | 4 → 5 freelancers: Heavy BR drops ~0.7 and MR ~0.5, others ~1.0 and ~1.1 (6: −0.9 vs −1.45). Vs 3 the BR rise is equal (+0.9), the MR rise much smaller (+0.4 vs +1.5) | **Confirmed for big parties** (→ rule: Heavies vs 5+ ×1½ units) |
+| E4 | Heavies weak as minions (gap MR − BR ≤ 2) | First pass: Leviathan 4.4, Gas Bloat 2.7. After recalibration: Drain 2.0, Boiler 1.1, Gas Bloat 2.5, Glasshide 1.5, Leviathan 1.6 (mean 1.7 vs Generalists 3.1). Builder test: the Heavy package alone is **+4 MR**; Bulky takes it back (−4.7) | Confirmed **only with a horde penalty** (→ rule: every Heavy needs Bulky/Interference/Territorial) |
+| E5 | Packs: MR − BR ≥ 3, +1 over plain | Pack gap 3.7 vs Generalist 3.1; group Traits measured at +½ to +1.2 MR steps, 0 BR | **Partly**: the effect is real but ~½–1 step, not "+1 or more" for every Trait |
+| E6 | Packs relatively stronger vs small parties | Vs 3 freelancers Packs and Generalists both rise +1.5 MR; Packs keep Downs up vs bigger parties (Pump Hall: 27% Down with 4, 26% with 5) | **Wrong as stated**: Packs aren't special vs 3; they are *Down-makers at every party size* (focus fire), while their HP cost falls |
+| E7 | 3 PCs = ratings +1, 5 PCs = −1 | +0.9 / −1.0 (BR), +1.5 / −1.1 (MR); 2 PCs +1.5–2, 6 PCs −1.5. **Bosses:** +1.7 / −1.8 (action economy) | Confirmed for normal creatures; **wrong for Bosses** (→ Boss HP & Damage × P/4) |
+| E8 | Units: BR-N = 4 units, MR-N = 1, step ×1.5, mixed encounters additive | Step = **×1.41** (`05`). Mixed encounters built by the rule (180 random, party 3/4/5): Easy +2 pts, Standard +2 pts of Down vs target, Hard −9, Deadly −13 (HP lost and death on target) | **Confirmed** with ×1.41; slightly conservative at Hard/Deadly |
+| E9 | Easy ½, Standard ¾, Hard 1, Deadly 1½ | ×1½ is a coin flip (win 43–69%), ×1¼ is Deadly (Down 66–82%, win 73–90%) | **Wrong at the top** (→ Deadly ×1¼) |
+| E10 | Controllers/support are MR-heavy (less than Packs) | Damper Drone gap 3.0 (= Generalist). Leader +½ MR, Mender ≈ 0 | **Mostly wrong**: support Traits are worth little in the sim; Leader is the only one that pays |
+| E11 | Ratings stable ±0.3 at 1,000 runs | Seed 2 vs seed 1, party 4: mean |Δ| 0.15–0.17, 42/51 in-range ratings within ±0.3, max 1.2 (Drowned Choir BR, flat curve) | Confirmed (Choir BR 7–8 is uncertain) |
+| E12 | A whole step is worth more across an Evolution | Fair count of T3 Soldiers at L4 = 7.6 (vs 3.9 at L3), T6 at L7 = 8.3; T4 at L3 = 1.5 (formula says 2.8) | **Confirmed, strongly** (→ next-stage creature ×2 units, previous-stage one step lower) |
+
+### Recalibration passes
+1. **Threat table v0.3** (`calibrate_table.py`, `01_table_calibration.md`): TN, HP and Damage re-solved so 4 T-N Soldiers are fair for level N (Guard kept). The v0.2 table had 4 L7 freelancers losing ~6% HP to 4 T7 Soldiers. New table jumps at T4 and T7 with the Evolutions.
+2. **Roster pass 1** (`tune_roster.py`, `02_ratings_pass1`): one HP/Damage factor per creature to hit its primary rating target, plus a damage→HP shift when fights were swingy (death > 5% or win < 90%).
+3. **Pass 2** (`03_ratings_pass2`): Heavies given Bulky/Territorial/Interference after E4 failed (Leviathan, Glasshide, Gas Bloat MR fell 1.5–2).
+4. **Pass 3 (this run):** Heavies' per-extra-PC damage first raised (3 → 4 × Bonus) to test E3, then replaced by **Engulf** (2 × Bonus per freelancer beyond the first, **max +2**) and **Apex applies to base Damage only**, because uncapped Engulf let a Seraph Gunship hit three clumped freelancers for 137 each. Glasshide and Leviathan Recharge 5 → 4. All Heavies retuned; Leviathan hand-tuned (HP ×0.9, Damage ×0.55) after the tuner pushed it to a damage-less HP sponge.
+5. **Rating maths:** minimum extrapolation slope past L1/L10 (0.08 per level for Down) so ratings stop running to 13 on flat curves (Reactor Wraith swung 9.5 → 12.4 for a 3% stat change before the fix).
+6. **Singles:** Ward Tough (damage rounding at T1 swung MR 0.6 ↔ 1.6; fixed at HP ×1.15, Damage ×1.0), Reactor Wraith (×0.56 → retuned ×0.81 with Engulf), Hollow Saint (target MR 9) and The Many (MR 10), **Brood Matriarch** (BR 1.2 with 7.9% deaths at L1 → HP ×0.52, Damage ×0.65: BR 0.8, deaths 4–5%), **Mother of Rust** (67-damage area every round at L9 → HP ×3.0, Damage ×1.9, BR 8.6).
+7. **Rules derived from the sims:** unit budget and table (step ×1.41), Deadly ×1¼, party-size budget (per-freelancer fair count 0.84 / 0.92 / 1.0 / 1.10 / 1.15 for 2–6, `08`), Boss scaling HP & Damage × P/4 (`12`), Heavies vs 5+ ×1½, stage rule (`05`, `05b`), Trait ΔBR/ΔMR (`09`, `09b`), starter mission (`11`).
+
+### Before / after (party of 4; "before" = the same creatures on the v0.2 table, untuned, `02_before_v02.md`)
+p3/p5 columns are the raw fractional ratings for 3 and 5 freelancers (−2.0 and 13.0 mean off the scale).
+
+| Creature | T | Kind | Before: BR / MR (v0.2 table) | After: BR / MR | BR p3 / p5 | MR p3 / p5 |
+|---|---|---|---|---|---|---|
+| Scrapjack Picker | 1 | pack | <1 / 2 | **<1 / 2** | -2.0 / -2.0 | 2.7 / 1.0 |
+| Spill Rats | 1 | pack | <1 / <1 | **<1 / 1** | -2.0 / -2.0 | 2.4 / -0.7 |
+| The Brood Matriarch | 1 | boss | 2 / 5 | **1 / 5** | 2.6 / -2.0 | 6.6 / 4.0 |
+| Ward Tough | 1 | general | <1 / <1 | **<1 / 1** | -2.0 / -2.0 | 2.6 / -1.5 |
+| Bloomhound | 2 | pack | <1 / 2 | **<1 / 2** | -2.0 / -2.0 | 2.8 / 1.3 |
+| Drain Beast | 2 | aoe | 2 / 4 | **2 / 4** | 2.5 / 1.4 | 3.9 / 3.5 |
+| Turret Drone | 2 | general | <1 / 2 | **<1 / 2** | -2.0 / -2.0 | 2.7 / 1.1 |
+| Boiler Hulk | 3 | aoe | 3 / 4 | **3 / 4** | 3.5 / 2.7 | 5.0 / 3.9 |
+| Ostrander Cleaner | 3 | general | <1 / 4 | **<1 / 3** | -2.0 / -2.0 | 3.7 / 2.9 |
+| Sporecaller | 3 | control | <1 / 4 | **<1 / 3** | -2.0 / -2.0 | 3.7 / 2.8 |
+| Cleaner Hound | 4 | pack | <1 / 4 | **<1 / 5** | 1.7 / -2.0 | 6.5 / 3.9 |
+| Gas Bloat | 4 | aoe | 4 / 5 | **4 / 6** | 4.3 / 3.7 | 6.7 / 6.2 |
+| Mirrormaw | 4 | general | 1 / 4 | **4 / 7** | 4.6 / 3.5 | 9.7 / 6.8 |
+| Bloom Knight | 5 | general | <1 / 4 | **3 / 5** | 3.3 / 1.8 | 6.8 / 4.1 |
+| Damper Drone | 5 | control | <1 / 4 | **2 / 5** | 2.5 / 1.1 | 6.7 / 4.5 |
+| Glasshide | 5 | aoe | 4 / 6 | **5 / 6** | 6.3 / 4.3 | 6.7 / 6.2 |
+| Stitchwork Brood | 5 | pack | <1 / 4 | **2 / 6** | 3.1 / 1.2 | 6.8 / 4.8 |
+| Warden Krell | 5 | boss | 4 / 9 | **5 / 10+** | 6.5 / 4.2 | 13.0 / 9.9 |
+| Hunter-Killer Unit | 6 | general | 3 / 6 | **6 / 10** | 6.6 / 4.5 | 13.0 / 7.0 |
+| Lancer Troopers | 6 | pack | <1 / 1 | **1 / 4** | 2.2 / 0.2 | 4.9 / 3.6 |
+| Feral Evolved | 7 | general | 4 / 7 | **7 / 10+** | 8.5 / 6.4 | 13.0 / 13.0 |
+| Gutter Leviathan | 7 | aoe | 7 / 7 | **7 / 9** | 8.3 / 6.8 | 11.1 / 6.9 |
+| Razorwing Flock | 7 | pack | 2 / 6 | **3 / 7** | 3.4 / 2.4 | 10.4 / 6.6 |
+| Bloom Husks | 8 | pack | <1 / 4 | **4 / 7** | 4.9 / 3.3 | 10.1 / 6.6 |
+| Ostrander Paladin | 8 | general | 3 / 6 | **6 / 8** | 6.6 / 4.1 | 13.0 / 6.9 |
+| Seraph Gunship | 8 | aoe | 4 / 7 | **8 / 10+** | 11.2 / 6.8 | 13.0 / 13.0 |
+| The Drowned Choir | 8 | control | 4 / 7 | **8 / 10+** | 10.2 / 6.9 | 13.0 / 13.0 |
+| Choir Thralls | 9 | pack | <1 / 4 | **4 / 8** | 5.3 / 3.5 | 12.3 / 6.8 |
+| Mother of Rust | 9 | control | 4 / 7 | **9 / 10+** | 13.0 / 6.9 | 13.0 / 13.0 |
+| Hollow Saint | 10 | general | 4 / 7 | **5 / 9** | 6.3 / 4.5 | 13.0 / 6.9 |
+| Patient Zero | 10 | boss | 9 / 10+ | **10 / 10+** | 13.0 / 7.0 | 13.0 / 13.0 |
+| Reactor Wraith | 10 | aoe | 8 / 10+ | **10 / 10+** | 13.0 / 8.5 | 13.0 / 13.0 |
+| The Many | 10 | pack | 3 / 7 | **6 / 10** | 6.5 / 4.3 | 13.0 / 7.5 |
+
+**Reading it:** on the v0.2 table almost everything from T5 up rated 2–6 levels below its T (the Seraph Gunship, a "T8", was a fair Boss fight for level 4). After: every level 1–10 has 2–5 creatures whose BR or MR equals it (ch 10 *By party level*).
+
+### Key findings (party 3 / 4 / 5)
+- **Heavies vs party size:** a Heavy's BR moves about +0.9 / 0 / −0.7 for 3 / 4 / 5 freelancers, against +0.9 / 0 / −1.0 for everything else; at 6 the gap widens (−0.9 vs −1.45). The Engulf bonus and the crowding term both grow with party size. Vs 3 freelancers, used as minions, Heavies gain only +0.4 MR (Packs +1.5).
+- **Packs:** group Traits add +½ to +1.2 MR steps and nothing solo (Pack +1.0, Flanker +1.2, Overwhelm/Leader +0.6, Crowd/Frenzy/Explosive +0.5, Linked +0.4). Their signature is focus fire: Down chance stays high as the party grows while HP cost falls.
+- **Bosses** swing hardest with party size (+1.7 / −1.8 rating) because of the fixed action + Interrupt. HP & Damage × P/4 brings 3- and 5-freelancer fights back into the band for the Matriarch and Krell (Patient Zero vs 3 is still win 79%; open question).
+- **Elites and Bosses are death-limited:** at their BR, Down is only 25–35% but fights are long and death risk reaches 4–5%. That's why mixed encounters with a centrepiece come in ~9–13 points under the Down target while HP lost is on target.
+- **The Evolution wall:** many ratings cluster at 6.8–7.0 because anything too strong for level 6 is suddenly fair at 7. Read a "7" as "Evolution II material".
+
+### Decisions
+- Ratings are for **4** freelancers; other sizes use the budget table, Boss scaling and the Heavy rule (ch 10 §6), not separate published ratings. The p2–p6 ratings are in `04_ratings_final.md` for anyone who wants them.
+- **Mooks keep HP ×¼** (not "dies to any damage"): one-hit Mooks were trivial against Area Surges.
+- **Fair = Hard.** Easy/Standard/Hard/Deadly = ×½ / ×¾ / ×1 / ×1¼ of the fair budget; most fights between Breathers should be Standard.
+- **Heavies must carry a horde penalty**; Engulf caps at +2 freelancers so a clumped party takes big damage but isn't one-shot.
+- Kinds are labels for the GM (Pack, Heavy, Generalist, Control, Boss), not rules.
+
+### Files
+`tools/encounter_sim.py` (sim + ratings), `encounter_roster.py` (table, roles, roster data), `sim_data/roster_tuning.json` (per-creature HP/Damage factors), `tune_roster.py`, `calibrate_table.py`, `encounter_math.py` (final/steps/budget/party/mixed/mixed2/builder/traitunits/bossscale/repatch), `threat_blocks.py` (prints the ch 10 stat blocks and roster table), `ch11_check.py`, `check_links.py`; results in `tools/sim_results/` (00 expectations … 12 boss scaling).
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -180,7 +284,7 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 | `chapters/07_Advancement.md` | Level table (stage, stats, nodes, die, Prime, Signatures), Evolve, Final Form, respec, Samples, pay | |
 | `chapters/08_Gear.md` | Weapon frames + mods, armor, kit, starting kits | |
 | `chapters/09_Running_the_Game.md` | GM advice, missions, Spill Clock, downtime, factions, generator | |
-| `chapters/10_Threats.md` | Threat table v0.2 (Guard/TN split), roles, traits, budget by stage, 21 threats + 3 Bosses grouped by stage | |
+| `chapters/10_Threats.md` | BR/MR ratings and fair band, threat table v0.3, roles + traits with rating deltas, Heavy package, unit budget, party size, 30 threats + 3 Bosses (generated stat blocks) | Stat blocks come from `tools/threat_blocks.py` |
 | `chapters/11_Starter_Mission.md` | *Pumpstation 9* + 5 pregens (one per Form) | Pregens are builder examples |
 | `chapters/12_Quick_Reference.md` | One-page cheat sheet | Update when rules change |
 | `chapters/13_Character_Building_Guide.md` | Step-by-step build (L1), leveling 1–10, Evolution checklist, builds by Form, common mistakes, worked example (Dree, Siren, L1 / L4 / L7) | Player-facing summary; rules chapters win on conflict. Update its tables if ch 2–8 numbers change |
@@ -192,6 +296,15 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 | `tools/check_builder_data.js` | Cross-checks the builder data block against ch 2, 2A, 3 (+ tree files), 4, 5, 7, 8, 11, 13 (493 checks) | Run after any rules change; no dependencies |
 | `tools/builder_flows.js` | Real-browser flow tests (Playwright + Chrome) | `npm i playwright-core`; set `CHROME=/path/to/chrome` |
 | `tools/tree_compare.py` | Per-Form expected DPR / HP lost / Flux per fight at L1, 3, 4, 6, 7, 10 | Re-run after node changes |
+| `tools/encounter_sim.py` | Encounter sim with real builder characters (party 2–6, positioning/clumping), BR/MR ratings: `python3 tools/encounter_sim.py rate "Name"` | Ratings definition and fair band live in `rating()` / `BAND` |
+| `tools/encounter_roster.py` | Threat table v0.3, roles, threat builder, the ch 10 roster as data (+ `MUTAGEN_OLD=1` for v0.2 "before" runs) | Source of truth for ch 10 stat blocks |
+| `tools/sim_data/roster_tuning.json` | Per-creature [HP, Damage] factors from tuning | Written by `tune_roster.py` |
+| `tools/tune_roster.py` / `calibrate_table.py` | Tune one creature to its target rating / re-solve the threat table | |
+| `tools/encounter_math.py` | Experiments: final ratings (p2–6), step value, difficulty sweep, party budget, mixed validation, trait deltas, boss scaling, repatch | Writes `tools/sim_results/` |
+| `tools/threat_blocks.py` | Regenerates the ch 10 roster table and stat blocks from the data | Paste output into ch 10 |
+| `tools/ch11_check.py` | Starter-mission fights at 3/4/5 players | |
+| `tools/check_links.py` | Link and anchor check for every Markdown file | Run before pushing docs |
+| `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling | Raw results of the enemy calibration |
 
 ## Style Guide
 - **Format:** GitHub-flavoured Markdown, one chapter per file, numeric prefixes (`NN_Name.md`). Images via relative paths (`../art/x.jpg`).
@@ -218,6 +331,11 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 | **Augment / Node / Root / Tree** | Your skill-tree abilities; Root unlocks a tree; 10 standard nodes per tree | Ch 3 |
 | **Base Form** | One of five body plans (Juggernaut, Skitter, Oracle, Alembic, Siren): sets your +3/+2/+1 stats and your primary/secondary/tertiary trees | Ch 2A |
 | **Bio / Chrome / Splice** | **Material** of a tree (grown / installed); Splice = you have both | Ch 3 |
+| **Boss Rating (BR) / Minion Rating (MR)** | Party level at which 1 / 4 of a creature is a fair fight for 4 fully rested freelancers | Ch 10 |
+| **Fair fight** | Win ≥ 90%, someone Down 40–60%, death ≤ 5%, 3–7 rounds (= a Hard fight) | Ch 10 |
+| **Units / budget** | Encounter currency: Hard = 1 unit per freelancer; creature value from rating − party level | Ch 10 |
+| **Heavy / Pack (kinds)** | Heavy: big-Area enemy with a horde penalty (BR ≈ MR); Pack: enemy with group Traits (MR ≫ BR) | Ch 10 |
+| **Engulf** | Heavy Area bonus: +2 × Bonus per freelancer caught beyond the first (max 2) | Ch 10 |
 | **Bloom / Glitch** | Overload tables for Bio / Chrome | Ch 5 |
 | **Breather / Lockdown** | Short rest (½ HP, Flux 0, 2 per Lockdown) / full rest | Ch 1 |
 | **Churn** | Quick action: +1 Flux, roll one more Prime; not on a turn you Unleash | Ch 4 |
@@ -304,6 +422,7 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 - [x] Playtest walkthrough: L1 and L5 rounds (see Playtest)
 - [x] Consistency pass: link/anchor check (0 broken), cross-chapter numbers
 - [x] Sanity check 2026-10-28: logic + per-tree balance review (see section below)
+- [x] **Enemy calibration (2026-10-28):** BR/MR ratings, threat table v0.3, 33-creature roster with Heavies and Packs, sims for party 2–6, expectations E1–E12 tested, recalibrated, ch 9/10/11/12 updated (see *Enemy Calibration*)
 - [ ] **Live playtest** with real players (needs humans)
 
 ### Backlog (unclaimed — pick one!)
@@ -318,6 +437,9 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 - [ ] PDF/print build (e.g. pandoc → HTML/PDF with a shared CSS)
 - [ ] Form-fillable PDF character sheet
 - [ ] Spreadsheet/VTT helper: Sequence roller and Flux tracker
+- [ ] Encounter builder page (web): pick party size/level/difficulty, add creatures, show units vs budget (data: `tools/sim_results/04_ratings_final.json`)
+- [ ] Sim: model terrain/positioning choices (players spreading out vs Heavies), Juice and Last Gasp; re-rate
+- [ ] More Bosses at T3, T7–8 (BR 3, BR 7–8), each with a Shift
 
 ## Design Decisions (why things are the way they are)
 1. **d20 + Stat + Rank, player-facing.** The owner's homebrew (4M, Mech Suit Panic, Spectrum) is d20-based with players rolling Dodge rather than having AC, and enemies acting simultaneously (Survive the Anomalies, 4M). Mutagen keeps all three. The GM never rolls to hit (Cypher/Into the Odd influence).
@@ -329,9 +451,10 @@ Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) 
 7. **Surges are optional and budgeted.** Baseline weapon hit ≈ Rank × 4.5 + stat; a Surge ≈ (Rank+1) dice + stat + a rider, i.e. ~1.4–1.9× a weapon hit, paid for with Flux and randomness. Sim shows Surges shorten fights by ~10–25% rather than dominating.
 8. **Flux resets on Overload.** Going over is a gamble, not a death spiral: Rank d6 damage (can't drop you below 1 HP) + a mostly-bad d12 table with some gifts. Breathers reset Flux, so Flux budgets are per 1–2 fights.
 9. **Missions = levels** (1 per mission, 10 missions), from the owner's ATRaC and M.O.T.H. games.
-10. **Enemies = T + Role + Traits** with fixed damage, so the GM can build a threat in under a minute. HP 7T+11, Damage 6+1.5T, TN 11+⌈T/2⌉.
+10. **Enemies = T + Role + Traits** with fixed damage, so the GM can build a threat in under a minute. *(v0.1 formulas superseded: the v0.3 table is calibrated by simulation; see Enemy Calibration.)*
 11. **Conditions have one default duration** (end of the affected creature's next turn) and Bosses shed one per Enemy Phase, so control Surges stay strong without locking down bosses.
 12. **Markdown, one chapter per file**: renders on GitHub, diffs cleanly, and lets several contributors work at once without merge conflicts.
+13. **Enemy ratings are measured, not guessed** (2026-10-28). BR/MR come from `tools/encounter_sim.py` with real builder characters; the threat table, roster numbers, budget and party-size rules were recalibrated from the sims. A GM-built threat uses the role's typical BR/MR + Trait deltas (ch 10 §3–4).
 
 ### v0.2 decisions (2026-10-28, owner request: Base Forms & Evolution)
 13. **Five Forms over six trees; Limbs is the shared tree.** Forms are a Latin square: every stat is primary once, secondary once and tertiary once, and each Form's tertiary stat is the one *before* its primary in the stat order. The first square (tertiary = the next stat) dumped both the Oracle's Grit and Moxie (147% HP lost per fight) and gave the Alembic Limit 4, so it was rotated. Limbs is never primary, so it has no exclusive nodes. It is secondary for Juggernaut and Skitter and tertiary for Siren.
@@ -396,6 +519,7 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - **Findings:** Wild rule gap, Spore Bloom self-hit, and Blood Price spike fixed. Single-target burst at L5+ (Strike + Kinetic + Overcharge ≈ 7d10+stat for 2 Flux, ~42) is high but can't one-shot a same-level Soldier (46 HP) on average; **watch in live play.** Brutes melt fast under focused Surges. That's intended as the payoff, but GMs can add Shielded/Armored.
 
 ## Issues Log
+- 2026-10-28 (enemy calibration): previous run was interrupted before docs; resumed from commit 8ca1bae. Found and fixed: uncapped AoE per-PC bonus (137 damage per clumped freelancer), Apex multiplying pack/AoE bonuses, rating extrapolation running to 13 on flat curves, tuner turning the Leviathan into a damage-less sponge and failing near L10 (hand-tuned), Ward Tough rating flipping on Damage rounding at T1, Brood Matriarch over the 5% death limit, Mother of Rust one-shotting with a 67-damage area. ch 10's old Cost/Budget system, v0.2 table and anchors replaced; ch 11 link to the Matriarch block updated.
 - 2026-10-28 — **v0.2 rewrite** (owner: Base Forms & Evolution). Files touched: every chapter, README, sheets, builder, all tools. Commits df621ff (spec), 97d77a8 (trees), 5213118 (Forms/Surges/Flux/Advancement), 1e861cc (threats, pregens, GM guidance, sims), 842c78c (guide, quick ref, intro, sheets), b07f1e0 (builder + tests) and this hub update.
 - 2026-10-28 — v0.2: the first Forms Latin square left the Oracle with two dump stats in its defenses (147% HP lost) and the Alembic at Limit 4. Rotated (tertiary = previous stat); ch 2A, ch 2 example and sims updated.
 - 2026-10-28 — v0.2 sims: Lightning Step full-dice → half dice (Skitter ~65% ahead at L7); Siren Song now redirects to the Siren *or a named ally*; tree_compare overstated HP loss (1.0 attack/round, 1.6 while Taunting).
@@ -574,6 +698,12 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 16. **Foresight / Thousand Eyes strength.** The Omen (replace any nearby d20 once a round) is the strongest Evolution I node on paper, and Thousand Eyes is the one explicit exception to non-stacking Crit ranges (17–20 with Deadeye). Watch the Oracle at L7+.
 17. **Haste Signatures.** *Live Feed* (Infuse + Haste) gives an ally an extra Move + Action every round for 1 Flux. It is strong in a party with one big hitter. Fine as the Siren's identity, or limit Haste Signatures to once per combat?
 
+18. **Big enemy hits.** The v0.3 table makes a failed defense cost ~⅔ of an average freelancer's HP (defenses succeed ~50%). Same ratings could be reached with a higher TN and lower Damage (less swing, more chip damage). Worth a live-play check; `calibrate_table.py` can solve either way.
+19. **Patient Zero vs 3 freelancers** is still win 79% after Boss scaling (HP & Damage ×¾). Option: it Blooms 1 Husk instead of 2 for small parties.
+20. **Support Traits are cheap.** Mender and Damper Field barely move ratings in the sim (the AI heals and Surges simply). Either they're under-modelled or they need to be stronger.
+21. **Area positioning is the biggest assumption.** Heavies' ratings assume a party that neither clumps nor spreads on purpose (catch odds 30/45/65% for 10/20/30 ft). A table that fights in corridors will find Heavies above their BR.
+22. **Evolution-wall clustering.** Many ratings sit at 6.8–7.0. If a finer scale is wanted between L6 and L7, rate with half-levels (impossible with real characters) or publish fractional ratings.
+23. **Drowned Choir BR** is 7–8 depending on seed (flat danger curve); published as 8.
 
 ## Hosting (GitHub Pages)
 

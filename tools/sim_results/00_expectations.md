@@ -19,3 +19,6 @@ Pre-roster finding already made while building the sim (logged, not an expectati
 | E10 | Controllers/support creatures are worth more in groups than alone (Leader and healing need allies), so they are MR-heavy too, but less than packs. | BR vs MR |
 | E11 | Ratings are stable within ±0.3 of a level at 1,000 runs per cell. | repeat with a second seed |
 | E12 | The Evolution jumps (L3→L4, L6→L7) mean a creature fair at L3 is "Easy" at L4: a whole rating step is worth more across an Evolution. | value of a rating step across stages |
+
+## Results
+Tested and recalibrated 2026-10-28: see `Current_Work.md`, *Enemy Calibration* → *Expectations vs results*. Summary: confirmed E1, E2, E8 (step ×1.41), E11, E12; confirmed with changes E3 (big parties only), E4 (only with a horde penalty), E7 (not for Bosses → Boss HP & Damage × P/4); partly E5; wrong E6, E9 (Deadly is ×1¼, not ×1½), E10.
