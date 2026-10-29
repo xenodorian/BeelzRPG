@@ -13,6 +13,8 @@
 - **Flux & Overload:** power has a price, rolled on the Bloom or Glitch tables.
 - **10 missions, 10 levels.**
 
+**The whole rulebook:** [Mutagen_Rulebook.pdf](https://xenodorian.github.io/BeelzRPG/rulebook/Mutagen_Rulebook.pdf) (print-ready, with art) · [Markdown](rulebook/Mutagen_Rulebook.md). One numbered book with Parts, a full contents and a glossary, compiled from the chapters below. See [Rulebook and chapters](#rulebook-and-chapters).
+
 **Everything in one file:** [Mutagen.html](https://xenodorian.github.io/BeelzRPG/Mutagen.html) ([download](https://github.com/xenodorian/BeelzRPG/raw/main/dist/Mutagen.html)): the whole rulebook with contents and search, the Character Builder, the Arcade and the printable sheet, in one offline HTML file (about 1.8 MB). See [Single-file edition](#single-file-edition).
 
 ## Read the Game
@@ -35,6 +37,8 @@
 | 12 | [Quick Reference](chapters/12_Quick_Reference.md) |
 | 13 | [Character Building Guide](chapters/13_Character_Building_Guide.md) |
 | 14 | [Appendix: Arcade vs Tabletop](chapters/14_Arcade_vs_Tabletop.md) |
+| 15 | [Glossary](chapters/15_Glossary.md) |
+| 📕 | **[The compiled Rulebook](rulebook/Mutagen_Rulebook.md)** · [PDF](https://xenodorian.github.io/BeelzRPG/rulebook/Mutagen_Rulebook.pdf) |
 | — | [Character Sheet (Markdown)](sheets/Character_Sheet.md) · [Printable HTML](sheets/Character_Sheet.html) |
 | — | **[Character Builder (web app)](https://xenodorian.github.io/BeelzRPG/builder/)** · [offline file](builder/index.html) |
 | — | **[Arcade: Gauntlet mode (web game)](https://xenodorian.github.io/BeelzRPG/arcade/)** · [offline file](arcade/index.html) · [how it works](#arcade-gauntlet-mode) |
@@ -65,15 +69,23 @@
 - **Losing:** in standard mode you can retry a lost fight from its start. Each retry wears the enemies down a little (Mercy), and the dead are recovered at the next Lockdown with a permanent Scar or Fault. **Permadeath** mode allows no retries and the dead stay dead.
 - Runs autosave, mid-battle too: resuming puts every token back where it was. Auto this turn / rest of round / Auto-battle are still there. The design notes and simplifications are in [Current_Work.md](Current_Work.md#arcade-gauntlet-mode-arcade).
 
+## Rulebook and chapters
+The rules live in **one place**: the chapter files in `chapters/` (and `chapters/03_Trees/`). They are the source; edit them, never the rulebook.
+- `rulebook/Mutagen_Rulebook.md` is **generated** from them by `python3 tools/build_rulebook.py`: Parts, a title page, a full table of contents, numbered sections (§6.4, §10.5 …), the six trees inlined into chapter 3, every link rewritten to the book's own anchors, repeated art and per-file navigation dropped. Text wrapped in `<!-- chapters-only -->…<!-- /chapters-only -->` appears only in the chapter files.
+- `rulebook/Mutagen_Rulebook.pdf` is printed from it with headless Chrome: `CHROME=/usr/bin/google-chrome node tools/rulebook_pdf.js` (puppeteer-core). It checks every image and internal link and stamps `rulebook/.pdf_source.sha256`.
+- **Sync test:** `python3 tools/build_rulebook.py --check` fails if the Markdown book or the PDF is older than the chapters.
+- The single-file edition's Rules tab renders the same compiled book (same order, numbers and Parts).
+- Coherence fixes (a duplicated passage, a contradiction) go into the chapters; the book picks them up on the next build.
+
 ## Single-file edition
 `dist/Mutagen.html` (also published as [/Mutagen.html](https://xenodorian.github.io/BeelzRPG/Mutagen.html)) is the whole game in one self-contained HTML file. Open it from disk or a USB stick; it needs no internet.
-- **Tabs:** 📖 Rules (all chapters rendered from the Markdown, a contents sidebar with every section, search with `/`), 🧬 Builder, ⚔ Arcade and 📝 Sheet.
+- **Tabs:** 📖 Rules (the compiled rulebook, numbered, by Part, a contents sidebar with every section, search with `/`), 🧬 Builder, ⚔ Arcade and 📝 Sheet.
 - Builder and Arcade run in the same page and **share saves** (localStorage), as on the website. Builder share links (`Link` button) point at the file itself.
 - All scripts, styles and art are inside the file (art downscaled to 900 px JPEG).
 - **Rebuild it** after changing chapters, the builder or the arcade: `python3 tools/build_single.py` (Python 3; Pillow optional, for smaller art). It writes `dist/Mutagen.html` and `Mutagen.html`.
 - **Test it:** `CHROME=/usr/bin/google-chrome node tools/single_test.js` (puppeteer-core) opens it from `file://` with the network cut off and checks every section: links, search, builder save, an arcade auto-run that uses the builder's save, share links and the phone layout.
 
 ## Contributing
-Start with [Current_Work.md](Current_Work.md): task list, design log, style guide, glossary, and known issues. One chapter per file, so you can work in parallel without conflicts.
+Start with [Current_Work.md](Current_Work.md): task list, design log, style guide and known issues (the glossary is [chapter 15](chapters/15_Glossary.md)). After editing chapters, run `python3 tools/build_rulebook.py`, `node tools/rulebook_pdf.js` and `python3 tools/build_single.py`. One chapter per file, so you can work in parallel without conflicts.
 
 *Art in `art/` is AI-generated placeholder art.*

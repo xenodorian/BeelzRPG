@@ -23,7 +23,7 @@ You don't pick a race or a class. You pick **what the Mutagen is turning you int
 | **Rank** | 1 (half your level, rounded up) |
 | **Max HP** | 12 + (2 × Grit) + 5 per level after 1st. Recalculate when Grit changes (it does at each Evolution). |
 | **Armor** | From gear and the Hide tree (max 4, unless a node says otherwise) |
-| **Speed** | 30 ft |
+| **Speed** | 30 ft (6 squares on a grid) |
 | **Flux Limit** | 4 + Rank + Nerve (minimum 4; Splice −1) |
 | **Sequence die** | d4 |
 | **Prime** | 2 |

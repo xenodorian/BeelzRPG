@@ -1,6 +1,6 @@
 # 6. Combat
 
-Combat is fast because the GM barely rolls. Players attack enemies' **Guard**; players defend against enemies' **TN**. Enemies move together, so the GM resolves them in one sweep.
+Combat is fast because the GM barely rolls. Players attack enemies' **Guard**; players defend against enemies' **TN**. All the enemies act in one phase, one after another, so the GM runs them in a single quick sweep.
 
 ## Starting a Fight
 1. **Who goes first?**

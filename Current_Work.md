@@ -3,6 +3,8 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-29)
+**Rules audit + compiled rulebook done (2026-10-29, owner request):** every mechanic in the arcade engine and the simulators was checked against the text. Real mechanics became rules (the grid is now an equal option to theatre of the mind), arcade conveniences moved to a new appendix (ch 14), and simulator bugs were fixed. The chapters are compiled into one numbered book, `rulebook/Mutagen_Rulebook.md` + a print-ready PDF. See *Rules Audit 2026-10-29* and *Rulebook* below.
+
 **Final pass done (2026-10-29, owner request):** rules and builder review, a battle-simulator stress test (600 seeded runs + random-click fuzz in Chrome) and a **single-file edition**, `Mutagen.html` (rules + builder + arcade + sheet in one offline file). See *Final Pass 2026-10-29* below.
 
 **Arcade v2 done (2026-10-29, owner request): battle map + RPG menus.** Fights are now played on a virtual-tabletop grid with movement, real ranges, area templates, JRPG-style command menus that auto-switch between freelancers, a turn-order bar and HUDs for the active freelancer and targeted enemy. See *Arcade v2: battle map* below.
@@ -509,6 +511,15 @@ Stale doc fixed: the *Arcade v2* grid table said an enemy "N-ft burst" has radiu
 
 **Creatures that ran hot on the grid** (party of 4, book budget; small samples, the off-map ratings stay authoritative): Ostrander Paladin (as an L6/8 centrepiece: 58% won), The Drowned Choir (65%, death 30%), Hunter-Killer Unit (80%), Drain Beast (death 14%). Logged as Open Question 24.
 
+## Rulebook (compiled, 2026-10-29)
+**Decision: the chapters stay the source; the rulebook is generated.** One file per chapter keeps parallel editing (several AIs or people at once) free of merge conflicts, and the builder, arcade and tests already point at chapter anchors. A single hand-maintained book next to the chapters would drift, so it isn't one:
+- `tools/build_rulebook.py` compiles `chapters/*.md` + `chapters/03_Trees/*.md` into `rulebook/Mutagen_Rulebook.md`: three Parts (Playing / Running / Guides and Reference), title page, *About This Book*, a full contents, numbered headings (chapter numbers unchanged, sections 6.4, 10.5.2 …; a chapter's own "1." numbers are folded in), trees as §3.6–3.11, links rewritten to book anchors (site/tool links become absolute URLs), repeated art and "← back" lines dropped, `<!-- chapters-only -->` blocks (the ch 0 chapter map) left out.
+- `tools/rulebook_pdf.js` prints it with headless Chrome to `rulebook/Mutagen_Rulebook.pdf` (cover, Part pages, each chapter on a new page, running header and page numbers, PDF bookmarks), checks every image and internal link, and stamps `rulebook/.pdf_source.sha256`.
+- `python3 tools/build_rulebook.py --check` is the sync test: it fails if the book or the PDF is older than the chapters.
+- `tools/build_single.py` renders the same compiled units for the single file's Rules tab (numbered, grouped by Part, glossary included); old chapter anchors still work there.
+- **Coherence pass (done in the chapters):** the Signature Surge rules were stated twice (ch 2A and ch 4), now ch 4 holds them and 2A summarises; Quick Reference "Enemy Phase (all at once)" contradicted ch 6's one-at-a-time sweep; ranges/Speed in squares added where numbers are given; the glossary moved from this file into the book as **chapter 15** (rewritten, with links, plus the new grid terms); ch 9's "add it to Current_Work.md" became table-facing advice.
+- **Workflow after any chapter edit:** `python3 tools/build_rulebook.py && node tools/rulebook_pdf.js && python3 tools/build_single.py`, then the tests.
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -565,6 +576,10 @@ Stale doc fixed: the *Arcade v2* grid table said an enemy "N-ft burst" has radiu
 | `tools/build_single.py` | Builds the single-file edition `dist/Mutagen.html` (+ root copy `Mutagen.html`) | Re-run after any chapter/builder/arcade/art change |
 | `tools/single_test.js` | Offline headless-Chrome test of `dist/Mutagen.html` (27 checks) | `CHROME=… node tools/single_test.js` |
 | `Mutagen.html`, `dist/Mutagen.html` | **Generated** single-file edition: rules, builder, arcade, sheet | Don't edit by hand |
+| `tools/build_rulebook.py` | Compiles the chapters into `rulebook/Mutagen_Rulebook.md`; `--check` = sync test; `--html F` = print HTML | Re-run after any chapter edit |
+| `tools/rulebook_pdf.js` | Prints the rulebook PDF with headless Chrome and verifies images/links | `CHROME=… node tools/rulebook_pdf.js` |
+| `rulebook/` | **Generated** compiled rulebook (`.md`, `.pdf`, PDF stamp) | Don't edit by hand |
+| `chapters/15_Glossary.md` | The glossary (was in this file) | Add terms with a link to their rule |
 | `tools/grid_budget.js` | Grid check of the ch 10 budgets: fresh party vs the book's Hard budget on the arcade map (no arcade difficulty factors) | `node tools/grid_budget.js [N=60] [party=4] [threat=1] [seed=7000]` → `tools/sim_results/13_grid_budget_*.md` |
 | `chapters/14_Arcade_vs_Tabletop.md` | Appendix: what the arcade does differently from the book | Update when the engine gains a convenience or knob |
 | `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling, 13 grid budget | Raw results of the enemy calibration |
@@ -582,68 +597,7 @@ Stale doc fixed: the *Arcade v2* grid table said an enemy "N-ft burst" has radiu
 
 ## Glossary
 
-| Term | Meaning | Defined in |
-|---|---|---|
-| **Action / Quick / Move / Reaction** | The four parts of a turn (Reaction is once per round) | Ch 6 |
-| **Advantage / Disadvantage** | Roll 2d20, keep higher/lower | Ch 1 |
-| **Amped** | A Primed Surge rolled as doubles; costs 0 Flux | Ch 4 |
-| **Analyze** | Gumption action: learn stats, target Exposed | Ch 6 |
-| **Apex** | Capstone node of a tree; level 7+, 6 other nodes in the tree, primary or secondary tree only | Ch 3 |
-| **Area / Single** | Attack types; Area deals half on a successful defense or miss | Ch 6 |
-| **Armor** | Flat reduction per hit, max 4 (5 with Unbreakable, 6 with Siege Hide) | Ch 6, 8 |
-| **Augment / Node / Root / Tree** | Your skill-tree abilities; Root unlocks a tree; 10 standard nodes per tree | Ch 3 |
-| **Base Form** | One of five body plans (Juggernaut, Skitter, Oracle, Alembic, Siren): sets your +3/+2/+1 stats and your primary/secondary/tertiary trees | Ch 2A |
-| **Bio / Chrome / Splice** | **Material** of a tree (grown / installed); Splice = you have both | Ch 3 |
-| **Boss Rating (BR) / Minion Rating (MR)** | Party level at which 1 / 4 of a creature is a fair fight for 4 fully rested freelancers | Ch 10 |
-| **Fair fight** | Win ≥ 90%, someone Down 40–60%, death ≤ 5%, 3–7 rounds (= a Hard fight) | Ch 10 |
-| **Units / budget** | Encounter currency: Hard = 1 unit per freelancer; creature value from rating − party level | Ch 10 |
-| **Heavy / Pack (kinds)** | Heavy: big-Area enemy with a horde penalty (BR ≈ MR); Pack: enemy with group Traits (MR ≫ BR) | Ch 10 |
-| **Engulf** | Heavy Area bonus: +2 × Bonus per freelancer caught beyond the first (max 2) | Ch 10 |
-| **Bloom / Glitch** | Overload tables for Bio / Chrome | Ch 5 |
-| **Breather / Lockdown** | Short rest (½ HP, Flux 0, 2 per Lockdown) / full rest | Ch 1 |
-| **Churn** | Quick action: +1 Flux, roll one more Prime; not on a turn you Unleash | Ch 4 |
-| **Crit** | Natural 20 on an attack: double damage dice | Ch 1 |
-| **Death mark** | 3 while Down = dead | Ch 6 |
-| **Defense** | Dodge (Moxie), Endure (Grit), Resist (Nerve), + Rank | Ch 1, 6 |
-| **Down** | At 0 HP | Ch 6 |
-| **Effect / Shape / Twist** | Surge building parts | Ch 4 |
-| **Emergence** | The on-screen moment after an Evolution: temp HP 2 × level, nearby enemies Shaken, first Signature Amped | Ch 2A |
-| **Evolution (I / II)** | The metamorphosis at level 4 / 7: new stats, +1 Prime, bigger die, an Evolution node, a Signature Surge, a new look | Ch 2A |
-| **Evolution node** | A Form-exclusive node on its primary tree, granted at L4 and L7 | Ch 3 |
-| **Final Form** | Level 10 third stage: Final look; once per Lockdown primary +2, Prime two extra, every Surge Amped | Ch 2A, 7 |
-| **Firmware / Knit** | Chrome / Bio Material perks | Ch 3 |
-| **Flux / Flux Limit** | Instability; Limit = 4 + Rank + Nerve | Ch 5 |
-| **GRAFT** | The players' employer | Ch 0 |
-| **Guard** | Number players attack against; from v0.2 its own column in the threat table (stalls at T4, T7) | Ch 10 |
-| **Injury** | Temporary harm from going Down (d6) | Ch 6 |
-| **Juice** | Reward token: reroll, choose a Prime, or end a condition | Ch 1 |
-| **Knack** | Narrow trained specialty; adds Rank to checks | Ch 1 |
-| **Last Gasp** | Once per Lockdown: Overload instead of going Down | Ch 5 |
-| **Mutagenic X** | Threat trait: adds Flux when it damages you | Ch 10 |
-| **Origin** | Background: a Knack + a Perk | Ch 2 |
-| **Overload** | Exceeding Flux Limit: damage + table roll, Flux → 0 | Ch 5 |
-| **Patch / Rally / Taunt / Brace / Help** | Baseline actions | Ch 6 |
-| **Material** | Bio or Chrome, chosen per tree (formerly "Form") | Ch 3 |
-| **Omen** | Foresight's set-aside d20 (Oracle, Evolution I) | Ch 3 (Senses) |
-| **Prime / Primed** | Surges rolled ready at combat start (2; 3 from L4; 4 from L7) | Ch 4 |
-| **Primary / Secondary / Tertiary** | Your Form's three stats (+3/+2/+1) and three trees | Ch 2A, 3 |
-| **Push** | Gain 1 Flux for a node's extra effect | Ch 3 |
-| **Rank** | ⌈level/2⌉, 1–5; added to attacks, defenses, Knack checks; scales everything | Ch 1 |
-| **Role / Trait / T (Threat level)** | Enemy-building parts | Ch 10 |
-| **Sample** | Harvested Boss/Elite part, spliced in as a Surge | Ch 7 |
-| **Scar / Fault** | Permanent Bio / Chrome Overload quirk | Ch 5 |
-| **Scrip** | Money | Ch 8 |
-| **Sequence / Sequence die** | Your numbered Surge list; d4 / d6 / d8 / d12; empty slots are Wild | Ch 4 |
-| **Signature Surge** | Always-ready Surge (once per round), one per Evolution; not on the Sequence | Ch 4, 2A |
-| **Stage** | Base / Evolution I / Evolution II / Final | Ch 2A |
-| **Spill / Spill Clock** | The disaster; the GM's 6-segment mission timer | Ch 0, 9 |
-| **Stats** | Grit, Moxie, Nerve, Gumption, Chutzpah; set by Form and stage | Ch 2, 2A |
-| **Tier I / Tier II** | Node tiers: Tier I needs the Root; Tier II needs level 4+ and 3 nodes in the tree | Ch 3 |
-| **Surge / Unleash** | Random combat power / the action that uses it | Ch 4 |
-| **TN (Threat Number)** | Enemy's Attack DC (players defend vs it); separate from Guard in v0.2 | Ch 10 |
-| **Upkeep** | 25 Scrip per Chrome tree per mission | Ch 3 |
-| **Wild / Wild Surge** | Empty Sequence slot; rolls on the d12 Wild table | Ch 4 |
-| Conditions: **Blinded, Burning, Dazed, Exposed, Held, Poisoned, Prone, Shaken, Veiled** | | Ch 6 |
+The glossary is now a chapter: [chapters/15_Glossary.md](chapters/15_Glossary.md) (also the last chapter of the compiled rulebook). Add new terms there, with a link to the section that defines them.
 
 ## Task List
 ### Setup

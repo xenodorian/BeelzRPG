@@ -110,7 +110,7 @@ Take one **Starting Kit** ([Ch 8](08_Gear.md#starting-kits)). All include Light 
 | **Rank** | ⌈level ÷ 2⌉ (1 at level 1) |
 | **Max HP** | 12 + 2 × Grit + 5 × (level − 1); Hide *Thick* +2 × level |
 | **Armor** | Light 1 / Heavy 2, Shield +1, *Plating* +1 (+2 from Rank 3), *Siege Hide* +1; max 4 (5 / 6) |
-| **Speed** | 30 ft; +10 *Quickened*, +10 *Spring Legs*, −5 Heavy armor (+5 *Hollow Bones*) |
+| **Speed** | 30 ft (6 squares); +10 *Quickened*, +10 *Spring Legs*, −5 Heavy armor (+5 *Hollow Bones*) |
 | **Defenses** | Dodge = Moxie + Rank · Endure = Grit + Rank · Resist = Nerve + Rank |
 | **Flux Limit** | 4 + Rank + Nerve, minimum 4; then −1 if Splice |
 | **Attack** | stat + Rank; damage Rank × die + stat |

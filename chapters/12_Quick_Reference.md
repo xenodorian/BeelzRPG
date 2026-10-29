@@ -24,15 +24,15 @@
 **Defenses:** Dodge = Moxie+Rank · Endure = Grit+Rank · Resist = Nerve+Rank
 
 ## Derived
-HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve (Splice −1) · Speed 30 · Armor max 4 (Unbreakable 5, Siege Hide 6) · Juice start 1, max 3
+HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve (Splice −1) · Speed 30 ft (6 squares) · Armor max 4 (Unbreakable 5, Siege Hide 6) · Juice start 1, max 3
 
 ## Round
-**Player Phase** (any order) → **Enemy Phase** (all at once, players defend).  
+**Player Phase** (any order) → **Enemy Phase** (enemies one at a time in one sweep; players defend).  
 **Turn:** Move + Action + Quick; 1 Reaction per round.  
 **Actions:** Attack · Unleash · Dash · Brace · Help · Patch · Analyze · Taunt · Rally · Grapple/Shove · Other  
 **Quick:** draw, stim, Churn, Target Lock, talk  
 **Reactions:** Opportunity Strike when an enemy leaves your reach (melee weapon attack); each enemy gets one per round on you if you leave its reach (move carefully, at half speed, to avoid it). Dazed: no Reactions.  
-**Ranges:** Help 30 ft · Analyze/Taunt/Rally 60 ft · Patch touch · ranged weapons to 2× range at disadvantage (not Areas/grenades) · enemy adjacent to a shooter = disadvantage.  
+**Ranges:** Help 30 ft · Analyze/Taunt/Rally 60 ft · Patch touch · ranged weapons to 2× range at disadvantage (not Areas/grenades/Surges) · shooting with an enemy adjacent = disadvantage (an enemy shooter with a freelancer adjacent: you defend with advantage).  
 **Positioning:** theatre of the mind (Close 5 ft · Near 30 ft · Far 120 ft · Distant) or grid (1 square = 5 ft, diagonals = 1; 30 ft = 6 squares; 10-ft burst = 5×5 squares; 15-ft cone 3 deep; line 1 wide; walls block sight and Areas).  
 **Wait:** go later in the Player Phase if you haven't acted. **Boss Interrupt:** one action (no Move) after any player's turn, once per round.  
 **Damage:** Rank × weapon die + stat. Armor −X per hit (min 1). Area: miss/successful defense = half.

@@ -113,4 +113,4 @@ What the Evolutions change is **last stage's monsters**. A creature rated in the
 Body horror can hit hard. Before play, agree as a table what's off-limits (lines) and what should happen off-screen (veils). Anyone can pause a scene, no questions asked.
 
 ## Rulings Log
-Keep a list of rulings at the table. If one should become a rule, add it to `Current_Work.md` as an open question.
+Keep a list of rulings at the table. If one should become a permanent rule, write it into your house rules, and if you think every table should have it, send it to the designers as an open question.

@@ -45,13 +45,7 @@ There are no other stat increases. Your stats only change when your body does.
 Your Max HP, defenses, Flux Limit and attacks all rise with the new stats. **Right after an Evolution, fights get noticeably easier.** The threats of the next few missions catch up with you (see [Threats](10_Threats.md)).
 
 ### Signature Surges
-A Signature Surge is the power your new body was built around. It's always there.
-- **Build it** from your Surge parts like any Surge ([chapter 4](04_Surges.md)), with Twists as your Rank allows. Name it after what your body does now.
-- **Write it in a Signature box,** not on your Sequence. It doesn't count toward your Surges known, your Prime, or your Primed maximum.
-- **It is always ready.** It's Primed at the start of every combat. After you Unleash it, it's Primed again at the start of your next turn, so you can use each Signature **once per round**.
-- **It costs its normal Flux** (1 + 1 per Twist). It can't be Amped by doubles; only Emergence and Final Form Amp it.
-- **Missed?** A missed Strike or Bolt Signature is still ready next turn, like any Signature.
-- **Changing it:** when you level up (from level 5), you may rebuild one Signature Surge.
+A Signature Surge is the power your new body was built around, and it's always there. You build it from your Surge parts like any Surge, with the Twists your Rank allows, and name it after what your body does now. It sits in its own Signature box (not on your Sequence), it's Primed at the start of every combat and again after each use, so you can Unleash it **once per round**, every round, for its normal Flux. The full rules are in [Signature Surges](04_Surges.md#signature-surges).
 - **Flux is the limit.** You can now Surge every turn, but every Surge pushes you toward Overload. Pace yourself, or plan your Overloads.
 
 ### Emergence: the moment it happens

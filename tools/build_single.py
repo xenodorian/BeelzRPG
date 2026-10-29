@@ -13,10 +13,11 @@ read = lambda p: open(R(p), encoding='utf-8').read()
 GH = 'https://github.com/xenodorian/BeelzRPG/blob/main/'
 SITE = 'https://xenodorian.github.io/BeelzRPG/'
 
-CHAPTERS = ['00_Introduction', '01_Core_Rules', '02_Character_Creation', '02A_Forms_and_Evolution', '03_Augment_Trees',
-            '03_Trees/Hide', '03_Trees/Limbs', '03_Trees/Senses', '03_Trees/Glands', '03_Trees/Wiring', '03_Trees/Mind',
-            '04_Surges', '05_Flux_and_Overload', '06_Combat', '07_Advancement', '08_Gear', '09_Running_the_Game',
-            '10_Threats', '11_Starter_Mission', '12_Quick_Reference', '13_Character_Building_Guide', '14_Arcade_vs_Tabletop']
+# The Rules tab is the compiled rulebook (tools/build_rulebook.py): same order, numbering, Parts and glossary.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import build_rulebook
+UNITS = build_rulebook.units()
+CHAPTERS = [u['file'][len('chapters/'):-3] for u in UNITS]
 key_of = lambda ch: ch.replace('/', '-')
 
 # ------------------------------------------------------------------ art
@@ -84,8 +85,12 @@ class Doc:
         return t
 
     def heading(self, level, text):
-        s = slug(text); n = self.seen.get(s, 0); self.seen[s] = n + 1
-        s = s if n == 0 else '%s-%d' % (s, n)
+        m = re.match(r'^(.*) \{#([^}]*)\}$', text)
+        if m:   # compiled rulebook heading: numbered text, original anchor kept so old links still work
+            text, s = m.group(1), m.group(2)
+        else:
+            s = slug(text); n = self.seen.get(s, 0); self.seen[s] = n + 1
+            s = s if n == 0 else '%s-%d' % (s, n)
         hid = self.key + '--' + s
         plain = re.sub(r'<[^>]+>', '', self.inline(text))
         self.heads.append((level, hid, html.unescape(plain)))
@@ -330,9 +335,13 @@ show(location.hash);
 def build():
     art = art_data()
     docs = []; body = []; toc = []
-    groups = {'00_Introduction': 'Start here', '01_Core_Rules': 'Player rules', '09_Running_the_Game': 'Game Master', '12_Quick_Reference': 'Reference'}
-    for ch in CHAPTERS:
-        d = Doc(ch); h = d.render(read('chapters/%s.md' % ch)); docs.append(d)
+    groups = {}
+    for u in UNITS:
+        if u['part'] not in groups.values(): groups[u['file'][len('chapters/'):-3]] = u['part']
+    groups = {k: build_rulebook.PARTS[v][0] for k, v in groups.items()}
+    for u in UNITS:
+        ch = u['file'][len('chapters/'):-3]
+        d = Doc(ch); h = d.render(u['md']); docs.append(d)
         first = d.heads[0] if d.heads else (1, d.key, ch)
         # the chapter's own id: the key itself points at its first heading's section
         body.append('<section class="chap" id="%s">%s</section>' % (d.key, h))
@@ -347,7 +356,8 @@ def build():
 <a href="#builder"><b>🧬 Character Builder</b>Click through creation and levelling; it checks legality and prints a sheet.</a>
 <a href="#arcade"><b>⚔ Arcade</b>Run a party through ten levels of grid battles. Uses the builder's saved characters.</a>
 <a href="#sheet"><b>📝 Character Sheet</b>Printable blank sheet.</a>
-</div><p class="meta">Single-file edition built %s from commit %s. Works offline; saves stay in this browser (localStorage) and are shared by the Builder and the Arcade. Online: <a href="%s" target="_blank" rel="noopener">%s</a></p>''' % (datetime.date.today().isoformat(), rev, SITE, SITE)
+<a href="%srulebook/Mutagen_Rulebook.pdf" target="_blank" rel="noopener"><b>📕 Rulebook PDF</b>The same rules as a print-ready book (online).</a>
+</div><p class="meta">Single-file edition built %s from commit %s. Works offline; saves stay in this browser (localStorage) and are shared by the Builder and the Arcade. Online: <a href="%s" target="_blank" rel="noopener">%s</a></p>''' % (SITE, datetime.date.today().isoformat(), rev, SITE, SITE)
     apps = {
         'builder': app_src(read('builder/index.html')),
         'arcade': app_src(inline_scripts(read('arcade/index.html'), 'arcade')),

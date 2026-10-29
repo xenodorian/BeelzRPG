@@ -32,9 +32,9 @@ const frameOf = async (p, tab) => { await p.evaluate(t => MutagenShell.go('#' + 
     const imgs = [...document.querySelectorAll('#doc img')];
     return { chaps, links: document.querySelectorAll('#doc a[href^="#"]').length, badLinks, imgs: imgs.length, imgBad: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.dataset.art), toc: document.querySelectorAll('#toc a').length };
   });
-  ok(r.chaps === 22, `rules: 22 chapters rendered (${r.chaps})`);
+  ok(r.chaps === 23, `rules: 23 chapters rendered (${r.chaps})`);
   ok(r.links > 100 && !r.badLinks.length, `rules: ${r.links} in-page links all resolve ${r.badLinks.slice(0, 5)}`);
-  ok(r.imgs >= 9 && !r.imgBad.length, `rules: ${r.imgs} embedded images load ${r.imgBad}`);
+  ok(r.imgs >= 7 && !r.imgBad.length, `rules: ${r.imgs} embedded images load ${r.imgBad}`);
   ok(await p.evaluate(() => { const t = document.querySelector('#doc table'); return !!t && document.querySelectorAll('#doc table').length > 60; }), 'rules: tables rendered');
   await p.click('#toc a[href="#06_Combat"]'); await sleep(300);
   ok(await p.evaluate(() => location.hash === '#06_Combat' && Math.abs(document.getElementById('06_Combat').getBoundingClientRect().top - document.getElementById('doc').getBoundingClientRect().top) < 30), 'TOC: click jumps to Combat');

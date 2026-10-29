@@ -36,6 +36,7 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 6. **Player-facing dice:** the GM rarely rolls. Players roll to hit, and players roll to dodge. ([Chapter 6](06_Combat.md))
 7. **One mission, one level:** a campaign runs 10 missions, levels 1 to 10. ([Chapter 7](07_Advancement.md))
 
+<!-- chapters-only -->
 ## Chapter Map
 
 | # | Chapter | What's in it |
@@ -58,3 +59,4 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 | 14 | [Arcade vs Tabletop](14_Arcade_vs_Tabletop.md) | What the web battle simulator does differently from these rules, and why |
 
 Prefer one book? **[The Mutagen Rulebook](../rulebook/Mutagen_Rulebook.md)** compiles all of these chapters into a single numbered document with a full table of contents and a glossary (also as a [print-ready PDF](../rulebook/Mutagen_Rulebook.pdf)).
+<!-- /chapters-only -->
