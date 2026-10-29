@@ -29,7 +29,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 
 /* ------------------------------------------------------------------ tables */
 // Difficulty = party size (the request) plus a threat factor on top of the book's budgets (calibrated by tools/arcade_test.js).
-const DIFFS = { easy: { name: "Easy", size: 5, threat: 1.25 }, medium: { name: "Medium", size: 4, threat: 1.5 }, hard: { name: "Hard", size: 3, threat: 1.7 } };
+const DIFFS = { easy: { name: "Easy", size: 5, threat: 1.25 }, medium: { name: "Medium", size: 4, threat: 1.6 }, hard: { name: "Hard", size: 3, threat: 1.75 } };
 const HARD_BUDGET = { 1: 1, 2: 1.75, 3: 2.75, 4: 4, 5: 5.5, 6: 7 };          // ch 10 §5
 const UNITS_MR = { "-3": 1 / 3, "-2": 0.5, "-1": 0.75, "0": 1, "1": 1.5, "2": 2, "3": 3 };
 const Q = { s: 0.30, m: 0.45, l: 0.65 };                                     // chance another freelancer is caught (party of 4)
@@ -119,11 +119,13 @@ function ensureEncounters(run) {
   const L = run.level; if (run.enc[L]) return run.enc[L];
   const save = _seed, saveRs = _rs; setSeed((run.seed + L * 7919) >>> 0);
   const P = run.pcs.filter(p => !p.dead).length || run.size;
-  const m = buildMinions(L, P, run.threat || 1), boss = bossFor(L);
+  const m = buildMinions(L, P, threatAt(run, L)), boss = bossFor(L);
   if (save === null) _seed = null; else { _seed = save; _rs = saveRs; }
   run.enc[L] = { minion: m.names, units: m.units, budget: m.budget, boss };
   return run.enc[L];
 }
+// Threat ramps in over the first levels: level-1 sheets are fragile, so L1 gets half the extra threat and L2 three quarters.
+function threatAt(run, L) { const t = run.threat || 1; return 1 + (t - 1) * Math.min(1, (L + 1) / 4); }
 function partySize(run) { return run.pcs.filter(p => !p.dead).length; }
 // Rests (ch 1): a Breather after each minion fight; level-up + Lockdown after each boss.
 function breather(run) {
@@ -314,22 +316,26 @@ class Fight {
   constructor(run, kind) {
     this.run = run; this.kind = kind; this.level = run.level; this.round = 0; this.phase = "prime"; this.logs = []; this.active = null; this.haste = null; this.lingers = [];
     this.pcs = run.pcs.map((rp, i) => makePC(rp, i, run));
+    this.pcs.forEach(c => { if (this.pcs.some(o => o !== c && o.short === c.short)) { const nick = (/"([^"]+)"/.exec(c.name) || [])[1]; c.short = nick || c.short + " " + (c.idx + 1); } });
     const P = this.pcs.filter(c => !c.dead).length || 1; this.P = P;
     const enc = ensureEncounters(run);
+    // Mercy (standard mode): each retry of the same fight takes 6% off enemy HP and 4% off their damage, up to ten retries.
+    const mc = Math.min(10, run.mercy || 0); this.mercy = { n: mc, hp: 1 - 0.06 * mc, dmg: 1 - 0.04 * mc };
     this.foes = [];
     if (kind === "boss") {
-      const th = run.threat || 1, sc = { hp: P / 4 * th, dmg: P / 4 * (1 + (th - 1) / 2), centre: true };
+      const th = threatAt(run, this.level), sc = { hp: P / 4 * th * this.mercy.hp, dmg: P / 4 * (1 + (th - 1) / 2) * this.mercy.dmg, centre: true };
       const f = makeFoe(BY[enc.boss], 0, sc); f.centre = true;
       f.attacks.forEach(a => { if (a.tmpl) a.tmpl = scaledSummon(a.tmpl, sc); });
       this.foes.push(f); this.title = (f.boss ? "Boss: " : "Centrepiece: ") + f.name;
     } else {
       const counts = {}; enc.minion.forEach(n => counts[n] = (counts[n] || 0) + 1); const seen = {};
-      enc.minion.forEach((n, i) => { seen[n] = (seen[n] || 0) + 1; this.foes.push(makeFoe(BY[n], i, { hp: 1, dmg: 1 }, counts[n] > 1 ? `${n} ${seen[n]}` : n)); });
+      enc.minion.forEach((n, i) => { seen[n] = (seen[n] || 0) + 1; this.foes.push(makeFoe(BY[n], i, { hp: this.mercy.hp, dmg: this.mercy.dmg }, counts[n] > 1 ? `${n} ${seen[n]}` : n)); });
       this.title = "Minions: " + Object.keys(counts).map(n => counts[n] > 1 ? `${counts[n]} × ${n}` : n).join(", ");
     }
     this.nextFoe = this.foes.length;
     this.stats = { rounds: 0, dealt: 0, taken: 0, downs: 0, deaths: 0, overloads: 0 };
     this.log(`— Level ${this.level} ${kind === "boss" ? "BOSS" : "minion"} fight: ${this.title} —`, "sys");
+    if (mc) this.log(`Retry ${mc}: the enemies are worn down (HP −${6 * mc}%, damage −${4 * mc}%).`, "sys");
     this.foes.forEach(f => f.tr.mimic ? this.log(`Something in the room is not what it seems… (${f.name} is hidden: Mimic)`, "foe") : null);
     this.initiative();
     this.pcs.forEach(c => { if (this.canAct(c) || c.down) this.rollPrimeDice(c); });
@@ -451,7 +457,7 @@ class Fight {
   endTurn(c) {
     if (!c || this.active !== c) return;
     if (c.mitosis && this.canAct(c)) { const w = this.bestWeapon(c); const t = this.pickTarget(c, w); if (w && t) { this.log(`${c.short}'s Mitosis copy attacks.`, "pc"); this.attack(c, w, t, {}); } }
-    if (c.t && c.t.ospike) { this.condPC(c, "dazed"); c.cond.dazed.at = c.turnNo + 0; c.cond.dazed.keep = 1; }
+    if (c.t && c.t.ospike && this.condPC(c, "dazed")) { c.cond.dazed.keep = 1; }
     for (const k in c.cond) { const x = c.cond[k]; if (x && x.keep) { delete x.keep; continue; } if (x && x.at != null && x.round == null && x.at < c.turnNo) delete c.cond[k]; }
     c.turnDone = true; this.active = null; this.haste = null;
     if (this.checkEnd()) return;
@@ -1273,7 +1279,7 @@ function completeFight(run, F) {
     if (run.hardcore) run.stats.endedAt = Date.now();
     return run.step;
   }
-  run.stats.wins++;
+  run.stats.wins++; run.mercy = 0;
   if (run.hardcore && !run.pcs.some(p => !p.dead)) { run.step = "gameover"; return run.step; }
   if (F.kind === "minion") { breather(run); run.step = "boss"; }
   else if (run.level >= 10) { run.step = "victory"; run.stats.endedAt = Date.now(); }
@@ -1282,9 +1288,9 @@ function completeFight(run, F) {
 }
 function retryFight(run) {
   if (run.hardcore || !run.snapshot) return false;
-  const keep = { retries: run.stats.retries + 1, losses: run.stats.losses, fights: run.stats.fights, rounds: run.stats.rounds }, hist = run.history, snap = run.snapshot;
+  const mercy = run.mercy || 0; const keep = { retries: run.stats.retries + 1, losses: run.stats.losses, fights: run.stats.fights, rounds: run.stats.rounds }, hist = run.history, snap = run.snapshot;
   const s = clone(snap); Object.keys(run).forEach(k => delete run[k]); Object.assign(run, s); run.snapshot = snap;
-  Object.assign(run.stats, keep); run.history = hist; return true;
+  Object.assign(run.stats, keep); run.history = hist; run.mercy = mercy + 1; return true;
 }
 // choices: array (one per party slot) of applyLevelUp choices, or null for an automatic pick.
 function completeLevelUp(run, choices) {
@@ -1351,5 +1357,5 @@ const Saves = {
 
 root.MutagenArcade = { VERSION, DIFFS, LS, BY, ROSTER: ROS, setSeed, rng, die, roll, d20, newRun, ensureEncounters, buildMinions, bossFor, unitsFor, breather, lockdown, levelPlan, eligibleNodes, surgeParts, autoNode, autoSurge,
   applyLevelUp, autoLevelChoices, fitToLevel, makePC, makeFoe, Fight, aiChoose, autoTurn, autoSetup, autoFight, startFight, completeFight, retryFight, completeLevelUp, abandonRun, autoRun, Saves, surgeDetail, surgeTarget,
-  COND_NAME, BLOOM, GLITCH, WILD, HARD_BUDGET, partySize, wildSurge };
+  COND_NAME, BLOOM, GLITCH, threatAt, WILD, HARD_BUDGET, partySize, wildSurge };
 })(typeof window !== "undefined" ? window : globalThis);

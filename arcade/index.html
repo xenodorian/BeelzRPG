@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mutagen Arcade · Gauntlet Mode</title>
+<link rel="icon" href="data:,">
+<!-- Mutagen Arcade. Plain HTML + JS, no build step, works offline from file:// and on GitHub Pages.
+     mutagen_rules.js is generated from builder/index.html (node tools/sync_arcade.js); roster.js from the encounter
+     roster (python3 tools/export_arcade_roster.py). engine.js holds the rules; app.js is this page. -->
+<style>
+:root{--bg:#0d1110;--pan:#161c1a;--pan2:#1e2623;--ink:#dfe8e2;--dim:#8fa39a;--acid:#b6ff2e;--acid2:#4cc300;--chrome:#62d7ff;--bio:#8cff6a;--splice:#ff5fd2;--bad:#ff5a5a;--warn:#ffc23d;--line:#2c3833;--foe:#ff8a5a}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+a{color:var(--acid)}
+header{position:sticky;top:0;z-index:5;background:linear-gradient(90deg,#0d1110 0%,rgba(13,17,16,.92) 60%,rgba(13,17,16,.75)),url(../art/cover.jpg) center/cover;border-bottom:2px solid var(--acid2);padding:8px 14px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
+header h1{margin:0 12px 0 0;font-size:22px;letter-spacing:4px;color:var(--acid);text-shadow:0 0 8px rgba(182,255,46,.5)}
+header h1 small{font-size:11px;letter-spacing:1px;color:var(--dim);display:block}
+.tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button,select,input,textarea{font:inherit;color:var(--ink);background:var(--pan2);border:1px solid var(--line);border-radius:6px;padding:6px 8px}
+button{cursor:pointer;min-height:36px}button:hover:not(:disabled){border-color:var(--acid)}button:disabled{opacity:.4;cursor:not-allowed}
+.pri{background:var(--acid2)!important;color:#061!important;font-weight:700;border-color:var(--acid)!important}
+.danger{border-color:var(--bad);color:#ff9a9a}
+input,textarea{width:100%}input[type=checkbox],input[type=radio]{width:auto;accent-color:var(--acid2);min-height:auto}
+label{display:block;margin:6px 0;color:var(--dim)}label input,label select{margin-top:2px;color:var(--ink)}
+label.inl{display:inline-flex;gap:6px;align-items:center}
+main{max-width:1300px;margin:auto;padding:14px}
+.panel{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+h2{margin:0 0 6px;color:var(--acid);letter-spacing:1px}h3{color:var(--acid);margin:12px 0 4px;font-size:16px}
+.hint,.small{color:var(--dim);font-size:13px}.small b{color:var(--ink)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:10px;margin:8px 0}
+.card{background:var(--pan2);border:1px solid var(--line);border-radius:8px;padding:10px;color:var(--ink);overflow-wrap:anywhere}
+.card.on{border-color:var(--acid);box-shadow:0 0 0 1px var(--acid) inset}.card.bad{border-color:var(--bad)}.card.dim{opacity:.55}
+.diff{cursor:pointer;text-align:left;width:100%}.diff b{font-size:18px;color:var(--acid)}
+.tag{font-size:11px;border:1px solid var(--acid2);color:var(--acid);border-radius:4px;padding:0 4px;display:inline-block;margin:1px}.tag.bad{border-color:var(--bad);color:#ff9a9a}.tag.dim{border-color:var(--dim);color:var(--dim)}.tag.foe{border-color:var(--foe);color:var(--foe)}.tag.amp{border-color:var(--splice);color:var(--splice)}
+.bio{color:var(--bio)}.chrome{color:var(--chrome)}.splice{color:var(--splice)}
+.bar{height:10px;background:#0a0d0c;border:1px solid var(--line);border-radius:5px;overflow:hidden;margin:3px 0;position:relative}.bar i{display:block;height:100%;background:var(--acid2)}.bar i.tmp{background:#8fd3ff;position:absolute;top:0}
+.bar.flux i{background:var(--splice)}.bar.foe i{background:var(--foe)}.bar.low i{background:var(--bad)}
+.nums{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:6px 0;font-size:12px}.nums div{background:var(--pan);border-radius:6px;padding:3px;text-align:center}.nums span{display:block;font-size:10px;color:var(--dim);text-transform:uppercase}
+.errs{color:#ff9a9a;font-size:12.5px;margin:4px 0;padding-left:18px}.warns{color:var(--warn);font-size:12.5px;padding-left:18px}
+/* battle */
+.battle{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr) minmax(0,1fr);gap:12px}
+.side h3{margin-top:0}.pcard,.ecard{margin-bottom:8px}.pcard.act{border-color:var(--acid);box-shadow:0 0 10px rgba(182,255,46,.25)}.pcard.down{border-color:var(--bad)}.ecard.dead{opacity:.4}
+.opts{display:flex;flex-direction:column;gap:6px}.opt{text-align:left;display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.opt small{color:var(--dim);display:block;font-size:12px}.opt .k{color:var(--dim);font-size:11px;white-space:nowrap}
+.center .opts{max-height:52vh;overflow:auto;padding:2px}
+.opt.over{border-color:var(--warn)}.opt .fx{color:var(--splice);font-weight:700;white-space:nowrap}
+.grp{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin:8px 0 2px;border-bottom:1px solid var(--line)}
+#log{background:#090c0b;border:1px solid var(--line);border-radius:8px;padding:8px;height:34vh;overflow:auto;font:12.5px/1.4 ui-monospace,Consolas,monospace;white-space:pre-wrap}
+#log .round{color:var(--acid);font-weight:700;margin-top:6px;border-top:1px solid var(--line)}#log .turn{color:var(--chrome)}#log .foe{color:#ffb38a}#log .bad{color:#ff8a8a}#log .heal{color:#9dff9d}
+#log .crit{color:var(--warn);font-weight:700}#log .over{color:var(--splice)}#log .down,#log .dead,#log .lose{color:var(--bad);font-weight:700}#log .win,#log .kill{color:var(--acid)}#log .sys{color:var(--dim)}#log .big{font-weight:700}#log .miss{color:#9aa}
+.dice{display:inline-flex;gap:4px;flex-wrap:wrap}.die{display:inline-block;min-width:30px;text-align:center;border:1px solid var(--acid2);border-radius:6px;padding:2px 4px;font-weight:700}
+.ladder{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;margin:8px 0}.rung{background:var(--pan2);border:1px solid var(--line);border-radius:6px;padding:4px;text-align:center;font-size:12px}.rung.done{border-color:var(--acid2);color:var(--acid)}.rung.cur{border-color:var(--warn);box-shadow:0 0 0 1px var(--warn) inset}
+.rung b{display:block;font-size:16px}
+.choice{display:block;width:100%;text-align:left;margin:3px 0;padding:6px;border:1px solid var(--line);border-radius:6px;background:var(--pan);color:var(--ink);cursor:pointer}.choice.on{border-color:var(--acid);background:rgba(76,195,0,.12)}.choice small{display:block;color:var(--dim)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;margin:6px 0}.tabs button[aria-selected=true]{border-color:var(--acid);color:var(--acid)}
+table.t{border-collapse:collapse;width:100%;font-size:13px;margin:6px 0}.t td,.t th{border:1px solid var(--line);padding:3px 6px;text-align:left}.t th{color:var(--dim)}
+.big{font-size:28px;letter-spacing:3px;color:var(--acid);text-shadow:0 0 10px rgba(182,255,46,.4);margin:4px 0}
+.sr{position:absolute;left:-9999px;width:1px;height:1px;overflow:hidden}
+:focus-visible{outline:2px solid var(--acid);outline-offset:2px}
+[tabindex="-1"]:focus{outline:none}
+.toast{position:fixed;bottom:14px;left:50%;transform:translateX(-50%);background:var(--pan2);border:1px solid var(--acid2);padding:8px 14px;border-radius:8px;z-index:20}
+@media (max-width:1000px){.battle{grid-template-columns:1fr 1fr}.battle .center{grid-column:1/-1;order:-1}}
+@media (max-width:640px){header{position:static}.battle{grid-template-columns:1fr}.ladder{grid-template-columns:repeat(5,1fr)}main{padding:8px}.panel{padding:10px}#log{height:36vh}}
+</style>
+</head>
+<body>
+<header><h1>MUTAGEN<small>Arcade · Gauntlet Mode</small></h1>
+<nav class="tools" aria-label="Links"><a href="../builder/index.html">Character Builder</a> · <a href="https://github.com/xenodorian/BeelzRPG#readme">Rules</a> <button id="btnHome" type="button">⌂ Title</button></nav></header>
+<main id="screen" tabindex="-1"></main>
+<div id="live" class="sr" aria-live="polite"></div>
+<input type="file" id="fileIn" accept=".json,application/json" hidden>
+<script src="mutagen_rules.js"></script>
+<script src="roster.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
