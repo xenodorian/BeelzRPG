@@ -97,12 +97,25 @@ def block(b):
         lines.append('**Shift (half HP):** ' + '; '.join(bits) + '.  ')
     lines.append('*%s* **Tactics:** %s' % (b['look'], b['tactics']))
     return '\n'.join(lines)
+STANDOUT = {
+ 'Spill Rats': 'Pack + Overwhelm: four on one freelancer pin them', 'Scrapjack Picker': 'Pack + Flanker', 'Ward Tough': 'Cowardly: surrenders',
+ 'Bloomhound': 'Flanker + Frenzy; Held', 'Turret Drone': 'Flying 10-ft Area; Explosive', 'Drain Beast': 'Engulf Tail Thrash; Bulky; Regenerating',
+ 'Boiler Hulk': 'Engulf Steam Vent, then skips a phase', 'Ostrander Cleaner': 'Shield Wall; Purge Rifle', 'Sporecaller': 'Leader + Mender; Poisoned area',
+ 'Mirrormaw': 'Mimic; two attacks', 'Cleaner Hound': 'Pack + Flanker; Purge bite', 'Gas Bloat': '30-ft Engulf; Explosive',
+ 'Bloom Knight': 'Armored 2; Poisoned', 'Glasshide': 'Engulf; Territorial; Vulnerable (Shock)', 'Stitchwork Brood': 'Linked + Crowd',
+ 'Damper Drone': 'Damper Field: Unleash +1 Flux', 'Lancer Troopers': 'Shield Wall + Purger', 'Hunter-Killer Unit': 'Hunter; two Dazing attacks',
+ 'Feral Evolved': 'Damage Gate + Shift', 'Razorwing Flock': 'Pack + Flanker + Frenzy', 'Gutter Leviathan': '30-ft Engulf; Bulky; Territorial',
+ 'Bloom Husks': 'Overwhelm + Crowd', 'Ostrander Paladin': 'Shielded; Armored 3', 'Seraph Gunship': '20-ft Engulf at 120 ft; Interference',
+ 'The Drowned Choir': 'Swarm; Leader; psychic 30-ft area', 'Choir Thralls': 'Overwhelm + Pack', 'Mother of Rust': 'Leader + Mender; Exposed area',
+ 'Hollow Saint': 'Mimic + Hunter', 'Reactor Wraith': '30-ft Engulf; Interference; Bulky', 'The Many': 'Linked + Frenzy',
+ 'The Brood Matriarch': 'Births Brood Spawn; Screech', 'Warden Krell': 'Calls the Line; Purge; Leader', 'Patient Zero': 'Blooms Husks; 60-ft Song; triple Shift'}
+def anchor(nm): return nm.lower().replace(' ', '-').replace("'", '')
 def table():
     print('| Creature | T | Role | Kind | BR | MR | Faction | Standout |')
     print('|---|---|---|---|---|---|---|---|')
     for b in sorted(RO.ROSTER, key=lambda b: (b['T'], b['role'] == 'boss', b['name'])):
         br, mr = ratings(b['name'])
-        print('| [%s](#%s) | %d | %s | %s | %s | %s | %s | %s |' % (b['name'], b['name'].lower().replace(' ', '-').replace("'", ''), b['T'], ROLE[b['role']], KIND[b['kind']], br, mr, b['faction'], ''))
+        print('| [%s](#%s) | %d | %s | %s | %s | %s | %s | %s |' % (b['name'], anchor(b['name']), b['T'], ROLE[b['role']], KIND[b['kind']], br, mr, b['faction'], STANDOUT.get(b['name'], '')))
 STAGES = [('Base stage (T1–3)', 1, 3), ('Evolution I stage (T4–6)', 4, 6), ('Evolution II stage (T7–10)', 7, 10)]
 def blocks():
     for title, lo, hi in STAGES:

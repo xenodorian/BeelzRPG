@@ -73,13 +73,17 @@ Gain Flux: Unleash, Churn, Push. Over Limit → **Overload:** take Rank d6 (min 
 ## Rest
 **Breather** (1 hr, 2 per Lockdown): regain ½ Max HP (+Knit, which also triggers after each combat), Flux 0, clear Death marks. **Lockdown** (8 hr safe): full reset.
 
-## Threat Builder
+## Threat Builder & Encounters
 
 | T | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | Guard | 12 | 13 | 14 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
-| TN | 12 | 12 | 13 | 13 | 14 | 15 | 16 | 17 | 18 | 18 |
-| HP | 18 | 22 | 30 | 40 | 48 | 56 | 72 | 84 | 92 | 100 |
-| Dmg | 7 | 8 | 10 | 12 | 14 | 16 | 18 | 21 | 24 | 27 |
-*Guard = what players attack; TN = what players defend against. Role Guard: Mook/Brute −1, Skirmisher/Boss +1.*
-**Roles (cost):** Mook ½ · Soldier 1 · Skirmisher 1 · Artillery 1 · Controller 1 · Brute 2 · Elite 2 · Boss 1/PC. **Budget** = # players (Easy ×¾, Hard ×1¼, Deadly ×1½).
+| TN | 13 | 13 | 14 | 16 | 17 | 18 | 20 | 21 | 22 | 23 |
+| HP | 28 | 30 | 38 | 62 | 74 | 78 | 150 | 158 | 162 | 168 |
+| Dmg | 10 | 11 | 16 | 25 | 29 | 30 | 46 | 47 | 48 | 50 |
+| Bonus | 2 | 2 | 3 | 5 | 6 | 6 | 9 | 9 | 10 | 10 |
+*Guard = what players attack; TN = what players defend against.*
+**Roles** (Guard / HP / Dmg → typical BR / MR): Mook −1/×¼/×½ → T−5/T−3 · Soldier → T−3/**T** · Skirmisher +1/×¾ → T−3/T · Artillery ×¾/×¾, Area → T−3/T+1 · Controller ×½ + rider → T−4/T−2 · Brute −1/×2/×1½ → T−2/T+3 · Elite ×2, 2 attacks → T−2/T+3 · Heavy (Brute + Area, Engulf, Recharge, a horde penalty) → T+1/T+2 · Boss +1/×1 per PC/×PC÷4, Interrupt, Shift → T+1/T+4.  
+**BR N** = 1 of it is a fair fight for 4 level-N PCs · **MR N** = 4 of it are. **Fair:** win 90%+, someone Down 40–60%, death ≤5%, 3–7 rounds. Group Traits (Pack, Flanker +1 MR; Overwhelm, Crowd, Linked, Frenzy, Leader +½ MR). Horde penalties (Bulky −4 MR, Territorial ≈ −1).  
+**Budget (Hard = fair)** = 1 unit per PC (2 PCs 1¾ · 3: 2¾ · 4: 4 · 5: 5½ · 6: 7). Easy ×½ · Standard ×¾ · Hard ×1 · Deadly ×1¼.  
+**Units** by rating − party level (−3/−2/−1/0/+1/+2/+3): group, by MR: ⅓ ½ ¾ **1** 1½ 2 3 · one centrepiece, by BR: 1½ 2 3 **4** 6 8 11. Next-stage creature ×2; previous-stage creature one step lower. Heavies vs 5+ PCs ×1½.

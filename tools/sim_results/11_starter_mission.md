@@ -17,12 +17,15 @@
 | Pump Hall v0.3 (3 PCs): 1 Picker + 1 Spill Rats | 3 | 10% | 9% | 100% | 0.1% | 1.8 |
 | Pump Hall v0.3 (3 PCs): 1 Picker + 1 Spill Rats | 4 | 8% | 5% | 100% | 0.0% | 1.4 |
 | Pump Hall v0.3 (3 PCs): 1 Picker + 1 Spill Rats | 5 | 8% | 4% | 100% | 0.0% | 1.2 |
-| Intake v0.2: Matriarch + 2 Spill Rats | 3 | 89% | 83% | 32% | 44.2% | 12.1 |
-| Intake v0.2: Matriarch + 2 Spill Rats | 4 | 67% | 56% | 84% | 22.4% | 9.3 |
-| Intake v0.2: Matriarch + 2 Spill Rats | 5 | 47% | 38% | 99% | 8.1% | 6.5 |
-| Intake v0.3: Matriarch alone | 3 | 67% | 69% | 62% | 25.2% | 10.2 |
-| Intake v0.3: Matriarch alone | 4 | 37% | 41% | 95% | 7.9% | 6.9 |
-| Intake v0.3: Matriarch alone | 5 | 16% | 26% | 100% | 1.4% | 4.7 |
+| Pump Hall v0.3 (5 PCs): 1 Picker + 3 Spill Rats | 3 | 60% | 35% | 92% | 5.5% | 3.7 |
+| Pump Hall v0.3 (5 PCs): 1 Picker + 3 Spill Rats | 4 | 48% | 16% | 99% | 1.1% | 2.6 |
+| Pump Hall v0.3 (5 PCs): 1 Picker + 3 Spill Rats | 5 | 44% | 10% | 100% | 0.2% | 2.1 |
+| Intake v0.2: Matriarch + 2 Spill Rats | 3 | 85% | 82% | 41% | 41.5% | 9.4 |
+| Intake v0.2: Matriarch + 2 Spill Rats | 4 | 66% | 53% | 86% | 21.9% | 7.1 |
+| Intake v0.2: Matriarch + 2 Spill Rats | 5 | 46% | 35% | 99% | 6.8% | 4.8 |
+| Intake v0.3: Matriarch alone | 3 | 54% | 59% | 73% | 19.4% | 7.1 |
+| Intake v0.3: Matriarch alone | 4 | 26% | 32% | 97% | 5.0% | 4.5 |
+| Intake v0.3: Matriarch alone | 5 | 13% | 22% | 100% | 0.8% | 3.3 |
 | Out: 2 Ostrander Cleaners | 3 | 43% | 47% | 87% | 9.6% | 3.8 |
 | Out: 2 Ostrander Cleaners | 4 | 27% | 31% | 98% | 3.8% | 2.8 |
 | Out: 2 Ostrander Cleaners | 5 | 22% | 23% | 100% | 1.2% | 2.2 |

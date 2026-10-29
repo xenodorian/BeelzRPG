@@ -42,7 +42,7 @@
 | Area 10 ft (artillery) | 3.3 | 6.9 | +0.5 | +2.1 | +1.6 |
 | Area 20 ft | 3.6 | 6.9 | +0.8 | +2.2 | +1.4 |
 | (base Brute) | 3.7 | 6.8 | | | |
-| Heavy: Area 20 ft + Crush 4 + Friendly fire + Recharge 4 | 5.9 | 13.0 | +2.2 | +6.2 | +4.0 |
-| Heavy + Apex | 6.4 | 13.0 | +2.7 | +6.2 | +3.4 |
-| Heavy + Apex + Bulky | 6.4 | 8.4 | +2.7 | +1.6 | -1.1 |
-| Heavy + Apex + Bulky + Interference | 6.4 | 8.2 | +2.7 | +1.4 | -1.3 |
+| Heavy: Area 20 ft + Engulf 2 + Friendly fire + Recharge 4 | 4.8 | 11.2 | +1.0 | +4.3 | +3.3 |
+| Heavy + Apex | 6.3 | 11.6 | +2.6 | +4.8 | +2.2 |
+| Heavy + Apex + Bulky | 6.3 | 6.9 | +2.6 | +0.1 | -2.5 |
+| Heavy + Apex + Bulky + Interference | 6.3 | 6.9 | +2.6 | +0.1 | -2.5 |

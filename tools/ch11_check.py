@@ -7,6 +7,7 @@ ENC = [('Toll: 3 Ward Toughs', [('Ward Tough', 3)]), ('Toll (old v0.2 numbers in
        ('Pump Hall v0.3: 1 Picker + 2 Spill Rats', [('Scrapjack Picker', 1), ('Spill Rats', 2)]),
        ('Pump Hall v0.3 (5 PCs): 2 Pickers + 2 Spill Rats', [('Scrapjack Picker', 2), ('Spill Rats', 2)]),
        ('Pump Hall v0.3 (3 PCs): 1 Picker + 1 Spill Rats', [('Scrapjack Picker', 1), ('Spill Rats', 1)]),
+       ('Pump Hall v0.3 (5 PCs): 1 Picker + 3 Spill Rats', [('Scrapjack Picker', 1), ('Spill Rats', 3)]),
        ('Intake v0.2: Matriarch + 2 Spill Rats', [('The Brood Matriarch', 1), ('Spill Rats', 2)]),
        ('Intake v0.3: Matriarch alone', [('The Brood Matriarch', 1)]),
        ('Out: 2 Ostrander Cleaners', [('Ostrander Cleaner', 2)])]

@@ -18,6 +18,8 @@ Pick the DC from the [Core Rules](01_Core_Rules.md#difficulty-dc) table: **13 wh
 - Mooks and Soldiers act simply. Elites and Bosses should feel smart: focus the weak, punish clumping, flee when beaten.
 - **Spread attacks** unless the fiction says otherwise. Focusing one player every round is how you get a death in a Standard fight.
 - Let the fiction override the grid: a Brute can smash a wall, a Skirmisher can jump down a stairwell.
+- **Area attacks catch whoever is inside.** Be honest about positions. Heavies (big Area, Engulf) are built to punish a bunched-up party; tell players that spreading out is the counter, and don't line them up in a corridor for the Heavy unless they walked into it.
+- **Packs focus.** Pack, Flanker and Overwhelm creatures gang up on one freelancer; that's their whole point. Everyone else should still spread attacks.
 
 ## Missions
 GRAFT contracts follow a simple shape. Each is about one session.
@@ -51,15 +53,19 @@ Evolutions (levels 4 and 7) are the biggest moments in a freelancer's life. Make
 - **Different speeds.** Everyone Evolves at the same level, so the whole party spikes together. Lean into it: the Spill Clock, GRAFT and the factions all *notice* evolved freelancers.
 
 ## Difficulty Across the Campaign
-Freelancers get dramatically stronger in two steps, at levels 4 and 7. The [Threat table](10_Threats.md#1-threat-level) is built around that: it stalls at T4 and T7, then catches up.
+Every enemy has a **Boss Rating** (one of it is a fair fight for 4 level-N freelancers) and a **Minion Rating** (four of it are). Build fights with the unit budget in [Threats](10_Threats.md#5-building-an-encounter): **one unit per freelancer is a Hard (fair) fight**, ×½ Easy, ×¾ Standard, ×1¼ Deadly. The ratings already account for each level, including the Evolutions, so the same budget works from level 1 to 10.
 
-| Party level | How fights feel at Standard | What to do |
+What the Evolutions change is **last stage's monsters**. A creature rated in the previous stage falls apart against freshly Evolved freelancers (four MR 3 creatures: Hard at level 3, Easy at level 4), and one rated in the next stage is twice as dangerous as its number suggests.
+
+| Party level | Plan | What to do |
 |---|---|---|
-| 1–3 (Base) | Tense; Downs happen | Standard fights; one Hard fight per mission |
-| **4** (just Evolved) | Easy: ~15% HP per fight | Let them enjoy it. Standard fights, a Boss with a good Shift. |
-| 5–6 | Back to tense by 6 | Hard set pieces; add Purgers and enemies that hit weak defenses (Resist for Sirens, Endure for Oracles) |
-| **7** (Evolved again) | Easy: ~13% HP per fight | A victory lap with bigger monsters (T7 Brutes and Elites) |
-| 8–10 | Tense again; the finale should be Deadly | Hard and Deadly fights; Bosses whose Shift lands after Final Form is spent |
+| 1–3 (Base) | Standard fights, one Hard per mission | Downs happen; Rats and Pickers teach Pack tactics, the Drain Beast and Boiler Hulk teach spreading out |
+| **4** (just Evolved) | A victory lap | Bring back level-3 enemies (they're Easy now), then one Hard fight with Evolution I creatures so the new body has something to push against |
+| 5–6 | Hard set pieces | Mix a Heavy centrepiece with a Pack; add Purgers and enemies that hit weak defenses (Resist for Sirens, Endure for Oracles) |
+| **7** (Evolved again) | A victory lap with bigger monsters | Level-6 enemies are Easy now; open with them, then show a Feral Evolved or a Gutter Leviathan |
+| 8–10 | Hard and Deadly fights; the finale should be Deadly | Bosses whose Shift lands after Final Form is spent; Seraph Gunships over open ground |
+
+**Between Breathers:** a fully rested party can take about **one Hard fight plus one Standard fight**, or three Standard fights, before it needs one (an estimate from HP lost per fight; the sims only test fully rested parties). The ratings assume full HP and Flux 0, so a tired party should face less.
 
 **Checks don't scale.** A DC 16 door stays DC 16. At high level, threaten what Forms are *bad* at (ask the Juggernaut for a Gumption check, the Oracle to win an arm-wrestle), and put Extreme (19), Mutant (22), Monstrous (25) and Mythic (28) obstacles in the way. A level 7 primary stat of +8 makes Hard checks routine; that's the point of Evolving.
 
@@ -91,7 +97,7 @@ Freelancers get dramatically stronger in two steps, at levels 4 and 7. The [Thre
 | 6 | Anonymous message | Find out why people are vanishing | Rooftop farms | Someone in the party is the real target |
 
 ## Pacing Guidelines
-- **Fights:** 2–3 per mission. One should be Hard. The boss can be Deadly if the players found a way to soften it.
+- **Fights:** 2–3 per mission. One should be Hard. The boss can be Deadly if the players found a way to soften it. Size every fight with the [encounter budget](10_Threats.md#5-building-an-encounter), and scale Bosses for party size ([Threats §6](10_Threats.md#6-party-size)).
 - **Breathers:** let the party take them, but make the clock tick.
 - **Surges:** encourage them. If a player never Unleashes, ask what their body is doing. Surges are the fun.
 - **Overload:** describe it gleefully, never as a punishment. It's the setting coming through the character.
