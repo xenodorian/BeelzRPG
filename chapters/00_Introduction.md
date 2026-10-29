@@ -2,7 +2,7 @@
 
 ![The Spill at Halcyon](../art/setting_halcyon.jpg)
 
-**Mutagen** is a tabletop roleplaying game about freelancers who rebuild their own bodies to survive a city that is rebuilding itself. There are no races and no classes. You are whatever you have grafted on: chitin and venom, chrome and wire, or a twitching mix of both. In a fight your body does not always do what you planned; it **Surges**, offering you a random handful of powers from everything you have ever become.
+**Mutagen** is a tabletop roleplaying game about freelancers who rebuild their own bodies to survive a city that is rebuilding itself. There are no races and no classes. The Mutagen pulls you toward one of five **Base Forms** (Juggernaut, Skitter, Oracle, Alembic or Siren), and you become whatever you graft on along the way: chitin and venom, chrome and wire, or a twitching mix of both. Twice in your career you **Evolve**, suddenly and violently, into something far bigger. In a fight your body does not always do what you planned; it **Surges**, offering you a random handful of powers from everything you have ever become.
 
 ## What You Need
 - 3–5 players and one Game Master (GM).
@@ -30,7 +30,7 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 ## The Big Ideas
 1. **One roll for everything:** d20 + Stat (+ Rank) against a number. ([Chapter 1](01_Core_Rules.md))
 2. **Emotive stats:** Grit, Moxie, Nerve, Gumption, Chutzpah. They describe *how* you do things, not what you are. ([Chapter 2](02_Character_Creation.md))
-3. **You are your Augments:** six skill trees (Hide, Limbs, Senses, Glands, Wiring, Mind), each grown as **Bio** or installed as **Chrome**. ([Chapter 3](03_Augment_Trees.md))
+3. **You are your Form and your Augments:** five Base Forms, each growing along three of six 10-node skill trees (Hide, Limbs, Senses, Glands, Wiring, Mind), each tree grown as **Bio** or installed as **Chrome**. Evolutions at levels 4 and 7 transform your body and your numbers. ([Chapter 2A](02A_Forms_and_Evolution.md), [Chapter 3](03_Augment_Trees.md))
 4. **Surges:** you build a personal list of combat powers from mix-and-match parts. Each fight, dice decide which few are ready. Using them is optional; your weapons and Augments always work. ([Chapter 4](04_Surges.md))
 5. **Flux:** every Surge pushes your body closer to **Overload**, where the Mutagen takes the wheel. ([Chapter 5](05_Flux_and_Overload.md))
 6. **Player-facing dice:** the GM rarely rolls. Players roll to hit, and players roll to dodge. ([Chapter 6](06_Combat.md))
@@ -43,7 +43,8 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 | 0 | Introduction | This page |
 | 1 | [Core Rules](01_Core_Rules.md) | Checks, Rank, Knacks, Advantage, Juice, rests |
 | 2 | [Character Creation](02_Character_Creation.md) | Stats, Origins, step-by-step |
-| 3 | [Augment Trees](03_Augment_Trees.md) | The six skill trees, Bio vs Chrome |
+| 2A | [Base Forms & Evolution](02A_Forms_and_Evolution.md) | The five Forms, their stages and looks, Evolutions, Signature Surges, Final Form |
+| 3 | [Augment Trees](03_Augment_Trees.md) | The six 10-node skill trees ([one file each](03_Trees/)), Bio vs Chrome |
 | 4 | [Surges](04_Surges.md) | Building Surges, the Sequence, Priming, Wild Surges |
 | 5 | [Flux & Overload](05_Flux_and_Overload.md) | Instability, Bloom and Glitch tables |
 | 6 | [Combat](06_Combat.md) | Turns, actions, damage, conditions, going Down |
