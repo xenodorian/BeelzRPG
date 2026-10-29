@@ -25,7 +25,7 @@ label{display:block;margin:6px 0;color:var(--dim)}label input,label select,label
 label.inl{display:inline-flex;gap:6px;align-items:center}
 #steps{display:flex;flex-wrap:wrap;gap:4px;padding:8px 14px;background:var(--pan);border-bottom:1px solid var(--line)}
 .stp{font-size:13px;background:transparent}.stp b{display:inline-block;width:20px;height:20px;line-height:20px;border-radius:50%;background:var(--line);text-align:center;font-size:12px}
-.stp.on{border-color:var(--acid);color:var(--acid)}.stp.on b{background:var(--acid2);color:#061}.stp.bad b{background:var(--bad);color:#200}.stp.warn b{background:var(--warn);color:#320}
+.stchip{display:none;margin-left:auto}.stchip.ok b{background:var(--acid2);color:#061}.stchip.no b{background:var(--bad);color:#200}.stp.on{border-color:var(--acid);color:var(--acid)}.stp.on b{background:var(--acid2);color:#061}.stp.bad b{background:var(--bad);color:#200}.stp.warn b{background:var(--warn);color:#320}
 main{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:14px;padding:14px;max-width:1300px;margin:auto}
 #panel{background:var(--pan);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
 #panel h2{margin:0 0 6px;color:var(--acid);letter-spacing:1px}#panel h3{color:var(--acid);margin:16px 0 4px;font-size:16px}
@@ -78,7 +78,8 @@ aside h3,.card,.node,.slot .line,.msgs button,.sheet td,.sheet p,.formbox{overfl
 .btn.trim{width:100%;margin:4px 0;border-color:var(--warn);color:var(--warn)}
 #saveNote{color:var(--warn);font-size:12px}
 .sheet h2 small{color:#cfd8d3}
-@media (max-width:860px){header{position:static}main{grid-template-columns:1fr}aside{position:static;order:-1}.nums{grid-template-columns:repeat(4,1fr)}header h1{font-size:18px}.msgs{max-height:none}}
+select{max-width:100%}.tscroll{overflow-x:auto;max-width:100%}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+@media (max-width:860px){header{position:static}main{grid-template-columns:minmax(0,1fr)}aside{position:static}.stchip{display:inline-flex!important}.nums{grid-template-columns:repeat(4,1fr)}header h1{font-size:18px}.msgs{max-height:none}}
 @media print{@page{size:letter;margin:.35in}body{background:#fff}.sheet{font-size:9.5px;max-width:none}.sheet td,.sheet th{padding:1px 3px}.sheet h1{font-size:18px}.sheet h2{font-size:10.5px;margin:5px 0 2px;padding:1px 5px}.sheet .small{font-size:9px}.sheet tr.off td{padding:0 3px;font-size:8px}#app{display:none!important}#printArea{display:block!important}.sheet h2{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
 </style>
 </head>
@@ -90,7 +91,7 @@ aside h3,.card,.node,.slot .line,.msgs button,.sheet td,.sheet p,.formbox{overfl
 <button id="btnRandom" title="Random legal character at this level">⚄ Random</button>
 <select id="exSel" aria-label="Load example"><option value="">Example…</option></select>
 <button id="btnNew">New</button><button id="btnSave">Save</button><select id="loadSel" aria-label="Load saved"></select>
-<button id="btnExport" title="Download this character as a .json file">Export</button><button id="btnImport" title="Load a character from an exported .json file">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden aria-label="Import character file"><span id="saveNote" role="status"></span><a href="../arcade/index.html" title="Gauntlet mode: run a party of saved characters through ten levels of fights">▶ Arcade</a>
+<button id="btnExport" title="Download this character as a .json file">Export</button><button id="btnImport" title="Load a character from an exported .json file">Import</button><button id="btnLink" title="Copy a link that opens this character (the whole sheet is packed into the link; nothing is uploaded)">Link</button><input type="file" id="importFile" accept=".json,application/json" hidden aria-label="Import character file"><span id="saveNote" role="status"></span><a href="../arcade/index.html" title="Gauntlet mode: run a party of saved characters through ten levels of fights">▶ Arcade</a>
 </div></header>
 <nav id="steps"></nav>
 <main><section><div id="panel"></div><div class="nav"><button id="prevB">← Back</button><button id="nextB" class="btn pri">Next →</button></div></section><aside id="summary"></aside></main>
@@ -784,6 +785,7 @@ function gearCalc(s, c, E, W, err) {
   const scrip = start + (Number(s.scripAdj) || 0) - spent;
   if (scrip < 0) err(5, `Not enough Scrip: ${scrip} after purchases.`);
   let smartlinks = 0;
+  if (s.shield && !c.has("extraarm")) { const two = weapons.filter(w => FRAME[w.frame] && /2 hands/.test(FRAME[w.frame].notes || "")).map(w => FRAME[w.frame].name); if (two.length) W.push({ step: 5, m: `Shield + two-handed ${[...new Set(two)].join(" / ")}: you can't use both at once (the Shield needs a hand). Stow one as a Quick action, or take Limbs: Extra Arm.` }); }
   const attacks = weapons.map(w => {
     const f = FRAME[w.frame], m = MOD[w.mod];
     if (m && m.only === "ranged" && !f.ranged) err(5, `${m.name} only fits ranged weapons (${f.name}).`);
@@ -902,7 +904,7 @@ function render() {
   document.getElementById("steps").innerHTML = STEPS.map((n, i) => {
     const bad = d.errors.some(e => e.step === i), w = d.warnings.some(e => e.step === i);
     return `<button class="stp${i === step ? " on" : ""}${bad ? " bad" : w ? " warn" : ""}" data-step="${i}"><b>${i + 1}</b> ${n}</button>`;
-  }).join("");
+  }).join("") + `<button class="stp stchip ${d.legal ? "ok" : "no"}" data-act="toSummary" aria-label="${d.legal ? "Legal character" : d.errors.length + " problem(s)"}: jump to the summary"><b>${d.legal ? "\u2714" : d.errors.length}</b> ${d.legal ? "Legal" : "Problems"} \u2193</button>`;
   document.getElementById("panel").innerHTML = [pStart, pForm, pOrigin, pAug, pSurges, pGear, pExtras, pSheet][step](d);
   document.getElementById("summary").innerHTML = summary(d);
   document.getElementById("printArea").innerHTML = sheet(d);
@@ -935,8 +937,8 @@ function pStart(d) {
   <div class="row"><label>Name<input data-k="name" value="${esc(S.name)}" placeholder="Dree \u201cBrownout\u201d Ocampo"></label><label>Player<input data-k="player" value="${esc(S.player)}"></label></div>
   <label>Concept<input data-k="concept" value="${esc(S.concept)}" placeholder="Ex-cop with a shotgun arm who can't stop apologising"></label>
   <label>Level ${sel("level", levelOpts, S.level, 'data-num="1"')}</label>
-  <table class="t"><tr><th>Lv</th><th>Rank</th><th>Stage</th><th>Nodes</th><th>Surges</th><th>Die</th><th>Prime</th><th>Sig.</th><th>Extra</th></tr>
-  ${D.levels.map(l => { const p = picks(l.lv), e = l.lv >= 7 ? 2 : l.lv >= 4 ? 1 : 0; return `<tr class="${l.lv === S.level ? "cur" : ""}"><td>${l.lv}</td><td>${l.rank}</td><td>${D.stages[stageIdx(l.lv)].name}</td><td>${p.total}${e ? ` (+${e})` : ""}</td><td>${l.surges}</td><td>d${l.die}</td><td>${l.prime}</td><td>${l.sigs}</td><td>${l.extra}</td></tr>`; }).join("")}</table>
+  <div class="tscroll"><table class="t"><caption class="sr">Level table</caption><tr><th>Lv</th><th>Rank</th><th>Stage</th><th>Nodes</th><th>Surges</th><th>Die</th><th>Prime</th><th>Sig.</th><th>Extra</th></tr>
+  ${D.levels.map(l => { const p = picks(l.lv), e = l.lv >= 7 ? 2 : l.lv >= 4 ? 1 : 0; return `<tr class="${l.lv === S.level ? "cur" : ""}"><td>${l.lv}</td><td>${l.rank}</td><td>${D.stages[stageIdx(l.lv)].name}</td><td>${p.total}${e ? ` (+${e})` : ""}</td><td>${l.surges}</td><td>d${l.die}</td><td>${l.prime}</td><td>${l.sigs}</td><td>${l.extra}</td></tr>`; }).join("")}</table></div>
   <p class="hint">Stuck? Hit <b>Random</b>, or load the guide's worked example or a pregen from the <b>Example</b> menu.</p>`;
 }
 function pForm(d) {
@@ -1196,6 +1198,7 @@ function act(a, el) {
     case "delweapon": S.buyWeapons.splice(i, 1); break;
     case "estimate": S.scripAdj = estimateScrip(S); break;
     case "trim": trimToLevel(); break;
+    case "toSummary": { const a = document.getElementById("summary"); a.scrollIntoView({ behavior: "smooth", block: "start" }); a.tabIndex = -1; a.focus({ preventScroll: true }); return; }
     case "print": window.print(); return;
     case "export": exportJSON(); return;
     default: return;
@@ -1216,12 +1219,23 @@ function refreshSaves() {
   const list = load("saves") || {};
   document.getElementById("loadSel").innerHTML = `<option value="">Load\u2026</option>` + Object.keys(list).map(n => `<option>${esc(n)}</option>`).join("");
 }
+// Share link: the character packed into the URL hash (#c=…), base64url of compact JSON. No server.
+function packChar(s) { const j = JSON.stringify(s, (k, v) => (v === "" || v === null || (Array.isArray(v) && !v.length) || (v && typeof v === "object" && !Array.isArray(v) && !Object.keys(v).length)) ? undefined : v); return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
+function unpackChar(t) { try { const o = JSON.parse(decodeURIComponent(escape(atob(t.replace(/-/g, "+").replace(/_/g, "/"))))); return looksLikeCharacter(o) ? o : null; } catch (e) { return null; } }
+function shareLink() {
+  const url = location.href.split("#")[0] + "#c=" + packChar(S), note = document.getElementById("saveNote");
+  const done = () => { note.textContent = "\u2714 Link copied"; setTimeout(() => { if (note.textContent === "\u2714 Link copied") note.textContent = ""; }, 2500); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => prompt("Copy this link:", url)); else prompt("Copy this link:", url);
+  return url;
+}
 function stepFromHash() { const m = /^#step-(\d)$/.exec(location.hash); return m ? Math.min(STEPS.length - 1, Math.max(0, +m[1] - 1)) : null; }
 function setStep(i) { step = Math.min(STEPS.length - 1, Math.max(0, i)); try { history.pushState(null, "", "#step-" + (step + 1)); } catch (e) {} render(); window.scrollTo(0, 0); const h = document.querySelector("#panel h2"); if (h) { h.tabIndex = -1; h.focus({ preventScroll: true }); } }
 function init() {
   const auto = load("autosave");
   if (auto) { try { S = normalize(auto); } catch (e) { S = blank(); } }
   const hs = stepFromHash(); if (hs !== null) step = hs;
+  const cm = /^#c=([\w-]+)$/.exec(location.hash);
+  if (cm) { const o = unpackChar(cm[1]); if (o) { try { S = normalize(o); step = STEPS.length - 1; } catch (e) { S = blank(); } } else setTimeout(() => alert("That link doesn't hold a readable Mutagen character."), 0); }
   document.getElementById("lvlTop").innerHTML = levelOpts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join("");
   document.getElementById("exSel").innerHTML = `<option value="">Example\u2026</option>` + Object.keys(D.examples).map(k => `<option value="${k}">${esc(D.examples[k].label || k)}</option>`).join("");
   window.addEventListener("popstate", () => { const h = stepFromHash(); if (h !== null && h !== step) { step = h; render(); } });
@@ -1253,9 +1267,10 @@ function init() {
   document.getElementById("nextB").onclick = () => setStep(step + 1);
   document.getElementById("btnImport").onclick = () => document.getElementById("importFile").click();
   document.getElementById("btnExport").onclick = exportJSON;
+  document.getElementById("btnLink").onclick = shareLink;
   refreshSaves(); render();
 }
-window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, picks, gate, formStats, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render, normalize, trimToLevel };
+window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, picks, gate, formStats, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render, normalize, trimToLevel, packChar, unpackChar, shareLink };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 

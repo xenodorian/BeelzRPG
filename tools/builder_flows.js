@@ -90,6 +90,15 @@ async function mobileAndStorage(b) {
   const q = await page(b); await q.addInitScript(() => { Storage.prototype.setItem = function () { throw new DOMException('full', 'QuotaExceededError'); }; });
   await q.goto(URL); await q.selectOption('#exSel', 'dree1');
   ok(await q.evaluate(() => /Autosave off/.test(document.getElementById('saveNote').textContent)), 'storage full: autosave warning shown');
+  // Share link: pack a character into #c=…, open it in a fresh page
+  const l = await page(b); await l.goto(URL); await l.selectOption('#exSel', 'dree7');
+  const link = await l.evaluate(() => location.href.split('#')[0] + '#c=' + MutagenBuilder.packChar(MutagenBuilder.state));
+  const l2 = await page(b); await l2.goto(link);
+  ok(await l2.evaluate(() => MutagenBuilder.state.level === 7 && /Dree/.test(MutagenBuilder.state.name) && MutagenBuilder.derive(MutagenBuilder.state).legal && /#step-8/.test(location.hash)), 'share link opens the character on the Sheet step');
+  // Phone: status chip jumps to the summary
+  const ph = await page(b, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); await ph.goto(URL); await ph.selectOption('#exSel', 'dree1');
+  await ph.evaluate(() => MutagenBuilder.goto(2)); await ph.click('.stchip');
+  ok(await ph.evaluate(() => document.activeElement && document.activeElement.id === 'summary' && document.documentElement.scrollWidth <= innerWidth + 1), 'phone: status chip focuses the summary, no overflow');
 }
 (async () => {
   const b = await chromium.launch({ executablePath: process.env.CHROME || undefined });

@@ -418,6 +418,14 @@ Read every chapter against the others, the threat table, the builder data and th
 - Terminology: no remaining "Form" used for Material (Bio/Chrome) in the chapters, sheets, README or builder; no TODO/TBD left.
 Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13–23 stand. Ch 10 ratings were calibrated off-map and are left as is.
 
+### Builder review
+- **Phones:** the page was wider than the screen on steps 1 and 6 (the grid column's `1fr` let the level table and the weapon selects push it to 513–546 px). Fixed (`minmax(0,1fr)`, the level table scrolls inside its box, selects capped at 100%).
+- **Phones:** the summary used to sit above every step, so you scrolled past it each time. It now follows the step, and a status chip at the end of the step bar ("✔ Legal" or "3 Problems ↓") jumps to it and focuses it.
+- **Hands check** (backlog item): a Shield together with a two-handed weapon (Heavy melee, Rifle, Shotgun, Launcher) warns on step 6, unless you have Limbs: *Extra Arm*. It's a warning, not an error: you can carry both and switch with a Quick action.
+- **Share link** (backlog item): the **Link** button packs the whole character into the URL (`#c=…`, base64 of compact JSON; nothing is uploaded) and copies it. Opening the link loads the character on the Sheet step. Bad links are refused with a message.
+- Level table got a caption for screen readers.
+- Tests: `builder_test.js` 263 checks (new: hands warning both ways, Extra Arm, status chip, share-link round-trip on three characters, bad link). `builder_flows.js` 35 flows (new: share link opens in a fresh page; phone status chip, no overflow).
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -840,8 +848,8 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 ### Builder backlog (bigger ideas, not done)
 - [ ] **Play mode:** Prime/Churn roller, Flux tracker with Overload prompts, HP/Juice/Death-mark counters on the saved character.
 - [ ] **Level history:** record which node and Surge came at which level, so respecs and "level down" are exact instead of newest-first.
-- [ ] **Shareable link:** compress the character into the URL hash (no server).
-- [ ] **Hands check:** warn on a two-handed weapon plus Shield, or more held items than hands (Extra Arm adds one).
+- [x] **Shareable link:** done 2026-10-29 (Link button, `#c=` hash).
+- [x] **Hands check:** done 2026-10-29 (Shield + two-handed weapon warns unless Extra Arm).
 - [x] **Pregens as examples:** done in v0.2: all five ch 11 pregens, plus Dree at L1/L4/L7, are in the Example menu and tested.
 - [ ] **Single data source:** move the `MUTAGEN` block to `data/mutagen.json`, used by the builder (inlined at release), `tree_compare.py`, and the checker, so rules live in one place.
 - [ ] **Party view:** load several saves side by side for the GM (defenses, Limits, roles).

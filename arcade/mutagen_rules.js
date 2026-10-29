@@ -683,6 +683,7 @@ function gearCalc(s, c, E, W, err) {
   const scrip = start + (Number(s.scripAdj) || 0) - spent;
   if (scrip < 0) err(5, `Not enough Scrip: ${scrip} after purchases.`);
   let smartlinks = 0;
+  if (s.shield && !c.has("extraarm")) { const two = weapons.filter(w => FRAME[w.frame] && /2 hands/.test(FRAME[w.frame].notes || "")).map(w => FRAME[w.frame].name); if (two.length) W.push({ step: 5, m: `Shield + two-handed ${[...new Set(two)].join(" / ")}: you can't use both at once (the Shield needs a hand). Stow one as a Quick action, or take Limbs: Extra Arm.` }); }
   const attacks = weapons.map(w => {
     const f = FRAME[w.frame], m = MOD[w.mod];
     if (m && m.only === "ranged" && !f.ranged) err(5, `${m.name} only fits ranged weapons (${f.name}).`);
