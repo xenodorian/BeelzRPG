@@ -3,6 +3,8 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-29)
+**Final pass done (2026-10-29, owner request):** rules and builder review, a battle-simulator stress test (600 seeded runs + random-click fuzz in Chrome) and a **single-file edition**, `Mutagen.html` (rules + builder + arcade + sheet in one offline file). See *Final Pass 2026-10-29* below.
+
 **Arcade v2 done (2026-10-29, owner request): battle map + RPG menus.** Fights are now played on a virtual-tabletop grid with movement, real ranges, area templates, JRPG-style command menus that auto-switch between freelancers, a turn-order bar and HUDs for the active freelancer and targeted enemy. See *Arcade v2: battle map* below.
 
 **Arcade mode done (2026-10-29, owner request):** `arcade/` is a playable battle simulator, *Gauntlet mode*. You build a party (5/4/3 freelancers for Easy/Medium/Hard), then each level runs minion fight → boss fight → level-up from 1 to 10, ending with Patient Zero. Parties and characters can be saved. See *Arcade: Gauntlet mode* below.
@@ -426,6 +428,20 @@ Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13�
 - Level table got a caption for screen readers.
 - Tests: `builder_test.js` 263 checks (new: hands warning both ways, Extra Arm, status chip, share-link round-trip on three characters, bad link). `builder_flows.js` 35 flows (new: share link opens in a fresh page; phone status chip, no overflow).
 
+### Battle simulator stress test
+- **`node tools/arcade_stress.js 100`** (new): 100 seeded auto-played runs per difficulty, each in permadeath and standard mode (600 runs, 11,434 fights, 152,816 turns). After every turn it checks the state (no NaN HP, HP within 0..max, one creature per square, in bounds, nobody standing in a wall unless flying, Flux ≥ 0). In 8% of steps it saves the fight to JSON mid-battle and resumes from the copy, and between fights it round-trips the whole run through JSON (11,317 mid-fight resumes). It flags crashes, softlocks (no progress for 50 steps), fights over 40 rounds and slow turns.
+- **Found and fixed: 2 stalemates.** Before the fix, 2 of 600 runs hit the 40-round cap: a rooted Brood Matriarch behind cover (freelancers "in range" but without line of sight kept Dashing in place) and hovering Turret Drones. Fix in `engine.js`: the fight tracks the last round anyone was hurt (`lastHarm`). After 3 rounds with no harm, the freelancer auto-player turns bold: it stops retreating, mostly ignores risk and walks toward the nearest enemy. Both repro seeds now finish, and `arcade_test.js` has a regression check (a walled-in, rooted enemy: the bold auto-player closes in, the normal one does not). A first version that always added the "close in" tie-break dropped Hard to 38%, so it only applies when bold.
+- **Result after the fix:** 0 crashes, 0 softlocks, 0 invariant failures, 0 fights over the cap, 0 level-up errors. Slowest turn 38 ms, slowest fight 137 ms, longest fight 30 rounds. Win rates on these seeds (auto-play): Easy 86%, Medium 65%, Hard 32% in permadeath; 100% in standard mode on every difficulty.
+- **`node tools/arcade_fuzz.js [actions] [url] [desktop|mobile]`** (new, real Chrome via puppeteer-core): random weighted clicks and keys on whatever is on screen, with a page reload + Continue every 400 actions. It checks for page errors, console errors, blank screens and softlocks (the screen state not changing for 600 actions in a row). Runs Easy (animations off), Medium (fast) and Hard permadeath. Desktop: 30,000 actions per difficulty, passed. Phone (390×844): 12,000 + 12,000 actions plus a Hard permadeath run to game over, passed.
+- `node tools/arcade_test.js 40`: 17,479 checks pass. Win rates unchanged: Easy 90%, Medium 75%, Hard 43% permadeath; standard 100% with 0.13 / 0.42 / 2.55 retries per run.
+- Also fixed: the Past-runs table overflowed on phones (it scrolls inside its box now), and the Home button's confirm text now says the run and the fight are saved.
+
+### Single-file edition (`Mutagen.html`)
+- **Build:** `python3 tools/build_single.py` (Python 3 + Pillow). It writes `dist/Mutagen.html` and a copy at the repo root, so Pages serves it at https://xenodorian.github.io/BeelzRPG/Mutagen.html. Re-run it after any change to the chapters, builder, arcade or art, and commit both copies.
+- **What's inside:** every chapter rendered from Markdown (own small renderer: headings with GitHub-style ids, tables, lists, links, images), with a contents sidebar, scroll-spy, full-text search (`/` focuses it), and tabs for Rules, Builder, Arcade and Sheet. The builder, arcade and character sheet are inlined as `srcdoc` iframes (same origin as the shell, so they **share localStorage**: a character saved in the builder shows up in the arcade). Art is shrunk (900 px JPEG, q70) and embedded as base64, turned into blob URLs at load. Links between chapters, the builder and the arcade are rewritten to in-file routes (`#rules`, `#builder`, `#arcade`, `#sheet`, `#<chapter>--<heading>`, `#c=…` share links). No network requests; works from `file://`.
+- **Size:** about 1.8 MB (art about 1 MB).
+- **Test:** `CHROME=/path/to/chrome node tools/single_test.js` (27 checks, puppeteer-core, network blocked). Covers all chapters and images, TOC, cross-links, search, builder save → arcade sees it, a full auto-played arcade run to victory inside the file, embedded art, sheet, share link, phone layout, no console errors.
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -459,7 +475,7 @@ Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13�
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
 | `tools/balance_sim.py` | Monte Carlo combat sim (v0.2 Forms and stages) | Re-run after number changes |
 | `builder/index.html` | Character builder web app (single offline file; GitHub Pages: https://xenodorian.github.io/BeelzRPG/builder/) | **Game data lives in the `MUTAGEN` object in the first `<script>`**; update it with any rule change in ch 2–8 |
-| `tools/builder_test.js` | Headless builder test (jsdom): 8 examples, 3,000 random characters, v0.2 gates/Evolution/Signature/migration tests, R1–R14 (255 checks) | Run after editing the builder or its data (`npm i jsdom`) |
+| `tools/builder_test.js` | Headless builder test (jsdom): 8 examples, 3,000 random characters, v0.2 gates/Evolution/Signature/migration tests, R1–R17 (263 checks) | Run after editing the builder or its data (`npm i jsdom`) |
 | `tools/check_builder_data.js` | Cross-checks the builder data block against ch 2, 2A, 3 (+ tree files), 4, 5, 7, 8, 11, 13 (493 checks) | Run after any rules change; no dependencies |
 | `tools/builder_flows.js` | Real-browser flow tests (Playwright + Chrome) | `npm i playwright-core`; set `CHROME=/path/to/chrome` |
 | `tools/tree_compare.py` | Per-Form expected DPR / HP lost / Flux per fight at L1, 3, 4, 6, 7, 10 | Re-run after node changes |
@@ -477,6 +493,11 @@ Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13�
 | `arcade/roster.js` | **Generated** from `tools/encounter_roster.py` + `sim_results/04_ratings_final.json` by `python3 tools/export_arcade_roster.py` | Re-run after any roster/rating change |
 | `tools/arcade_test.js` | Arcade tests (jsdom + Node): sync, party save/load/import, level-ups/Evolutions 1→10 for every Form, seeded auto-play of all 10 levels per difficulty with win rates, page flow | `node tools/arcade_test.js [runs]` (`npm i jsdom`) |
 | `tools/arcade_shots.js` | Arcade screenshots + real-Chrome smoke test (puppeteer-core) | Writes `arcade_{start,party,battle,levelup,mobile}.png` |
+| `tools/arcade_stress.js` | Arcade stress test: seeded runs per difficulty × permadeath/standard, invariants, mid-fight save/resume, softlock and round-cap detection | `node tools/arcade_stress.js [runsPerDiff] [seedBase]` |
+| `tools/arcade_fuzz.js` | Random-click fuzz of the arcade in real Chrome (puppeteer-core) | `CHROME=… node tools/arcade_fuzz.js [actions] [url] [desktop\|mobile]` |
+| `tools/build_single.py` | Builds the single-file edition `dist/Mutagen.html` (+ root copy `Mutagen.html`) | Re-run after any chapter/builder/arcade/art change |
+| `tools/single_test.js` | Offline headless-Chrome test of `dist/Mutagen.html` (27 checks) | `CHROME=… node tools/single_test.js` |
+| `Mutagen.html`, `dist/Mutagen.html` | **Generated** single-file edition: rules, builder, arcade, sheet | Don't edit by hand |
 | `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling | Raw results of the enemy calibration |
 
 ## Style Guide

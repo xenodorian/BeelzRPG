@@ -103,6 +103,14 @@ A.Saves.deleteChar(party[0].name, st); ok(Object.keys(A.Saves.chars(st)).length 
   // Wait hands the turn on; pending follows initiative order
   F3.startRound(); const ord = F3.pending().map(x => x.id); ok(ord.length === 4, 'four freelancers to act'); const first = F3.pending()[0]; F3.beginTurn(first);
   ok(F3.canWait(first) && F3.waitTurn(first) && F3.pending()[F3.pending().length - 1] === first, 'Wait sends the freelancer to the back of the order');
+  // stalemate breaker: a rooted enemy behind a wall, nobody hurt for 3 rounds → the auto-player walks up instead of waiting forever
+  { seeded(9); const run4 = A.newRun({ difficulty: 'medium', characters: [R.randomChar(1), R.randomChar(1), R.randomChar(1), R.randomChar(1)], seed: 9 });
+    const F4 = A.startFight(run4); A.autoSetup(F4); F4.map = open(16, 9); for (let x = 11; x <= 15; x++) for (let y = 2; y <= 6; y++) if (Math.max(Math.abs(x - 13), Math.abs(y - 4)) === 2) F4.map.blocked.add(G.key(x, y));
+    F4.foes = F4.foes.slice(0, 1); F4.pcs = F4.pcs.slice(0, 1); F4.map.blocked.delete(G.key(15, 4)); const r4 = F4.foes[0]; r4.pos = { x: 13, y: 4 }; r4.speedSq = 0; r4.hp = r4.maxhp = 999; r4.fly = false;
+    F4.pcs.forEach((x, i) => { x.pos = { x: 1, y: 1 + i * 2 }; x.weapons.push({ name: 'Long gun', atk: 3, n: 1, s: 8, k: 0, ranged: true, melee: false, reach: 0, range: 30, long: true }); });
+    F4.phase = 'player'; F4.round = 6; F4.lastHarm = 2; F4.pcs.forEach(x => { x.turnDone = false; x.reactions = 1; });
+    const c4 = F4.pcs[0], d0 = G.dist(c4.pos, r4.pos); F4.beginTurn(c4); A.aiMove(F4, c4, false);
+    ok(G.dist(c4.pos, r4.pos) < d0, `stalemate: the auto-player closes in on a rooted enemy it can't hit (${d0} → ${G.dist(c4.pos, r4.pos)} squares)`); }
 }
 
 // ---- 3. level-ups and evolutions

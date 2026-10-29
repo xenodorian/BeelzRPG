@@ -764,7 +764,7 @@ class Fight {
     if (c.nodes.has("transmute") && (effect === "toxin" || effect === "corrode")) { this.condFoe(e, "poisoned"); this.condFoe(e, "exposed"); }
   }
   damageFoe(e, dm, o) {
-    if (!e || e.dead) return 0; o = o || {};
+    if (!e || e.dead) return 0; o = o || {}; if (dm > 0) this.lastHarm = this.round;
     if (o.src && o.src.side === "pc" && e.dominated) { e.dominated = false; this.log(`${e.name} snaps out of ${o.src.short}'s control!`, "foe"); }
     if (!o.psy && !e.cond.weakspot) dm = Math.max(1, dm - e.armor);
     if (e.tr.vuln && o.type === e.tr.vuln) dm *= 2;
@@ -817,7 +817,7 @@ class Fight {
   omenHolder(pred, who) { return this.standing.find(p => p.omen != null && pred(p.omen) && (!who || !who.pos || G.dist(p.pos, who.pos) <= 12)) || null; }
   // ---------------- damage to freelancers
   harmPC(c, dm, o) {
-    o = o || {}; if (c.dead || dm <= 0) return 0;
+    o = o || {}; if (c.dead || dm <= 0) return 0; this.lastHarm = this.round;
     if (c.cond.cocoon && !o.overload) { this.log(`  The Cocoon absorbs it: ${c.short} takes no damage.`, "pc"); return 0; }
     if (c.tmp && !o.noTemp) { const x = Math.min(c.tmp, dm); c.tmp -= x; dm -= x; if (x) this.log(`  (${x} soaked by temporary HP)`, "pc"); }
     if (dm <= 0) return 0;
@@ -1606,11 +1606,15 @@ function aiMove(F, c, retreat) {
   const R = F.reach(c, false), RC = F.reach(c, true);
   const myRange = Math.max(1, ...c.weapons.map(w => Math.max(w.reach || 0, w.range || 0)), ...c.surges.concat(c.sigs).filter(s => !s.infuse).map(s => s.geo ? (s.geo.reach || s.geo.range || 1) : 1));
   const near = cell => Math.min(...foes.map(e => G.dist(cell, e.pos)));
+  // stalemate breaker: if nobody has been hurt for 3 rounds (rooted boss, hovering drones, both sides waiting), stop playing safe
+  const bold = F.round - (F.lastHarm || 1) >= 3;
+  if (bold && retreat) return false;
   let best = null; const here = R.get(G.key(c.pos.x, c.pos.y));
   const score = (n, careful) => {
     const path = G.pathOf(n); let v = retreat ? 0 : aiCellValue(F, c, n, opts, low);
-    if (!retreat && v <= 0) v = -0.5 * Math.max(0, near(n) - myRange);    // nothing in reach: close the distance
-    return v - aiRisk(F, c, n, th, path, careful) - 0.03 * n.cost;
+    // nothing worth doing from here: close the distance (the small last term breaks ties when foes are "in range" but out of sight)
+    if (!retreat && v <= 0) v = -(bold ? 2 : 0.5) * Math.max(0, near(n) - myRange) - (bold ? 0.6 : 0) * near(n);
+    return v - aiRisk(F, c, n, th, path, careful) * (bold ? 0.15 : 1) - 0.03 * n.cost;
   };
   R.forEach(n => { const v = score(n, false); if (!best || v > best.v + 1e-9) best = { n, v, careful: false }; });
   RC.forEach(n => { if (n.cost === 0) return; const v = score(n, true); if (v > best.v + 1e-9) best = { n, v, careful: true }; });

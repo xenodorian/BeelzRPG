@@ -15,7 +15,7 @@ $("#fileIn").addEventListener("change", e => { const f = e.target.files[0]; if (
 function pickFile(cb) { fileCb = cb; $("#fileIn").click(); }
 const slug = s => String(s || "party").replace(/[^a-z0-9]+/gi, "_").replace(/^_|_$/g, "").toLowerCase() || "party";
 function go(view) { ui.view = view; ui.pendingOpt = null; render(true); }
-$("#btnHome").addEventListener("click", () => { if (ui.view === "battle" && ui.F && !/won|lost/.test(ui.F.phase) && !confirm("Leave this fight? Your run is saved; the fight restarts when you continue.")) return; go("title"); });
+$("#btnHome").addEventListener("click", () => { if (ui.view === "battle" && ui.F && !/won|lost/.test(ui.F.phase) && !confirm("Leave this fight? Your run and this fight are saved; Continue picks up where you left off.")) return; go("title"); });
 
 /* ------------------------------------------------------------------ characters */
 const fitL1 = s => { const x = R.normalize(JSON.parse(JSON.stringify(s))); return x.level === 1 ? x : A.fitToLevel(x, 1); };
@@ -158,6 +158,8 @@ const store = (k, d) => { try { const v = localStorage.getItem("mutagen.arcade.u
 const keep = (k, v) => { try { localStorage.setItem("mutagen.arcade.ui." + k, JSON.stringify(v)); } catch (e) { } };
 Object.assign(ui, { menu: { lv: "root" }, cur: null, careful: false, aimMode: "cone", zoom: store("zoom", typeof innerWidth !== "undefined" && innerWidth < 640 ? 36 : 46), speed: store("speed", "normal"), autoSwitch: store("autoSwitch", true), selFoe: null, hover: null, logOpen: store("logOpen", false), anim: null });
 const COND_ABBR = { prone: "Pr", held: "Hd", dazed: "Dz", blinded: "Bl", shaken: "Sh", poisoned: "Po", exposed: "Ex", burning: "Bu", veiled: "Ve", linked: "Li", shell: "+A", braced: "Br", helped: "He", spotted: "Sp", adrenal: "Ad", redmist: "RM", targeterr: "TE", cocoon: "Co", weakspot: "WS" };
+// art path; the single-file build (dist/Mutagen.html) supplies window.MUTAGEN_ART with embedded images
+const artURL = n => (window.MUTAGEN_ART && window.MUTAGEN_ART[n]) || "../art/" + n;
 const THEME_ART = { pumpstation: "setting_halcyon.jpg", streets: "cover.jpg", camp: "setting_halcyon.jpg", clinic: "clinic.jpg", rustyard: "threat_drainbeast.jpg", bloom: "surge.jpg" };
 const colName = x => String.fromCharCode(65 + x), sqName = p => p ? colName(p.x) + (p.y + 1) : "—";
 const ft = n => n * 5 + " ft";
@@ -225,7 +227,7 @@ function mapHTML(F, posOverride) {
   }
   const toks = F.pcs.concat(F.foes).filter(x => !(x.fled) && (!x.dead || x.side === "pc" || (posOverride && posOverride[x.id] && !posOverride[x.id].dead))).map(x => tokenHTML(F, x, ov, posOverride && posOverride[x.id] ? posOverride[x.id] : null)).join("");
   const cc = ui.cur ? F.at(ui.cur.x, ui.cur.y) : null;
-  return { html: `<div class="mapwrap theme-${m.theme}" style="--art:url(../art/${THEME_ART[m.theme] || "cover.jpg"})"><div class="mapscroll" id="mapScroll">
+  return { html: `<div class="mapwrap theme-${m.theme}" style="--art:url(${artURL(THEME_ART[m.theme] || "cover.jpg")})"><div class="mapscroll" id="mapScroll">
     <div id="map" class="map theme-${m.theme}" role="application" tabindex="0" data-fkey="map" aria-roledescription="battle map" aria-label="Battle map, ${m.w} by ${m.h} squares, 5 feet each. ${esc(m.themeName)}. Arrow keys move the cursor, Enter acts on the cursor square, Escape goes back." style="--cs:${ui.zoom}px;--w:${m.w};--h:${m.h}">
     <div class="cells">${cells}</div>${toks}<div id="fx"></div></div></div>
     <div class="maptools"><span class="small">${esc(m.themeName)} · ${m.w}×${m.h} squares · 1 square = 5 ft</span><span class="small" id="curInfo" aria-live="polite">${ui.cur ? `Cursor ${sqName(ui.cur)}${cc ? ": " + esc(cc.name) : ""}` : ""}</span>
@@ -236,7 +238,7 @@ function pcHUD(F, c) {
   if (!c) return `<div class="hud"><p class="small">No freelancer standing.</p></div>`;
   const t = c.t && F.active === c ? c.t : null, mat = c.material === "chrome" ? "chrome" : c.material === "splice" ? "splice" : "bio";
   return `<div class="hud pchud" aria-label="Active freelancer">
-  <div class="hrow"><div class="portrait ${mat}" style="background-image:url(../art/char_${mat}.jpg)" role="img" aria-label="${esc(c.formName)} portrait"></div>
+  <div class="hrow"><div class="portrait ${mat}" style="background-image:url(${artURL("char_" + mat + ".jpg")})" role="img" aria-label="${esc(c.formName)} portrait"></div>
   <div><b class="nm">${esc(c.name)}</b><div class="small">L${c.level} ${esc(c.formName)} · ${esc(c.stageName)}${c.ffActive ? " · ★ FINAL FORM" : ""}</div>${F.active === c ? `<span class="tag">ACTIVE · ${sqName(c.pos)}</span>` : `<span class="tag dim">${c.turnDone ? "acted" : "waiting"}</span>`}</div></div>
   ${c.dead ? `<div class="tag bad">DEAD</div>` : c.down ? `<div class="tag bad">DOWN · Death marks ${c.marks}/3</div>` : ""}
   <div class="lbl">HP <b>${c.hp}</b>/${c.maxhp}${c.tmp ? ` <span class="tmpv">+${c.tmp} temp</span>` : ""}</div>

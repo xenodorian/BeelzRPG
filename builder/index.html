@@ -1223,7 +1223,7 @@ function refreshSaves() {
 function packChar(s) { const j = JSON.stringify(s, (k, v) => (v === "" || v === null || (Array.isArray(v) && !v.length) || (v && typeof v === "object" && !Array.isArray(v) && !Object.keys(v).length)) ? undefined : v); return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
 function unpackChar(t) { try { const o = JSON.parse(decodeURIComponent(escape(atob(t.replace(/-/g, "+").replace(/_/g, "/"))))); return looksLikeCharacter(o) ? o : null; } catch (e) { return null; } }
 function shareLink() {
-  const url = location.href.split("#")[0] + "#c=" + packChar(S), note = document.getElementById("saveNote");
+  const url = (window.MUTAGEN_SHARE_BASE || location.href.split("#")[0]) + "#c=" + packChar(S), note = document.getElementById("saveNote");
   const done = () => { note.textContent = "\u2714 Link copied"; setTimeout(() => { if (note.textContent === "\u2714 Link copied") note.textContent = ""; }, 2500); };
   if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done, () => prompt("Copy this link:", url)); else prompt("Copy this link:", url);
   return url;
@@ -1234,7 +1234,7 @@ function init() {
   const auto = load("autosave");
   if (auto) { try { S = normalize(auto); } catch (e) { S = blank(); } }
   const hs = stepFromHash(); if (hs !== null) step = hs;
-  const cm = /^#c=([\w-]+)$/.exec(location.hash);
+  const cm = /^#c=([\w-]+)$/.exec(window.MUTAGEN_HASH || location.hash);
   if (cm) { const o = unpackChar(cm[1]); if (o) { try { S = normalize(o); step = STEPS.length - 1; } catch (e) { S = blank(); } } else setTimeout(() => alert("That link doesn't hold a readable Mutagen character."), 0); }
   document.getElementById("lvlTop").innerHTML = levelOpts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join("");
   document.getElementById("exSel").innerHTML = `<option value="">Example\u2026</option>` + Object.keys(D.examples).map(k => `<option value="${k}">${esc(D.examples[k].label || k)}</option>`).join("");
