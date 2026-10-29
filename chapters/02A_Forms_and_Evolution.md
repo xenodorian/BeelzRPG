@@ -8,11 +8,11 @@ The Mutagen doesn't make you *anything*. It makes you into **something**: one of
 
 | Form | Primary +3 | Secondary +2 | Tertiary +1 | You place +0 and −1 in | Primary tree | Secondary | Tertiary | In one line |
 |---|---|---|---|---|---|---|---|---|
-| [**Juggernaut**](#juggernaut) | Grit | Nerve | Moxie | Gumption, Chutzpah | Hide | Limbs | Glands | *"I don't move. You do."* |
-| [**Skitter**](#skitter) | Moxie | Gumption | Nerve | Grit, Chutzpah | Wiring | Limbs | Senses | *"You blinked. I was already there."* |
-| [**Oracle**](#oracle) | Nerve | Chutzpah | Gumption | Grit, Moxie | Senses | Mind | Wiring | *"I saw you coming. Three days ago."* |
-| [**Alembic**](#alembic) | Gumption | Grit | Chutzpah | Moxie, Nerve | Glands | Hide | Mind | *"Hold still. This will either cure you or kill it."* |
-| [**Siren**](#siren) | Chutzpah | Moxie | Grit | Nerve, Gumption | Mind | Wiring | Limbs | *"Everybody look at me."* |
+| [**Juggernaut**](#juggernaut) | Grit | Nerve | Chutzpah | Moxie, Gumption | Hide | Limbs | Glands | *"I don't move. You do."* |
+| [**Skitter**](#skitter) | Moxie | Gumption | Grit | Nerve, Chutzpah | Wiring | Limbs | Senses | *"You blinked. I was already there."* |
+| [**Oracle**](#oracle) | Nerve | Chutzpah | Moxie | Grit, Gumption | Senses | Mind | Wiring | *"I saw you coming. Three days ago."* |
+| [**Alembic**](#alembic) | Gumption | Grit | Nerve | Moxie, Chutzpah | Glands | Hide | Mind | *"Hold still. This will either cure you or kill it."* |
+| [**Siren**](#siren) | Chutzpah | Moxie | Gumption | Grit, Nerve | Mind | Wiring | Limbs | *"Everybody look at me."* |
 
 - **Stats:** your Form fixes your +3, +2 and +1. You put **+0** in one of the other two stats and **−1** in the last.
 - **Trees:** you take nodes only from your Form's three trees ([chapter 3](03_Augment_Trees.md)): 3 in the primary, 2 in the secondary and 1 in the tertiary at level 1.
@@ -76,9 +76,9 @@ Your third and last stage. At level 10 you take your Form's **Final look** for g
 ## The Five Forms
 
 ### Juggernaut
-**Primary Grit · Secondary Nerve · Tertiary Moxie · Dump Gumption and Chutzpah · Trees: Hide (primary), Limbs (secondary), Glands (tertiary)**
+**Primary Grit · Secondary Nerve · Tertiary Chutzpah · Dump Moxie and Gumption · Trees: Hide (primary), Limbs (secondary), Glands (tertiary)**
 
-*"I don't move. You do."* The Mutagen decided you should be **unkillable** and started stacking. Juggernauts hold doorways, carry the wounded, and end arguments by standing in them. Their three positive stats are the three defenses: they're hard to hurt in every way.
+*"I don't move. You do."* The Mutagen decided you should be **unkillable** and started stacking. Juggernauts hold doorways, carry the wounded, and end arguments by standing in them. Grit and Nerve make them hard to hurt and harder to scare, and a little Chutzpah helps them loom. They're slow off the mark and not much for book-learning.
 
 - **Play it if** you want to be the wall: Taunt, intercept, and take the hit meant for your friend.
 - **Evolution nodes:** **Siege Hide** (level 4): +1 Armor, Armor max 6, reach 10 ft, counts as Huge. **Fortress** (level 7): allies near you take half Area damage, and once per round you take an ally's lethal hit.
@@ -91,12 +91,12 @@ Your third and last stage. At level 10 you take your Form's **Final look** for g
 | Final | **Citadel** | Stone-hard ridges, moss in the cracks, small things nesting in you. You are a place. | Siren lights, warning stencils, a hatch in your chest. Ostrander would classify you as infrastructure. |
 
 ### Skitter
-**Primary Moxie · Secondary Gumption · Tertiary Nerve · Dump Grit and Chutzpah · Trees: Wiring (primary), Limbs (secondary), Senses (tertiary)**
+**Primary Moxie · Secondary Gumption · Tertiary Grit · Dump Nerve and Chutzpah · Trees: Wiring (primary), Limbs (secondary), Senses (tertiary)**
 
-*"You blinked. I was already there."* The Mutagen took your nerves and set them on fire. Skitters are the fastest thing in any room, clever with their hands and impossible to pin down, but fragile when something finally lands.
+*"You blinked. I was already there."* The Mutagen took your nerves and set them on fire. Skitters are the fastest thing in any room: clever with their hands, wiry, and impossible to pin down. They're also jumpy, tactless and short on Flux; their Nerve is the first thing to go.
 
 - **Play it if** you want to dart in, Daze, dart out, and act more often than anyone else.
-- **Evolution nodes:** **Mantis Reflex** (level 4): two Reactions per round, and full-damage Reflex Spikes. **Lightning Step** (level 7): a weapon attack as a Quick action after you Unleash.
+- **Evolution nodes:** **Mantis Reflex** (level 4): two Reactions per round, and full-damage Reflex Spikes. **Lightning Step** (level 7): a half-dice weapon attack as a Quick action after you Unleash.
 
 | Stage | Name | Bio | Chrome |
 |---|---|---|---|
@@ -106,9 +106,9 @@ Your third and last stage. At level 10 you take your Form's **Final look** for g
 | Final | **Livewire** | Barely solid: a figure of arcs and chitin that's always slightly somewhere else. | A human-shaped storm in a chrome cage, held together by a magnetic field. |
 
 ### Oracle
-**Primary Nerve · Secondary Chutzpah · Tertiary Gumption · Dump Grit and Moxie · Trees: Senses (primary), Mind (secondary), Wiring (tertiary)**
+**Primary Nerve · Secondary Chutzpah · Tertiary Moxie · Dump Grit and Gumption · Trees: Senses (primary), Mind (secondary), Wiring (tertiary)**
 
-*"I saw you coming. Three days ago."* The Mutagen gave you **too much input**, and you learned to stay calm inside it. Oracles see everything, steady everyone and hold the most Flux of any Form (their high Nerve raises their Flux Limit). Their bodies are fragile; their aim isn't.
+*"I saw you coming. Three days ago."* The Mutagen gave you **too much input**, and you learned to stay calm inside it. Oracles see everything, steady everyone and hold the most Flux of any Form (their high Nerve raises their Flux Limit). They're light on their feet but physically fragile and impractical; their aim isn't.
 
 - **Play it if** you want to shoot from a rooftop, spot every weakness, and decide which way the dice fall.
 - **Evolution nodes:** **Foresight** (level 4): each round, an Omen d20 that can replace any nearby d20. **Thousand Eyes** (level 7): Target Lock on three creatures, no surprise or Blindness nearby, wider Crits.
@@ -121,9 +121,9 @@ Your third and last stage. At level 10 you take your Form's **Final look** for g
 | Final | **Panopticon** | A tall white shape of lids and lashes; when you look at someone, they feel *seen*. | A tower of lenses and dishes; every camera in the district turns toward you. |
 
 ### Alembic
-**Primary Gumption · Secondary Grit · Tertiary Chutzpah · Dump Moxie and Nerve · Trees: Glands (primary), Hide (secondary), Mind (tertiary)**
+**Primary Gumption · Secondary Grit · Tertiary Nerve · Dump Moxie and Chutzpah · Trees: Glands (primary), Hide (secondary), Mind (tertiary)**
 
-*"Hold still. This will either cure you or kill it."* The Mutagen made you a **laboratory**. Alembics brew medicine and poison in their own bodies, stay standing in toxic air, and keep the whole crew alive. They're slow and tough, and their chemistry depends on knowing what they're doing.
+*"Hold still. This will either cure you or kill it."* The Mutagen made you a **laboratory**. Alembics brew medicine and poison in their own bodies, stay standing in toxic air, and keep the whole crew alive. They're slow, tough and steady-handed, with a bedside manner best described as *blunt*.
 
 - **Play it if** you want to heal, poison, and out-think the problem.
 - **Evolution nodes:** **Transmute** (level 4): your Toxin and Corrode riders apply both Poisoned and Exposed, and your healing restores more. **Panacea** (level 7): once per combat, heal everyone nearby and end their conditions.
@@ -136,12 +136,12 @@ Your third and last stage. At level 10 you take your Form's **Final look** for g
 | Final | **Wellspring** | A living garden: roots in the floor where you stand, fruit that heals, pollen that kills. | A mobile clinic: hissing pipes, a dozen spigots, steam that smells like hospitals. |
 
 ### Siren
-**Primary Chutzpah · Secondary Moxie · Tertiary Grit · Dump Nerve and Gumption · Trees: Mind (primary), Wiring (secondary), Limbs (tertiary)**
+**Primary Chutzpah · Secondary Moxie · Tertiary Gumption · Dump Grit and Nerve · Trees: Mind (primary), Wiring (secondary), Limbs (tertiary)**
 
-*"Everybody look at me."* The Mutagen made you **impossible to ignore**. Sirens command attention: they talk past guards, Taunt whole rooms, and bend minds. They're quick enough to survive the attention they draw, but nervous and reckless under pressure.
+*"Everybody look at me."* The Mutagen made you **impossible to ignore**. Sirens command attention: they talk past guards, Taunt whole rooms, and bend minds. They're quick enough to dodge the attention they draw and sharp enough to improvise, but fragile, reckless, and the first to Overload (their low Nerve means a low Flux Limit).
 
 - **Play it if** you want to lead, talk, Taunt and control the battlefield.
-- **Evolution nodes:** **Siren Song** (level 4): a Quick mass Taunt, and enemies you Taunted have −2 TN against you. **Crown of Will** (level 7): once per combat, a non-Boss fights for you.
+- **Evolution nodes:** **Siren Song** (level 4): a Quick mass Taunt that sends every Taunted enemy at you or an ally you name (usually your Juggernaut), at −2 TN. **Crown of Will** (level 7): once per combat, a non-Boss fights for you.
 
 | Stage | Name | Bio | Chrome |
 |---|---|---|---|

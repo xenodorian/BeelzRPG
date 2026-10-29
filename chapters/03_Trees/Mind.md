@@ -25,5 +25,5 @@
 - **Hive Mind.** Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll. At the start of each combat, choose one ally: they Prime one extra Surge.
 
 ## Evolution nodes (Siren only; granted automatically)
-- **Siren Song** *(level 4, Evolution I).* Your voice splits into harmonies. Once per round you can Taunt as a Quick action, and your Taunt can target every enemy within 30 ft you choose (compare one roll to each creature's TN). Enemies you have Taunted have **−2 TN** against your defense rolls.
+- **Siren Song** *(level 4, Evolution I).* Your voice splits into harmonies. Once per round you can Taunt as a Quick action, and your Taunt can target every enemy within 30 ft you choose (compare one roll to each creature's TN). Each enemy you Taunt this way must target **you or one ally you name** within 30 ft of you (same ally for all of them) if it can, and has **−2 TN** against that creature's defense rolls until the Taunt ends.
 - **Crown of Will** *(level 7, Evolution II).* Once per combat, *Action,* **Push:** Chutzpah + Rank vs the TN of a creature within 60 ft. A **non-Boss** obeys you until the end of combat. In each Enemy Phase it acts as you choose (it won't harm itself), and it breaks free if you or an ally damages it. A **Boss** instead loses its next Interrupt and is Dazed until the end of its next turn.

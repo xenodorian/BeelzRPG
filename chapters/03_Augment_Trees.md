@@ -58,10 +58,10 @@ Your Evolutions follow your Materials: a Bio Juggernaut's Rampart stage grows bo
 | Form | Primary tree | Level 4: Evolution I | Level 7: Evolution II |
 |---|---|---|---|
 | Juggernaut | Hide | **Siege Hide:** +1 Armor, Armor max 6, reach 10 ft, counts as Huge | **Fortress:** allies within 10 ft take half Area damage; take an ally's lethal hit |
-| Skitter | Wiring | **Mantis Reflex:** two Reactions per round; Reflex Spike and Opportunity Strikes use full dice | **Lightning Step:** after you Unleash, a weapon attack as a Quick action |
+| Skitter | Wiring | **Mantis Reflex:** two Reactions per round; Reflex Spike and Opportunity Strikes use full dice | **Lightning Step:** after you Unleash, a half-dice weapon attack as a Quick action |
 | Oracle | Senses | **Foresight:** each round, an Omen d20 that can replace any nearby d20 | **Thousand Eyes:** Target Lock ×3, no surprise or Blindness nearby, wider Crits |
 | Alembic | Glands | **Transmute:** Toxin/Corrode riders apply Poisoned *and* Exposed; healing +Gumption | **Panacea:** once per combat, heal the whole party and end their conditions |
-| Siren | Mind | **Siren Song:** a Quick mass Taunt; Taunted enemies −2 TN against you | **Crown of Will:** once per combat, a non-Boss fights for you |
+| Siren | Mind | **Siren Song:** a Quick mass Taunt that sends enemies at you or an ally you name, at −2 TN | **Crown of Will:** once per combat, a non-Boss fights for you |
 
 ## Building With Trees
 Your Form decides your trees, but which nodes you take decides your role.

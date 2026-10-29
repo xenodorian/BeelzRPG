@@ -26,4 +26,4 @@
 
 ## Evolution nodes (Skitter only; granted automatically)
 - **Mantis Reflex** *(level 4, Evolution I).* Your nerves fire before you think. You get **two Reactions** per round (both refresh at the start of your turn). Your Reflex Spike and Opportunity Strikes use your full damage dice.
-- **Lightning Step** *(level 7, Evolution II).* You move between moments. Once per turn, after you Unleash a Surge, you may make **one weapon attack as a Quick action**.
+- **Lightning Step** *(level 7, Evolution II).* You move between moments. Once per turn, after you Unleash a Surge, you may make **one weapon attack as a Quick action**, with half its damage dice (round up).

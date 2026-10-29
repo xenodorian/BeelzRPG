@@ -11,15 +11,15 @@
 This section is the **spec**. Chapters implement it; when they disagree, fix the chapter and log it.
 
 ### D1. The five Base Forms
-Each stat is primary for exactly one Form, secondary for one and tertiary for one (a Latin square, so no stat is everyone's dump). Each Form's primary tree follows its primary stat.
+Each stat is primary for exactly one Form, secondary for one and tertiary for one (a Latin square, so no stat is everyone's dump). Each Form's primary tree follows its primary stat. *Revised during balancing:* the first square (tertiary = next stat) left the Oracle with both Dodge and Endure as dump stats (147% of its HP lost in `tree_compare.py`'s solo fight) and the Alembic with Flux Limit 4. The square used now (tertiary = previous stat) gives the Oracle Moxie +1 and the Alembic Nerve +1, and makes the Siren the low-Nerve, reckless Flux-burner.
 
 | Form | Primary +3 | Secondary +2 | Tertiary +1 | Dump (+0 / −1, your choice) | Primary tree | Secondary tree | Tertiary tree | L4 exclusive | L7 exclusive | Stages (Base → Evo I → Evo II → Final) |
 |---|---|---|---|---|---|---|---|---|---|---|
-| **Juggernaut** | Grit | Nerve | Moxie | Gumption, Chutzpah | Hide | Limbs | Glands | Siege Hide | Fortress | Juggernaut → Rampart → Colossus → Citadel |
-| **Skitter** | Moxie | Gumption | Nerve | Grit, Chutzpah | Wiring | Limbs | Senses | Mantis Reflex | Lightning Step | Skitter → Mantis → Wraith → Livewire |
-| **Oracle** | Nerve | Chutzpah | Gumption | Grit, Moxie | Senses | Mind | Wiring | Foresight | Thousand Eyes | Oracle → Argus → Seraph → Panopticon |
-| **Alembic** | Gumption | Grit | Chutzpah | Moxie, Nerve | Glands | Hide | Mind | Transmute | Panacea | Alembic → Still → Bloomheart → Wellspring |
-| **Siren** | Chutzpah | Moxie | Grit | Nerve, Gumption | Mind | Wiring | Limbs | Siren Song | Crown of Will | Siren → Diva → Choir → Crowned |
+| **Juggernaut** | Grit | Nerve | Chutzpah | Moxie, Gumption | Hide | Limbs | Glands | Siege Hide | Fortress | Juggernaut → Rampart → Colossus → Citadel |
+| **Skitter** | Moxie | Gumption | Grit | Nerve, Chutzpah | Wiring | Limbs | Senses | Mantis Reflex | Lightning Step | Skitter → Mantis → Wraith → Livewire |
+| **Oracle** | Nerve | Chutzpah | Moxie | Grit, Gumption | Senses | Mind | Wiring | Foresight | Thousand Eyes | Oracle → Argus → Seraph → Panopticon |
+| **Alembic** | Gumption | Grit | Nerve | Moxie, Chutzpah | Glands | Hide | Mind | Transmute | Panacea | Alembic → Still → Bloomheart → Wellspring |
+| **Siren** | Chutzpah | Moxie | Gumption | Grit, Nerve | Mind | Wiring | Limbs | Siren Song | Crown of Will | Siren → Diva → Choir → Crowned |
 
 - **5 Forms vs 6 trees:** each of the five stat-trees (Hide/Grit, Wiring/Moxie, Senses/Nerve, Glands/Gumption, Mind/Chutzpah) is one Form's primary tree. **Limbs** (Grit *or* Moxie) is the shared body tree. It is never primary, but it's secondary or tertiary for three Forms (Juggernaut, Skitter, Siren), so it has no Form-exclusive nodes. Every tree appears 1–3 times as secondary or tertiary.
 - **Every Form can build Infuse Surges** (Juggernaut: Shell/Mend; Skitter: Haste/Veil; Oracle: Veil/Link/Haste; Alembic: Mend/Shell/Link; Siren: Link/Haste). This closes v0.1 open question 12 (no base Infuse Effect).

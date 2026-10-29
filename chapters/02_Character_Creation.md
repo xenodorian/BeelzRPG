@@ -60,11 +60,11 @@ A Knack should be something you could teach in a weekend course or learn on the 
 
 ## Example: Vex (Level 1)
 - **Concept:** Wiry Spill-Born courier with mantis claws who runs messages through gang turf.
-- **Form:** **Skitter.** Moxie +3, Gumption +2, Nerve +1; she puts **Grit +0** and **Chutzpah −1**.
+- **Form:** **Skitter.** Moxie +3, Gumption +2, Grit +1; she puts **Nerve +0** and **Chutzpah −1**.
 - **Origin:** Spill-Born (*Scavenging*). Knacks: *Parkour*, *Gang Turf*.
 - **Augments (6):** Wiring (Bio): **Quickened** (Root), **Capacitor**, **Slipstream**. Limbs (Bio): **Natural Weapons** (Root), **Spring Legs**. Senses (Bio): **Keen** (Root). She is all Bio, so Knit heals her 1 × 3 = 3 HP after each fight.
 - **Surge parts:** base (Strike, Bolt, Infuse, Kinetic) + Wiring (Shock, Blaze, Haste) + Limbs (Wave, Snare) + Senses (Glare, Veil).
 - **Surges:** 1 *Mantis Lunge* (Strike + Kinetic, Moxie), 2 *Live Wire* (Bolt + Shock, Moxie via Wiring), 3 *Slip Veil* (Infuse + Veil). 4 = Wild.
 - **Gear:** Sneak kit (two knives, suppressed pistol, Breach kit), Light armor.
-- **Numbers:** HP 12, Armor 1, Speed 50 ft (Quickened + Spring Legs), Limit 6 (4 + 1 + 1), Dodge +4, Endure +1, Resist +2. Claws: +4 to hit, 1d8+3, +1d8 Shock once per turn (Capacitor).
-- **Her Evolution I** (level 4, Mantis): Moxie +5, Gumption +3, Nerve +2, Grit +1, Chutzpah +0; Prime 3, d8 Sequence, **Mantis Reflex**, and a Signature Surge (she'll pick *Live Wire*).
+- **Numbers:** HP 14, Armor 1, Speed 50 ft (Quickened + Spring Legs), Limit 5 (4 + 1 + 0), Dodge +4, Endure +2, Resist +1. Claws: +4 to hit, 1d8+3, +1d8 Shock once per turn (Capacitor).
+- **Her Evolution I** (level 4, Mantis): Moxie +5, Gumption +3, Grit +2, Nerve +1, Chutzpah +0; Prime 3, d8 Sequence, **Mantis Reflex**, and a Signature Surge (she'll pick *Live Wire*).

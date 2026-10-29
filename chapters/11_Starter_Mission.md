@@ -1,6 +1,6 @@
 # 11. Starter Mission — *Pumpstation 9*
 
-A one-session mission for **3–5 level 1 freelancers**. Four pregenerated characters are at the end. Numbers assume 4 players; scale Mooks and the Boss's HP for other sizes.
+A one-session mission for **3–5 level 1 freelancers**. Five pregenerated characters (one per Base Form) are at the end. Numbers assume 4 players; scale Mooks and the Boss's HP for other sizes.
 
 ## The Brief
 *Handler Dez Okafor, GRAFT Field Office 3, over a crackling radio:*
@@ -45,52 +45,64 @@ A flooded concrete cathedral where the river pipe meets the pumps. Glowing roots
 ---
 
 ## Pregenerated Freelancers (Level 1)
-All have Rank 1, Prime 2, Sequence d4 (slot 4 is Wild), Juice 1, a Damper, and the kit items listed.
+One per Base Form. All have Rank 1, Prime 2, Sequence d4 (slot 4 is Wild), Juice 1, Light armor, a Damper, and the kit items listed. Each has **6 nodes**: 3 in the primary tree, 2 in the secondary and 1 in the tertiary.
 
-### Vex — Bio Stalker
-*Spill-Born courier with mantis claws and a chitin shell.*
-- **Stats:** Grit +2, Moxie +3, Nerve +1, Gumption −1, Chutzpah +0
-- **HP** 16 · **Armor** 2 · **Speed** 30 · **Flux Limit** 6
-- **Defenses:** Dodge +4, Endure +3, Resist +2
+### Vex — Skitter (Bio)
+*Spill-Born courier with mantis claws, wired nerves and the reflexes of a cockroach.*
+- **Stats:** Moxie +3, Gumption +2, Grit +1, Nerve +0, Chutzpah −1
+- **HP** 14 · **Armor** 1 · **Speed** 50 · **Flux Limit** 5
+- **Defenses:** Dodge +4, Endure +2, Resist +1
 - **Knacks:** Scavenging, Parkour, Gang Turf
-- **Augments:** Limbs: *Natural Weapons* (Bio) · Hide: *Plating* (Bio)
-- **Attacks:** Claws +4, 1d8+3 · Shotgun +2, 1d10+1 (30 ft)
-- **Surges:** 1 *Mantis Lunge* (Strike + Kinetic: +4, 3d10+3, push 10 ft) · 2 *Pin* (Strike + Snare: +4, 2d10+3, Held) · 3 *Carapace Flex* (Infuse + Shell: 2d6+2 temp HP, +1 Armor) · 4 Wild
-- **Gear:** Wardrunner kit (Standard melee, Shotgun, Gas mask, Scanner), Light armor
-- **Perk:** Advantage on Endure vs poison, disease, and Flux-adding attacks. **Bio:** Knit, Bloom table.
+- **Augments:** Wiring: *Quickened*, *Capacitor*, *Slipstream* · Limbs: *Natural Weapons*, *Spring Legs* · Senses: *Keen* (all Bio)
+- **Attacks:** Claws +4, 1d8+3 (+1d8 Shock once per turn, Capacitor) · Pistol +1, 1d6 (60 ft, suppressed)
+- **Surges:** 1 *Mantis Lunge* (Strike + Kinetic: +4, 3d10+3, push 10 ft) · 2 *Live Wire* (Bolt + Shock, Moxie: +4, 2d8+3 Shock, Dazed) · 3 *Slip Veil* (Infuse + Veil: target Veiled) · 4 Wild
+- **Gear:** Sneak kit (two Light melee, Pistol with Suppressor, Breach kit)
+- **Perk:** Advantage on Endure vs poison, disease, and Flux-adding attacks. Dash as a Quick action; never provokes Opportunity Strikes. **Bio:** Knit 3 HP (3 Bio trees × Rank 1), Bloom table.
 
-### Juno — Chrome Spotter
+### Juno — Oracle (Chrome)
 *Corporate washout with a sniper's optic and an encrypted voice in everyone's ear.*
-- **Stats:** Grit −1, Moxie +0, Nerve +3, Gumption +1, Chutzpah +2
-- **HP** 10 · **Armor** 1 · **Speed** 30 · **Flux Limit** 8
-- **Defenses:** Dodge +1, Endure +0, Resist +4
+- **Stats:** Nerve +3, Chutzpah +2, Moxie +1, Gumption +0, Grit −1
+- **HP** 10 · **Armor** 1 · **Speed** 40 · **Flux Limit** 8
+- **Defenses:** Dodge +2, Endure +0, Resist +4
 - **Knacks:** Corporate Protocol, Ostrander Security, Fast Talk
-- **Augments:** Senses: *Keen* (Chrome) · Mind: *Uplink* (Chrome)
-- **Attacks:** Rifle +4, 1d8+3 (120 ft) · Mind Spike +4, 1d8+3 Psychic (60 ft)
-- **Surges:** 1 *Neural Spike* (Bolt + Dread: +4, 2d8+3 Psychic, Shaken) · 2 *Dazzle* (Bolt + Glare: +4, 2d8+3 Blaze, Blinded) · 3 *Hive Whisper* (Infuse + Link: Juno and 1 ally get advantage on next roll) · 4 Wild
-- **Gear:** Gunhand kit (Rifle, Pistol, Frag grenade), Light armor, +100 Scrip
-- **Perk:** One old contact per mission. **Chrome:** Firmware swap, Glitch table, disadvantage vs Shock, Upkeep 50.
+- **Augments:** Senses: *Keen*, *Target Lock*, *Threat Sense* · Mind: *Uplink*, *Iron Will* · Wiring: *Quickened* (all Chrome)
+- **Attacks:** Rifle +4, 1d8+3 (120 ft; +1d8 vs her Target Lock) · Mind Spike +4, 1d8+3 Psychic (60 ft)
+- **Surges:** 1 *Neural Spike* (Bolt + Dread: +4, 2d8+3 Psychic, Shaken) · 2 *Dazzle* (Bolt + Glare: +4, 2d8+3 Blaze, Blinded) · 3 *Hive Whisper* (Infuse + Link: target and 1 more ally get advantage on their next roll) · 4 Wild
+- **Gear:** Gunhand kit (Rifle, Pistol, Frag grenade), +100 Scrip
+- **Perk:** One old contact per mission. Her group can't be surprised. **Chrome:** Firmware swap, Glitch table, disadvantage vs Shock, Upkeep 75 per mission (GRAFT prepays 25).
 
-### Ozzie — Splice Doc
+### Ozzie — Alembic (Splice)
 *A clinic rat with acid glands in his throat and a plated chest his surgeon is still paying off.*
-- **Stats:** Grit +2, Moxie −1, Nerve +1, Gumption +3, Chutzpah +0
-- **HP** 16 · **Armor** 2 · **Speed** 30 · **Flux Limit** 5 (Splice)
-- **Defenses:** Dodge +0, Endure +3, Resist +2
+- **Stats:** Gumption +3, Grit +2, Nerve +1, Moxie +0, Chutzpah −1
+- **HP** 18 · **Armor** 2 · **Speed** 30 · **Flux Limit** 5 (Splice)
+- **Defenses:** Dodge +1, Endure +3, Resist +2
 - **Knacks:** Street Medicine, Chemistry, Black-Market Contacts
-- **Augments:** Glands: *Spit* (Bio) · Hide: *Plating* (Chrome)
-- **Attacks:** Spit +4 (Gumption), 1d8+3 Toxin/Corrode (30 ft) · Pistol +2, 1d6+1
-- **Surges:** 1 *Field Dressing* (Infuse + Mend: 2d8+3 HP) · 2 *Acid Bloom* (Burst + Corrode: +2 (Nerve), 2d6, Exposed) · 3 *Stomp* (Pulse + Quake: +3, 2d6, Prone) · 4 Wild
-- **Gear:** Medic kit (Pistol, Standard melee, 2 Medkits, 2 Stims), Light armor
-- **Perk:** Patch heals +1 extra. **Splice:** roll both Overload tables and choose. Upkeep 25.
+- **Augments:** Glands: *Spit*, *Stim Gland*, *Antibodies* (Bio) · Hide: *Plating*, *Thick* (Chrome) · Mind: *Uplink* (Bio)
+- **Attacks:** Spit +4 (Gumption), 1d8+3 Toxin/Corrode (30 ft) · Mind Spike +2, 1d8+1 Psychic · Pistol +2, 1d6+1
+- **Surges:** 1 *Field Dressing* (Infuse + Mend: 2d8+3 HP) · 2 *Acid Bloom* (Burst + Corrode, Gumption: +4, 2d6, Exposed) · 3 *Stomp* (Pulse + Quake: +3, 2d6, Prone) · 4 Wild
+- **Gear:** Medic kit (Pistol, Standard melee, 2 Medkits, 2 Stims)
+- **Perk:** Patch heals +1 extra; Scars and Faults cost him half to remove. Stim Gland twice per Breather; can't be Poisoned. **Splice:** Knit 2, roll both Overload tables and choose, Upkeep 25 (prepaid).
 
-### Rook — Chrome Brick
-*Ward militia veteran with piston fists and reflex wiring down his spine.*
-- **Stats:** Grit +3, Moxie +2, Nerve +0, Gumption −1, Chutzpah +1
-- **HP** 18 · **Armor** 1 · **Speed** 40 · **Flux Limit** 5
-- **Defenses:** Dodge +3, Endure +4, Resist +1
+### Rook — Juggernaut (Chrome)
+*Ward militia veteran with piston fists, a riveted hide and a voice like a closing door.*
+- **Stats:** Grit +3, Nerve +2, Chutzpah +1, Moxie +0, Gumption −1
+- **HP** 20 · **Armor** 2 · **Speed** 30 · **Flux Limit** 7
+- **Defenses:** Dodge +1, Endure +4, Resist +3
 - **Knacks:** Squad Tactics, Intimidation, Demolition
-- **Augments:** Wiring: *Quickened* (Chrome) · Limbs: *Natural Weapons* (Chrome)
-- **Attacks:** Sledge +4, 1d10+3 · Piston Fists +4, 1d8+3
-- **Surges:** 1 *Arc Punch* (Strike + Shock: +4, 2d10+3, Dazed) · 2 *Arc Lash* (Wave + Shock, 30-ft line: +4, 2d6, Dazed) · 3 *Piston Slam* (Strike + Kinetic: +4, 3d10+3, push 10 ft) · 4 Wild
-- **Gear:** Bruiser kit (Heavy melee, Medkit, Grapnel), Light armor
-- **Perk:** +2 to group initiative; Brace as Quick once per combat. Dash as Quick. **Chrome:** Firmware, Glitch, Upkeep 50.
+- **Augments:** Hide: *Plating*, *Thick*, *Barbs* · Limbs: *Natural Weapons*, *Extra Arm* · Glands: *Spit* (all Chrome)
+- **Attacks:** Sledge +4, 1d10+3 · Piston Fists +4, 1d8+3 (+1 die once per turn, Extra Arm) · Spit +3 (Nerve), 1d8+2
+- **Surges:** 1 *Piston Slam* (Strike + Kinetic: +4, 3d10+3, push 10 ft) · 2 *Floor Breaker* (Pulse + Quake: +4, 2d6, Prone) · 3 *Bulkhead* (Infuse + Shell: 2d6+3 temp HP, +1 Armor) · 4 Wild
+- **Gear:** Bruiser kit (Heavy melee, Medkit, Grapnel)
+- **Perk:** +2 to his roll in group initiative; Brace as a Quick action once per combat. Melee attackers that damage him take 2. **Chrome:** Firmware, Glitch table, disadvantage vs Shock, Upkeep 75 (GRAFT prepays 25).
+
+### Mags — Siren (Bio)
+*A Bloom street-preacher with a voice that harmonises with itself and a crowd that follows her home.*
+- **Stats:** Chutzpah +3, Moxie +2, Gumption +1, Grit +0, Nerve −1
+- **HP** 12 · **Armor** 1 · **Speed** 40 · **Flux Limit** 4
+- **Defenses:** Dodge +3, Endure +1, Resist +0 (advantage: Iron Will)
+- **Knacks:** Bloom Lore, Street Preaching, Gambling
+- **Augments:** Mind: *Uplink*, *Iron Will*, *Commanding Voice* · Wiring: *Quickened*, *Slipstream* · Limbs: *Natural Weapons* (all Bio)
+- **Attacks:** Mind Spike +4 (Chutzpah), 1d8+3 Psychic (60 ft) · Claws +3 (Moxie), 1d8+2
+- **Surges:** 1 *Nightmare* (Bolt + Dread, Chutzpah: +4, 2d8+3 Psychic, Shaken) · 2 *Hold Them* (Wave + Snare, Moxie: +3, 2d6, Held) · 3 *Go, Go!* (Infuse + Haste: an ally takes a Move and an Action) · 4 Wild
+- **Gear:** Face kit (Concealed Pistol, Light melee, Hack deck, Flashbang, +50 Scrip)
+- **Perk:** Once per Lockdown, reroll an Overload result and choose. Rally as a Quick action. Can't be Shaken. **Bio:** Knit 3, Bloom table. *Her Limit is only 4: she will Overload. That's the point of her.*
