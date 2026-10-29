@@ -2,7 +2,9 @@
 
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
-## Status (2026-10-28)
+## Status (2026-10-29)
+**Arcade mode done (2026-10-29, owner request):** `arcade/` is a playable battle simulator, *Gauntlet mode*. You build a party (5/4/3 freelancers for Easy/Medium/Hard), then each level runs minion fight → boss fight → level-up from 1 to 10, ending with Patient Zero. Parties and characters can be saved. See *Arcade: Gauntlet mode* below.
+
 **Enemy calibration done (2026-10-28, owner request):** every enemy now has a **Boss Rating** and a **Minion Rating** from simulated fights with real builder characters (party sizes 2–6), the threat table was recalibrated (v0.3), the roster is 30 creatures + 3 Bosses with Heavies (AoE) and Packs, and the encounter budget, party-size and difficulty rules come from the sims. See *Enemy Calibration* below; the v0.2 table in D6 is superseded.
 
 **v0.2 done (2026-10-28): Base Forms & Evolution.** The owner dropped the compactness rule. Five Base Forms, 10-node trees, Evolutions at L4/L7, Signature Surges, a Final Form stage and a rebalanced threat table. Every chapter, the sheets, the builder (v0.2) and the tools are updated. The spec is *v0.2 Design* below; results are in *Balance v0.2* and *Playtest v0.2*. The v0.1.1 history (sanity checks, builder) is kept further down for reference.
@@ -259,6 +261,94 @@ p3/p5 columns are the raw fractional ratings for 3 and 5 freelancers (−2.0 and
 ### Files
 `tools/encounter_sim.py` (sim + ratings), `encounter_roster.py` (table, roles, roster data), `sim_data/roster_tuning.json` (per-creature HP/Damage factors), `tune_roster.py`, `calibrate_table.py`, `encounter_math.py` (final/steps/budget/party/mixed/mixed2/builder/traitunits/bossscale/repatch), `threat_blocks.py` (prints the ch 10 stat blocks and roster table), `ch11_check.py`, `check_links.py`; results in `tools/sim_results/` (00 expectations … 12 boss scaling).
 
+## Arcade: Gauntlet mode (arcade/)
+The owner asked for an arcade mode in the battle simulator (2026-10-29):
+- the player fights a series of battles in a row;
+- each level is a minion battle, then a boss battle, then a level-up;
+- Easy, Medium and Hard field 5, 4 and 3 player characters;
+- it starts with character creation, saves both characters and whole parties, and the player controls and levels every sheet.
+
+Live at https://xenodorian.github.io/BeelzRPG/arcade/ and offline at `arcade/index.html`. The page is plain HTML and JS with no build step.
+
+### Architecture
+- `mutagen_rules.js` is **generated from the builder**. `tools/sync_arcade.js` copies the `MUTAGEN` data block and the builder's rules code (`derive`, `normalize`, `randomChar`, gates, pick counts…). The builder stays the single source of truth: change the builder, re-run the sync, and the arcade test fails if you forget.
+- `roster.js` is generated from `tools/encounter_roster.py` (the ch 10 roster with computed stats) plus the BR/MR ratings in `sim_results/04_ratings_final.json`.
+- `engine.js` holds the rules with no DOM: runs, encounters, the `Fight` class, the enemy AI (traits and targeting follow `tools/encounter_sim.py`), the freelancer auto-player, level-ups and saving. `app.js` only draws screens.
+- **Saves:**
+  - Characters go to the builder's own list (`localStorage["mutagen.builder.saves"]`), so the two apps share them on the same origin.
+  - Parties go to `mutagen.arcade.parties`, the current run to `mutagen.arcade.run` and the last 25 results to `mutagen.arcade.records`.
+  - Party files are `{app: "mutagen-arcade-party", name, characters: [builder JSON…]}`. Import also accepts a single builder character or an array.
+
+### Design decisions
+1. **Difficulty = party size + threat.**
+   - Encounters follow ch 10 for the actual party size: the Hard unit budget for minions, and the Boss's HP and damage × party ÷ 4.
+   - At book budgets the auto-player won about 99% of fights at every size, so each difficulty adds a threat factor: Easy ×1.25, Medium ×1.6, Hard ×1.75.
+   - The factor multiplies the minion budget and the boss's HP. Boss damage gets half of it.
+   - The extra threat ramps in: half at level 1, three-quarters at level 2.
+2. **Each level** is: minion fight → **Breather** (half Max HP + Knit, Flux 0, death marks cleared, per-Breather abilities back, a Ravenous freelancer eats a ration) → boss fight → **level-up** → **Lockdown** (full HP, injuries cleared, Juice at least 1, kit restocked, per-Lockdown abilities back).
+   - The minion fight is one or two creature types from one faction (at most 8 creatures), costed in MR units, with next-stage creatures excluded.
+   - The boss is the real Boss at levels 1, 5 and 10. Other levels use a centrepiece (Elite, Brute, Controller, Artillery or Soldier) whose party-of-4 BR is within 0.75 of the level, scaled like a Boss.
+   - Encounters are seeded per run and level, so a retry faces the same enemies.
+3. **Everyone starts at level 1.** Imports and pregens above level 1 are fitted down, like the builder's "Fit to level".
+4. **Death and retries.**
+   - In standard mode, a lost fight can be retried from a snapshot taken at the start of the fight.
+     - Each retry of the same fight takes 6% off the enemies' HP and 4% off their damage (**Mercy**, up to 10 retries).
+     - A freelancer who dies is recovered by GRAFT at the next Lockdown with a permanent Scar (Bio) or Fault (Chrome).
+   - In **permadeath** mode there are no retries, the dead stay dead, and a lost fight ends the run.
+   - Quitting mid-fight saves the run. Resuming restarts that fight.
+5. **Level-up.**
+   - The primary node is chosen automatically (the request asked for that); the player picks the secondary and tertiary nodes, new Surges and Signatures, and Knacks.
+   - Every pick is checked with the builder's `derive()`, so a sheet can't be confirmed while it's illegal.
+   - Evolution nodes (4, 7) come from the builder rules. The new stage Emerges at the start of that freelancer's first turn in the next fight.
+   - Final Form is offered on the Ready screen from level 10, once per Lockdown.
+6. **Quick character creation** inside the arcade covers name, Form, dump stat, Origin, Kit, Materials, Surges (shape, effect, Twists) and Knacks. Nodes are grown like the builder's Random and can be rerolled. For hand-picked nodes, build in the full builder and use "Load saved".
+7. **Auto-play** (the "Auto this turn", "Auto: rest of round" and "Auto-battle" buttons, and the tests) uses `aiChoose()`:
+   - heal the fallen first;
+   - spend Flux only below the Limit, Amped Surges first, Areas into crowds;
+   - Churn when nothing worthwhile is Primed;
+   - Target Lock, Menace and Siren Song for tanks;
+   - Final Form at the level 10 Boss.
+
+### Rules simplifications (things the tabletop does that the arcade abstracts)
+- **No battle map.**
+  - Positioning uses the encounter sim's catch odds. Each enemy Area catches each other freelancer with probability Q (small 30%, medium 45%, large 65%), scaled by party size. A freelancer Area catches each other enemy 45% (Burst), 35% (Wave) or 40% (Pulse) of the time, and an ally 12% of the time.
+  - Party order is the line for "adjacent" (Living Wall, Bulwark, Fortress, Hardening, Spore Bloom, Heat Vent).
+  - Movement effects (Overgrowth, Joint Lock, Spring Legs, Grapnel, push distances) are logged only.
+- **Enemies waste 10% of their actions** (the sim's friction for terrain and line of sight). Freelancers don't.
+- **Reactions resolve automatically** when they help: Bulwark, Threat Sense, Precog, Unbreakable, Reflex Spike, Fortress, Omen and Deadeye. Last Gasp fires automatically on the first drop to 0 in each Lockdown. Hair Trigger fires automatically.
+- **Juice** can set Prime dice (Prime screen) and Shrug a condition. There's no Juice reroll of a d20, because rolls resolve at once.
+- **Splice** Overloads roll both tables and keep the better result, and Bloom Lore rerolls bad results automatically. Hive Mind's extra Prime goes to the ally with the fewest Primed Surges. Puppet picks its own target. Perfect Expression picks your two best Surges.
+- **Scars and injuries** gained in a fight take effect from the next fight.
+- **Haste** gives the ally one immediate Action (not Unleash) with advantage.
+- **Mimic** gets advantage on its first attack only. The Drowned Choir and other Shaken-on-Shift Bosses roll Resist for everyone.
+- **Enemy stats are visible** (Guard, TN, HP, attacks). Analyze still matters for Exposed and Weak Spot.
+
+### Tests (2026-10-29)
+- **`node tools/arcade_test.js 40`: 16,882 checks, all pass.** They cover:
+  - sync checks;
+  - party create, save, load, delete, export and import, and run save/resume;
+  - level-ups 1→10 for all five Forms (legal at every level, Evolution nodes and stage names at 4 and 7, Knacks at 3/6/9, Final Form at 10, a manual secondary pick applied);
+  - 40 seeded runs per difficulty in permadeath mode and 40 in standard mode;
+  - a jsdom page flow (title → Hard party → pregen/random/editor → save and load party → fight by hand and auto → retry → level-up screen → confirm → resume).
+- **Auto-play win rates** (random level-1 parties, seeded):
+
+  | Difficulty | Permadeath runs won | Fights won first try | Standard runs finished | Retries per run |
+  |---|---|---|---|---|
+  | Easy (5) | 35/40 (88%) | 99.3% | 40/40 | 0.23 |
+  | Medium (4) | 28/40 (70%) | 98.2% | 40/40 | 0.63 |
+  | Hard (3) | 18/40 (45%) | 96.2% | 38/40 | 2.92 |
+
+  Losses on Hard spread from level 1 to level 10. With 20 fights per run, one bad fight in 25 is enough to end a permadeath run.
+- **Real Chrome:**
+  - `tools/arcade_shots.js` produced the screenshots with no page errors.
+  - A random-click fuzz (5,575 clicks, every option type, Hard, retries allowed) played a full run to victory with no page errors.
+- `check_builder_data.js` (493/0), `builder_test.js` (255, all pass), `builder_flows.js` (Playwright, 33 flows, all pass) and `check_links.py` (177 links, 0 broken) still pass.
+
+### Known issues / ideas
+- Levels 2–4, 6–9 use centrepieces because there are only three Bosses. Mother of Rust can come up twice (levels 8 and 9).
+- A few random Hard parties hit a wall against one matchup (all-Siren parties against psychic areas). Mercy softens this, but a human may still need a different party.
+- No battle map, shops or Scrip between levels (see the backlog).
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -304,6 +394,12 @@ p3/p5 columns are the raw fractional ratings for 3 and 5 freelancers (−2.0 and
 | `tools/threat_blocks.py` | Regenerates the ch 10 roster table and stat blocks from the data | Paste output into ch 10 |
 | `tools/ch11_check.py` | Starter-mission fights at 3/4/5 players | |
 | `tools/check_links.py` | Link and anchor check for every Markdown file | Run before pushing docs |
+| `arcade/index.html` + `app.js` | Arcade (Gauntlet mode) page: screens, party creation, battle UI, level-up UI | Live at https://xenodorian.github.io/BeelzRPG/arcade/ |
+| `arcade/engine.js` | Arcade rules engine, no DOM: encounters, combat, enemy AI, auto-play, level-ups, runs, saves (`window.MutagenArcade`) | Rules simplifications are listed under *Arcade* |
+| `arcade/mutagen_rules.js` | **Generated** from `builder/index.html` (data block + rules code) by `node tools/sync_arcade.js` | Re-run after any builder change; `--check` is part of the arcade test |
+| `arcade/roster.js` | **Generated** from `tools/encounter_roster.py` + `sim_results/04_ratings_final.json` by `python3 tools/export_arcade_roster.py` | Re-run after any roster/rating change |
+| `tools/arcade_test.js` | Arcade tests (jsdom + Node): sync, party save/load/import, level-ups/Evolutions 1→10 for every Form, seeded auto-play of all 10 levels per difficulty with win rates, page flow | `node tools/arcade_test.js [runs]` (`npm i jsdom`) |
+| `tools/arcade_shots.js` | Arcade screenshots + real-Chrome smoke test (puppeteer-core) | Writes `arcade_{start,party,battle,levelup,mobile}.png` |
 | `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling | Raw results of the enemy calibration |
 
 ## Style Guide
@@ -424,6 +520,7 @@ p3/p5 columns are the raw fractional ratings for 3 and 5 freelancers (−2.0 and
 - [x] Sanity check 2026-10-28: logic + per-tree balance review (see section below)
 - [x] **Enemy calibration (2026-10-28):** BR/MR ratings, threat table v0.3, 33-creature roster with Heavies and Packs, sims for party 2–6, expectations E1–E12 tested, recalibrated, ch 9/10/11/12 updated (see *Enemy Calibration*)
 - [ ] **Live playtest** with real players (needs humans)
+- [x] **Arcade mode (2026-10-29, owner request):** `arcade/` Gauntlet battle simulator: difficulty = party size (5/4/3), character + party creation and saving, minion → boss → level-up for levels 1–10, Patient Zero finale, turn-based combat on the real rules, level-up UI, end screens, tests (see *Arcade: Gauntlet mode*)
 
 ### Backlog (unclaimed — pick one!)
 - [x] More threats: 2–3 per T band, especially T6–T10, plus two more Bosses (T5, T10) *(done in v0.2: 21 threats, Bosses at T1, T5, T10)*
@@ -437,6 +534,7 @@ p3/p5 columns are the raw fractional ratings for 3 and 5 freelancers (−2.0 and
 - [ ] PDF/print build (e.g. pandoc → HTML/PDF with a shared CSS)
 - [ ] Form-fillable PDF character sheet
 - [ ] Spreadsheet/VTT helper: Sequence roller and Flux tracker
+- [ ] Arcade: hand-drawn battle map (real positioning instead of catch odds), shops between levels, more Bosses so levels 2–9 aren't centrepieces
 - [ ] Encounter builder page (web): pick party size/level/difficulty, add creatures, show units vs budget (data: `tools/sim_results/04_ratings_final.json`)
 - [ ] Sim: model terrain/positioning choices (players spreading out vs Heavies), Juice and Last Gasp; re-rate
 - [ ] More Bosses at T3, T7–8 (BR 3, BR 7–8), each with a Shift
@@ -519,6 +617,8 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - **Findings:** Wild rule gap, Spore Bloom self-hit, and Blood Price spike fixed. Single-target burst at L5+ (Strike + Kinetic + Overcharge ≈ 7d10+stat for 2 Flux, ~42) is high but can't one-shot a same-level Soldier (46 HP) on average; **watch in live play.** Brutes melt fast under focused Surges. That's intended as the payoff, but GMs can add Shielded/Armored.
 
 ## Issues Log
+- 2026-10-29 (arcade): auto-play at book budgets won ~99% of fights on every difficulty: the sim ratings assume a less careful party, and the arcade's AI uses every node. Added a per-difficulty threat factor (×1.25/1.6/1.75) and ramped it in over levels 1–2, because most early losses were fragile level-1 sheets against the Brood Matriarch. Two of 40 random Hard parties (for example three Sirens against the psychic Drowned Choir) still hit a wall even with Mercy. That's accepted on Hard; Mercy goes up to 10 retries.
+- 2026-10-29 (arcade): found by the arcade's level-up loop: a Scar such as Sticky Sequence shrinks the Sequence and left a sheet illegal (too many Surges). The arcade now drops the last Surge when that happens (`tidy()`). The builder only reports the error, which is right for a sheet editor.
 - 2026-10-28 (enemy calibration): previous run was interrupted before docs; resumed from commit 8ca1bae. Found and fixed: uncapped AoE per-PC bonus (137 damage per clumped freelancer), Apex multiplying pack/AoE bonuses, rating extrapolation running to 13 on flat curves, tuner turning the Leviathan into a damage-less sponge and failing near L10 (hand-tuned), Ward Tough rating flipping on Damage rounding at T1, Brood Matriarch over the 5% death limit, Mother of Rust one-shotting with a 67-damage area. ch 10's old Cost/Budget system, v0.2 table and anchors replaced; ch 11 link to the Matriarch block updated.
 - 2026-10-28 — **v0.2 rewrite** (owner: Base Forms & Evolution). Files touched: every chapter, README, sheets, builder, all tools. Commits df621ff (spec), 97d77a8 (trees), 5213118 (Forms/Surges/Flux/Advancement), 1e861cc (threats, pregens, GM guidance, sims), 842c78c (guide, quick ref, intro, sheets), b07f1e0 (builder + tests) and this hub update.
 - 2026-10-28 — v0.2: the first Forms Latin square left the Oracle with two dump stats in its defenses (147% HP lost) and the Alembic at Limit 4. Rotated (tertiary = previous stat); ch 2A, ch 2 example and sims updated.
