@@ -431,8 +431,9 @@ class Fight:
         if not ok and not c.down and (a['dmg'] + extra) >= 0.2 * c.max:
             o = s.omen_holder(lambda v: v + stat >= tn)
             if o: ok = True; o.omen = None
-        dmg = a['dmg'] + extra + e.dmgbonus + e.enrage * (e.tr.get('enrage', (0, 0))[0]) + s.leader_bonus(e)
-        if alone: dmg = int(dmg * (e.tr['apex'][1] if isinstance(e.tr['apex'], tuple) else 1.5))
+        dmg = a['dmg'] + e.dmgbonus + e.enrage * (e.tr.get('enrage', (0, 0))[0]) + s.leader_bonus(e)
+        if alone: dmg = int(dmg * (e.tr['apex'][1] if isinstance(e.tr['apex'], tuple) else 1.5))   # Apex: base Damage only
+        dmg += extra                                                      # Pack / Crowd / Engulf bonuses added after
         if e.cond.get('poisoned'): dmg //= 2
         if c.down:
             if area or not ok:
@@ -508,7 +509,7 @@ class Fight:
             if e.tr.get('interference'): s.focus['interf'] = True
             q = min(0.95, Q[a['area']] * (1 + CROWD * (s.np - 4)))
             caught = [tgt] + [c for c in s.P if c is not tgt and not c.dead and random.random() < q]
-            extra = a.get('extra', 0) * (sum(1 for c in caught if c.standing()) - 1)
+            extra = a.get('extra', 0) * min(2, sum(1 for c in caught if c.standing()) - 1)   # Engulf: max +2 steps
             for c in caught: s.hit_pc(e, c, a, area=True, boss=e.boss, extra=extra)
             if a.get('ff'):
                 for x in s.E:

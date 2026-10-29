@@ -134,10 +134,10 @@ VARIANTS = [
     ('Mimic', dict(traits={'mimic': True})), ('Hunter (smart)', dict(traits={'smart': True})), ('Shielded', dict(traits={'shielded': True})),
     ('Swarm', dict(traits={'swarm': True})), ('Cowardly (surrender)', dict(traits={'surrender': True})), ('Shocking (Dazed rider)', dict(rider='dazed')),
     ('Area 10 ft (artillery)', dict(area='s')), ('Area 20 ft', dict(area='m')),
-    ('Heavy: Area 20 ft + Crush 4 + Friendly fire + Recharge 4', dict(area='m', extra=4, ff=True, recharge=4)),
-    ('Heavy + Apex', dict(area='m', extra=4, ff=True, recharge=4, traits={'apex': True})),
-    ('Heavy + Apex + Bulky', dict(area='m', extra=4, ff=True, recharge=4, traits={'apex': True, 'bulky': 0.5})),
-    ('Heavy + Apex + Bulky + Interference', dict(area='m', extra=4, ff=True, recharge=4, traits={'apex': True, 'bulky': 0.5, 'interference': True})),
+    ('Heavy: Area 20 ft + Engulf 2 + Friendly fire + Recharge 4', dict(area='m', extra=2, ff=True, recharge=4)),
+    ('Heavy + Apex', dict(area='m', extra=2, ff=True, recharge=4, traits={'apex': True})),
+    ('Heavy + Apex + Bulky', dict(area='m', extra=2, ff=True, recharge=4, traits={'apex': True, 'bulky': 0.5})),
+    ('Heavy + Apex + Bulky + Interference', dict(area='m', extra=2, ff=True, recharge=4, traits={'apex': True, 'bulky': 0.5, 'interference': True})),
 ]
 def builder(n=1000, T=5):
     lines = ['# Threat-builder calibration (T%d; ratings for 4 PCs, %d fights per level per mode)' % (T, n), '',
@@ -165,5 +165,96 @@ def builder(n=1000, T=5):
         lines.append('| %s | %.1f | %.1f | %+.1f | %+.1f | %+.1f |' % (nm, br, mr, br - b0[0], mr - b0[1], (mr - br) - (b0[1] - b0[0]))); print(lines[-1], flush=True)
     open(os.path.join(OUT, '09_builder_traits.md'), 'w').write('\n'.join(lines) + '\n')
 
+
+def stage(L): return 0 if L <= 3 else (1 if L <= 6 else 2)
+def mixed2(n=1000, trials=180):
+    """v2 (the published rule): same-stage creatures only, MR within ±2 of L, big creatures by BR within ±1;
+    budget = P units x difficulty; a creature of rating R at party level L = 2^((R-L)/2) units (x4 when valued by BR)."""
+    R = json.load(open(os.path.join(OUT, '04_ratings_final.json')))
+    by = {b['name']: b for b in RO.ROSTER}
+    rng = random.Random(9); lines = ['| L | PCs | Encounter | units | Down ≥1 | target | HP lost | death | win | rounds |', '|---|---|---|---|---|---|---|---|---|---|']
+    errs = {}; TG = {0.5: 0.05, 0.75: 0.20, 1.0: 0.5, 1.25: 0.75}
+    for t in range(trials):
+        L = rng.randint(1, 10); P = rng.choice((3, 4, 5)); mult = rng.choice((0.5, 0.75, 1.0, 1.25))
+        budget = P * mult
+        pool = [nm for nm in by if by[nm]['role'] != 'boss' and abs(R[nm]['m4'] - L) <= 2 and stage(min(10, max(1, round(R[nm]['m4'])))) == stage(L)]
+        big = [nm for nm in by if by[nm]['role'] in ('boss', 'elite', 'brute') and abs(R[nm]['b4'] - L) <= 1 and stage(min(10, max(1, round(R[nm]['b4'])))) == stage(L)]
+        enc = {}; tot = 0
+        if big and rng.random() < 0.5:
+            nm = rng.choice(big); u = units(R[nm]['b4'], L, True)
+            if u <= budget * 1.1: enc[nm] = 1; tot += u
+        pool = [x for x in pool if x not in enc]
+        while pool and tot < budget * 0.9:
+            nm = rng.choice(pool); u = units(R[nm]['m4'], L, False)
+            if tot + u > budget * 1.1: pool.remove(nm); continue
+            enc[nm] = enc.get(nm, 0) + 1; tot += u
+        if not enc or tot < budget * 0.8: continue
+        m = S.sim(L, [(by[nm], k) for nm, k in enc.items()], P, n, seed=t)
+        tgt = 1 - (1 - TG[mult]) ** (P / 4)
+        errs.setdefault((P, mult), []).append((m['down'] - tgt, m['lost'], m['death'], m['win']))
+        lines.append('| %d | %d | %s | %.2f (×%.2f) | %.0f%% | %.0f%% | %.0f%% | %.1f%% | %.0f%% | %.1f |' % (L, P, ', '.join('%d %s' % (k, nm) for nm, k in enc.items()), tot, mult, 100 * m['down'], 100 * tgt, 100 * m['lost'], 100 * m['death'], 100 * m['win'], m['rounds']))
+        print(lines[-1], flush=True)
+    lines += ['', '| PCs | difficulty × | fights | mean (Down − target) | mean HP lost | mean death | mean win |', '|---|---|---|---|---|---|---|']
+    for (P, mult), e in sorted(errs.items()):
+        lines.append('| %d | %.2f | %d | %+.0f pts | %.0f%% | %.1f%% | %.0f%% |' % (P, mult, len(e), 100 * st.mean(x[0] for x in e), 100 * st.mean(x[1] for x in e), 100 * st.mean(x[2] for x in e), 100 * st.mean(x[3] for x in e)))
+    lines += ['', '| difficulty × | fights | mean (Down − target) | within ±15 pts |', '|---|---|---|---|']
+    for mult in (0.5, 0.75, 1.0, 1.25):
+        e = [x[0] for (P, m_), v in errs.items() if m_ == mult for x in v]
+        if e: lines.append('| %.2f | %d | %+.0f pts | %d%% |' % (mult, len(e), 100 * st.mean(e), 100 * sum(abs(x) <= 0.15 for x in e) / len(e)))
+    open(os.path.join(OUT, '07b_mixed_validation_rule.md'), 'w').write('# Mixed-encounter validation of the published rule (same stage only; party 3/4/5; 1,000 fights each)\n\n' + '\n'.join(lines) + '\n')
+def traitunits(n=800):
+    """trait value in rating steps, measured as fair-count ratios (robust to the Evolution walls): steps = 2*log2(k_base/k_trait)"""
+    import math
+    lines = ['| Trait | L2: fair count (base → trait) | L5 | L8 | mean steps |', '|---|---|---|---|---|']
+    tests = [('Pack', 'soldier', dict(traits={'pack': 1})), ('Flanker', 'soldier', dict(traits={'flank': True})), ('Overwhelm', 'soldier', dict(traits={'overwhelm': 3})),
+             ('Crowd', 'soldier', dict(traits={'crowd': 0.5})), ('Linked', 'soldier', dict(traits={'link': True})), ('Leader', 'soldier', dict(traits={'leader': 1})),
+             ('Frenzy', 'soldier', dict(traits={'enrage': 1})), ('Shield Wall', 'soldier', dict(traits={'shieldwall': (1, 2)})), ('Armored 2', 'soldier', dict(armor=2)),
+             ('Explosive', 'soldier', dict(traits={'explode': 0.5})), ('Mender', 'soldier', dict(traits={'heal': 0.25})), ('Regenerating', 'soldier', dict(traits={'regen': 0.1})),
+             ('Area 20 ft', 'soldier', dict(area='m')), ('Heavy (vs Brute)', 'brute', dict(area='m', extra=2, ff=True, recharge=4)),
+             ('Heavy + Bulky (vs Brute)', 'brute', dict(area='m', extra=2, ff=True, recharge=4, traits={'bulky': 0.5}))]
+    base = {}
+    for role in ('soldier', 'brute'):
+        for L in (2, 5, 8): base[(role, L)] = fair_count(L, variant(L, role), n=n)
+    lines.insert(0, '')
+    lines.insert(0, 'Base fair counts: ' + ', '.join('%s L%d %.2f' % (r, L, k) for (r, L), k in base.items()))
+    for nm, role, kw in tests:
+        cells = []; steps = []
+        for L in (2, 5, 8):
+            k = fair_count(L, variant(L, role, label=nm, **kw), n=n)
+            b = base[(role, L)]; cells.append('%.2f → %.2f' % (b, k))
+            if k not in (0, float('inf')): steps.append(2 * math.log2(b / k))
+        lines.append('| %s | %s | %+.1f |' % (nm, ' | '.join(cells), st.mean(steps) if steps else float('nan'))); print(lines[-1], flush=True)
+    open(os.path.join(OUT, '09b_trait_steps.md'), 'w').write('# Trait value in rating steps (minion use; fair-count ratios at L2/L5/L8, 4 PCs)\n\n' + '\n'.join(lines) + '\n')
+
+def repatch(names):
+    """re-rate some creatures (party 2-6) and patch 04_ratings_final.json/.md after a late retune"""
+    R = json.load(open(os.path.join(OUT, '04_ratings_final.json')))
+    md = open(os.path.join(OUT, '04_ratings_final.md')).read().split('\n')
+    for nm in names:
+        b = RO.BY_NAME[nm]; res = S.rate_one(b, SIZES, 1000)
+        R[nm] = {('%s%d' % (m[0], P)): round(v[0], 2) for (m, P), v in res.items()}
+        row = '| %s | %s | %d | %s | %s |' % (nm, b['kind'], b['T'], ' | '.join('%.1f' % res[('boss', P)][0] for P in SIZES), ' | '.join('%.1f' % res[('minion', P)][0] for P in SIZES))
+        md = [row if l.startswith('| %s |' % nm) else l for l in md]; print(row, flush=True)
+    json.dump(R, open(os.path.join(OUT, '04_ratings_final.json'), 'w'), indent=1)
+    open(os.path.join(OUT, '04_ratings_final.md'), 'w').write('\n'.join(md))
+def bossscale(n=2000):
+    """Boss party-size rule: HP and Damage x P/4 (published in ch 10). Writes 12_boss_party_scaling.md"""
+    import copy
+    lines = ['| Boss (at its BR) | PCs | scaling | Down ≥1 (target) | HP lost | death | win | rounds |', '|---|---|---|---|---|---|---|---|']
+    for nm in [b['name'] for b in RO.ROSTER if b['role'] == 'boss']:
+        b = RO.BY_NAME[nm]; L = min(10, max(1, int(round(json.load(open(os.path.join(OUT, '04_ratings_final.json')))[nm]['b4']))))
+        for P in SIZES:
+            for f, lab in ((1.0, 'none'), (P / 4, 'HP & Damage ×%g' % (P / 4))):
+                if P == 4 and f == 1.0 and lab != 'none': continue
+                if P == 4 and lab != 'none': continue
+                sp = copy.deepcopy(b); sp['hp'] = int(sp['hp'] * f)
+                for a in sp['attacks'] + ((sp.get('shift') or {}).get('attacks') or []):
+                    if 'dmg' in a: a['dmg'] = int(round(a['dmg'] * f))
+                    if 'tmpl' in a:
+                        for z in a['tmpl']['attacks']: z['dmg'] = max(1, int(round(z['dmg'] * f)))
+                m = S.sim(L, [(sp, 1)], P, n, seed=5)
+                lines.append('| %s (L%d) | %d | %s | %.0f%% (%.0f%%) | %.0f%% | %.1f%% | %.0f%% | %.1f |' % (nm, L, P, lab, 100 * m['down'], 100 * S.target_for(P), 100 * m['lost'], 100 * m['death'], 100 * m['win'], m['rounds'])); print(lines[-1], flush=True)
+    open(os.path.join(OUT, '12_boss_party_scaling.md'), 'w').write('# Boss party-size scaling (each Boss at its party-of-4 BR level; 2,000 fights per cell)\n\n' + '\n'.join(lines) + '\n')
+
 if __name__ == '__main__':
-    {'final': final, 'steps': steps, 'budget': budget, 'party': party, 'mixed': mixed, 'builder': builder}[sys.argv[1]]()
+    {'final': final, 'steps': steps, 'budget': budget, 'party': party, 'mixed': mixed, 'builder': builder, 'mixed2': mixed2, 'traitunits': traitunits, 'bossscale': bossscale}.get(sys.argv[1], lambda: repatch(sys.argv[2].split('|')))()

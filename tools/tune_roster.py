@@ -13,7 +13,7 @@ TARGET = {  # name: (primary mode, target rating)
  'Mirrormaw': ('boss', 4), 'Cleaner Hound': ('minion', 5), 'Gas Bloat': ('boss', 4), 'Bloom Knight': ('minion', 5),
  'Glasshide': ('boss', 5), 'Stitchwork Brood': ('minion', 6), 'Damper Drone': ('minion', 5), 'Lancer Troopers': ('minion', 4),
  'Hunter-Killer Unit': ('boss', 6), 'Warden Krell': ('boss', 5),
- 'Feral Evolved': ('boss', 7), 'Razorwing Flock': ('minion', 7), 'Bloom Husks': ('minion', 7), 'Gutter Leviathan': ('boss', 8),
+ 'Feral Evolved': ('boss', 7), 'Razorwing Flock': ('minion', 7), 'Bloom Husks': ('minion', 7), 'Gutter Leviathan': ('boss', 7),
  'Seraph Gunship': ('boss', 8), 'The Drowned Choir': ('boss', 8), 'Ostrander Paladin': ('minion', 8), 'Choir Thralls': ('minion', 8),
  'Mother of Rust': ('boss', 9), 'Reactor Wraith': ('boss', 10), 'Hollow Saint': ('minion', 9), 'The Many': ('minion', 10),
  'Patient Zero': ('boss', 10)}

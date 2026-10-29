@@ -82,12 +82,12 @@ mk('Turret Drone', 2, 'artillery', 'general', 'Ostrander Remnant',
    [dict(n='Flechette Spray', d='dodge', area='s', shape='10-ft burst', rng='90 ft', m=1)], traits={'mover': 'fly', 'explode': 0.5}, armor=1,
    speed='30 (fly)', melee=False, look='A coffee-can drone with a shotgun.', tactics='Hovers out of reach; fires into clusters.')
 mk('Drain Beast', 2, 'brute', 'aoe', 'Spill fauna',
-   [dict(n='Tail Thrash', d='endure', area='m', shape='20 ft around it', rng='', m=0.8, extra=4, ff=True, recharge=4, special=True),
+   [dict(n='Tail Thrash', d='endure', area='m', shape='20 ft around it', rng='', m=0.8, extra=2, ff=True, recharge=4, special=True),
     dict(n='Crush', d='endure', rng='reach 10 ft', m=0.4, rider='held')],
    traits={'apex': True, 'huge': True, 'bulky': 0.5, 'regen': 0.1}, speed='30 (swim)',
    look='A drowned bull crocodile the size of a bus.', tactics='Thrashes when it is surrounded; drags one victim under when it is not.')
 mk('Boiler Hulk', 3, 'brute', 'aoe', 'Scrapjacks',
-   [dict(n='Steam Vent', d='endure', area='m', shape='20 ft around it', rng='', m=0.9, extra=4, ff=True, stagger=True, special=True),
+   [dict(n='Steam Vent', d='endure', area='m', shape='20 ft around it', rng='', m=0.9, extra=2, ff=True, stagger=True, special=True),
     dict(n='Furnace Fist', d='dodge', rng='melee', m=0.4, rider='burning')],
    traits={'apex': True, 'huge': True, 'bulky': 0.5}, armor=1,
    look='A walking furnace bolted onto a press-ganged Ward diver.', tactics='Wades into the middle of the party and vents. Vents again whether or not its crew is close.')
@@ -108,7 +108,7 @@ mk('Cleaner Hound', 4, 'skirmisher', 'pack', 'Ostrander Remnant',
    [dict(n='Injector Bite', d='dodge', rng='melee', m=1, rider='purge')], traits={'pack': 1, 'flank': True}, speed='50',
    look="Ostrander's chrome dogs.", tactics='Run in threes or fours, chase whoever just Surged, and drain their Primed Surges.')
 mk('Gas Bloat', 4, 'brute', 'aoe', 'Children of the Bloom',
-   [dict(n='Spore Gout', d='endure', area='l', shape='30 ft around it', rng='', m=0.7, extra=4, ff=True, recharge=5, rider='poisoned', special=True),
+   [dict(n='Spore Gout', d='endure', area='l', shape='30 ft around it', rng='', m=0.7, extra=2, ff=True, recharge=5, rider='poisoned', special=True),
     dict(n='Slam', d='dodge', rng='melee', m=0.4)],
    traits={'apex': True, 'explode': 0.6, 'bulky': 0.5}, speed='20',
    look='A Bloom convert swollen into a weather balloon of spores.', tactics='Drifts into the biggest crowd it can find and bursts.')
@@ -116,7 +116,7 @@ mk('Bloom Knight', 5, 'soldier', 'general', 'Children of the Bloom',
    [dict(n='Thorn Glaive', d='dodge', rng='reach 10 ft', m=1, rider='poisoned')], traits={'mutagenic': 1}, armor=2,
    look='Holy warrior grown from a single rosebush.', tactics='Stands in front of Sporecallers and never retreats.')
 mk('Glasshide', 5, 'brute', 'aoe', 'Spill fauna',
-   [dict(n='Shatter Roar', d='endure', area='m', shape='20 ft around it', rng='', m=0.8, extra=4, ff=True, recharge=4, special=True),
+   [dict(n='Shatter Roar', d='endure', area='m', shape='20 ft around it', rng='', m=0.8, extra=2, ff=True, recharge=4, special=True),
     dict(n='Crystal Maul', d='endure', rng='reach 10 ft', m=0.4, rider='prone')],
    traits={'apex': True, 'huge': True, 'territorial': 0.67, 'bulky': 0.5, 'vuln': 'shock'}, armor=2,
    look='A bear grown into a cathedral of quartz.', tactics='Charges the loudest thing. Fights any other Glasshide on sight.')
@@ -143,12 +143,12 @@ mk('Razorwing Flock', 7, 'skirmisher', 'pack', 'Spill fauna',
    [dict(n='Razor Dive', d='dodge', rng='melee', m=1)], traits={'flank': True, 'enrage': 1, 'pack': 1}, speed='60 (fly)',
    look='Pigeons the Spill turned into flying knives.', tactics='Dive one target from every side; scream and dive harder when one falls.')
 mk('Gutter Leviathan', 7, 'brute', 'aoe', 'Spill fauna',
-   [dict(n='Undertow', d='endure', area='l', shape='30 ft around it', rng='', m=0.8, extra=4, ff=True, recharge=4, rider='prone', special=True),
+   [dict(n='Undertow', d='endure', area='l', shape='30 ft around it', rng='', m=0.8, extra=2, ff=True, recharge=4, rider='prone', special=True),
     dict(n='Swallow', d='endure', rng='reach 15 ft', m=0.4, rider='held')],
    traits={'apex': True, 'huge': True, 'bulky': 0.5, 'territorial': 0.67}, armor=3, speed='20 (swim 40)',
    look='The thing that lives in the flooded subway.', tactics='Surfaces, drowns everyone near the water, dives. Two never share a tunnel.')
 mk('Seraph Gunship', 8, 'artillery', 'aoe', 'Ostrander Remnant',
-   [dict(n='Rotary Cannon', d='dodge', area='m', shape='20-ft burst', rng='120 ft', m=1.0, extra=4, recharge=4, special=True),
+   [dict(n='Rotary Cannon', d='dodge', area='m', shape='20-ft burst', rng='120 ft', m=1.0, extra=2, recharge=4, special=True),
     dict(n='Door Gun', d='dodge', rng='120 ft', m=0.4)],
    traits={'apex': True, 'mover': 'fly', 'interference': True, 'explode': 0.5}, armor=3, speed='40 (fly)', melee=False,
    look='An Ostrander drone with angel wings painted on.', tactics='Circles the rooftops and shreds anyone in the open. Gunships share one fire-control net.')
@@ -167,7 +167,7 @@ mk('Mother of Rust', 9, 'controller', 'control', 'Scrapjacks',
    traits={'leader': 1, 'heal': 0.25}, speed='30 (climb)',
    look="The Scrapjacks' queen, a cathedral of rust and stolen limbs.", tactics='Melts Armor, rebuilds her crew from scrap, and lets them feast.')
 mk('Reactor Wraith', 10, 'brute', 'aoe', 'Spill fauna',
-   [dict(n='Meltdown', d='endure', area='l', shape='30 ft around it', rng='', m=0.8, extra=4, ff=True, stagger=True, special=True),
+   [dict(n='Meltdown', d='endure', area='l', shape='30 ft around it', rng='', m=0.8, extra=2, ff=True, stagger=True, special=True),
     dict(n='Irradiate', d='endure', rng='30 ft', m=0.4, rider='burning')],
    traits={'apex': True, 'huge': True, 'interference': True, 'bulky': 0.5}, armor=2, speed='30 (fly)',
    look='The ghost of a cooling tower.', tactics='Hovers into the middle of the fight and goes critical. Wraiths drain each other.')
