@@ -2,114 +2,74 @@
 
 ![Chrome freelancer](../art/char_chrome.jpg)
 
-Your Augments are your class, your race, and your story. There are **six trees**. Each tree is a part of the body you've changed; each can be **grown (Bio)** or **installed (Chrome)**.
+Your Augments are what you've done to your body. Your **Base Form** ([chapter 2A](02A_Forms_and_Evolution.md)) decides which **three trees** you grow along: a **primary** tree you master, a **secondary** you lean on, and a **tertiary** you dabble in. There are six trees, and each one is a body system you've rebuilt. Each can be **grown (Bio)** or **installed (Chrome)**.
+
+| Tree | Stat | Role | Unlocks | Primary of | Secondary of | Tertiary of |
+|---|---|---|---|---|---|---|
+| [**Hide**](03_Trees/Hide.md) | Grit | Tank, protector | Pulse (Shape), Quake, Shell | Juggernaut | Alembic | — |
+| [**Limbs**](03_Trees/Limbs.md) | Grit / Moxie | Melee, grappler, mover | Wave (Shape), Snare | — | Juggernaut, Skitter | Siren |
+| [**Senses**](03_Trees/Senses.md) | Nerve | Sniper, scout, spotter | Glare, Veil | Oracle | — | Skitter |
+| [**Glands**](03_Trees/Glands.md) | Gumption | Chemist, healer, attrition | Burst (Shape), Toxin, Corrode, Mend | Alembic | — | Juggernaut |
+| [**Wiring**](03_Trees/Wiring.md) | Moxie | Speed, reflexes, shock | Shock, Blaze, Haste | Skitter | Siren | Oracle |
+| [**Mind**](03_Trees/Mind.md) | Chutzpah | Psionics, hacking, control | Dread, Link | Siren | Oracle | Alembic |
 
 ## How Trees Work
-- **Nodes.** You take **2 nodes at level 1** and **1 node every level after** (11 at level 10). A node is taken once.
-- **Root first.** You must take a tree's **Root** before any other node in it. After the Root, take nodes in any order.
-- **Apex.** A tree's Apex requires **level 7+** and **three other nodes** in that tree.
-- **Scaling.** Nodes scale with your **Rank**; you never need a "greater" version.
+- **Ten nodes per tree:** a **Root**, four **Tier I** nodes, four **Tier II** nodes, and an **Apex**. A Form's primary tree also holds that Form's two **Evolution nodes**.
+- **You only take nodes from your Form's three trees.**
+- **Gates:**
+
+| Node | Needs |
+|---|---|
+| **Root** | Nothing. You take all three Roots at level 1. |
+| **Tier I** | The tree's Root |
+| **Tier II** | **Level 4+** and **3 nodes** already in that tree |
+| **Apex** | **Level 7+**, **6 other nodes** in that tree, and it must be your **primary or secondary** tree |
+| **Evolution node** | Your Form, at level 4 (Evolution I) or level 7 (Evolution II). Granted automatically. |
+
+- **Scaling.** Nodes scale with your **Rank**; you never need a "greater" version. A node is taken once.
 - **Push.** Some nodes say **Push**: you may gain **1 Flux** to get the extra effect ([Chapter 5](05_Flux_and_Overload.md)).
-- **Unlocks.** Each tree unlocks **Surge parts** ([Chapter 4](04_Surges.md)) the moment you take its Root.
-- **Respec.** When you level up, you may swap one node for another you qualify for (the clinic rips it out).
+- **Unlocks.** Each tree unlocks **Surge parts** ([Chapter 4](04_Surges.md)) the moment you take its Root. Since you take all three Roots at level 1, your Form fixes your Surge parts.
 
-## Form: Bio or Chrome
-When you take a tree's Root, choose its **Form**. Every node in that tree shares it. Form changes how it looks and adds the rules below.
+## Gaining Nodes
 
-| Form | Looks like | Perk | Cost |
+| When | Primary tree | Secondary or tertiary tree |
+|---|---|---|
+| **Level 1** | **3 nodes** (Root + 2) | **2 nodes** in the secondary (Root + 1) and **1 node** in the tertiary (its Root) |
+| **Each level after** | **+1 node, automatically.** You always get it, and you choose which. | **+1 node** in your secondary **or** tertiary tree (your choice) |
+| **Level 4 and 7** | **+ your Form's Evolution node** (on top of the pick) | — |
+
+- **Primary tree full?** Its 10 standard nodes fill up at level 8. From level 9, the automatic primary pick **overflows** into your secondary or tertiary tree.
+- **Totals:** 2 × level + 4 nodes, plus Evolution nodes: **6 at level 1, 13 at level 4, 20 at level 7, 26 at level 10.**
+- **Respec.** When you level up, you may swap one node for another of the same pick type that you qualify for. The clinic rips it out.
+
+## Material: Bio or Chrome
+When you take a tree's Root, choose its **Material**: grown or installed. Every node in that tree shares it. Material changes how the tree looks and adds the rules below. *(v0.1 called this "Form"; that word now means your Base Form.)*
+
+| Material | Looks like | Perk | Cost |
 |---|---|---|---|
 | **Bio** (grown) | Chitin, scales, extra eyes, glands, tentacles, glowing veins | **Knit:** at the end of each combat, and when you take a Breather, regain HP equal to **Rank × your number of Bio trees**. | Your Overloads roll on the **Bloom** table. |
 | **Chrome** (installed) | Plates, pistons, optics, ports, wiring, servo-arms | **Firmware:** once per combat, right after you Prime, you may swap one Primed Surge for any Surge you know that uses a part unlocked by one of your Chrome trees (base parts alone don't count). | Your Overloads roll on the **Glitch** table. You roll defense with **disadvantage against Shock** attacks. **Upkeep:** 25 Scrip per Chrome tree each mission (GRAFT prepays your first), or start the mission with +1 Flux per unpaid tree. |
-| **Splice** (you have both) | Meat and metal fighting for the same body | Overload: roll on **both** tables, then choose one result. | Your Flux Limit is **−1**. |
+| **Splice** (you have both) | Meat and metal fighting for the same body | Overload: roll on **both** tables, then choose one result. Each tree keeps its own Material rules. | Your Flux Limit is **−1** (after the minimum of 4). |
 
-## Tree Summary
+Your Evolutions follow your Materials: a Bio Juggernaut's Rampart stage grows bone slabs, a Chrome one bolts on bulkheads.
 
-| Tree | Stats | Role | Unlocks |
+## The Evolution Nodes at a Glance
+
+| Form | Primary tree | Level 4: Evolution I | Level 7: Evolution II |
 |---|---|---|---|
-| **Hide** | Grit | Tank, protector | Pulse (shape), Quake, Shell |
-| **Limbs** | Grit / Moxie | Melee, grappler, mover | Wave (shape), Snare |
-| **Senses** | Nerve | Sniper, scout, spotter | Glare, Veil |
-| **Glands** | Gumption / Grit | Chemist, healer, attrition | Burst (shape), Toxin, Corrode, Mend |
-| **Wiring** | Moxie | Speed, reflexes, shock | Shock, Blaze, Haste |
-| **Mind** | Nerve / Chutzpah | Psionics, hacking, control | Dread, Link |
+| Juggernaut | Hide | **Siege Hide:** +1 Armor, Armor max 6, reach 10 ft, counts as Huge | **Fortress:** allies within 10 ft take half Area damage; take an ally's lethal hit |
+| Skitter | Wiring | **Mantis Reflex:** two Reactions per round; Reflex Spike and Opportunity Strikes use full dice | **Lightning Step:** after you Unleash, a weapon attack as a Quick action |
+| Oracle | Senses | **Foresight:** each round, an Omen d20 that can replace any nearby d20 | **Thousand Eyes:** Target Lock ×3, no surprise or Blindness nearby, wider Crits |
+| Alembic | Glands | **Transmute:** Toxin/Corrode riders apply Poisoned *and* Exposed; healing +Gumption | **Panacea:** once per combat, heal the whole party and end their conditions |
+| Siren | Mind | **Siren Song:** a Quick mass Taunt; Taunted enemies −2 TN against you | **Crown of Will:** once per combat, a non-Boss fights for you |
 
----
+## Building With Trees
+Your Form decides your trees, but which nodes you take decides your role.
 
-## HIDE
-*Bio: chitin plates, scales, rubbery blubber, bark-skin. Chrome: dermal plating, kinetic mesh, ablative shell.*  
-**Unlocks:** Pulse, Quake, Shell.
-
-- **Root — Plating.** +1 Armor (**+2 from Rank 3**). Armor from all sources maxes at 4.
-- **Thick.** +2 Max HP per level (count past levels too).
-- **Barbs.** When an enemy's melee attack damages you, it takes **2 × Rank** damage.
-- **Adaptive.** When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old.
-- **Bulwark.** *Reaction:* when an ally within 10 ft is targeted by a Single attack, you become the target instead and roll your own defense. **Push:** roll it with advantage.
-- **Apex — Unbreakable.** Once per round, when you fail a defense roll, **Push** to take half damage and ignore its rider. You can't be knocked Prone or moved against your will.
-
-## LIMBS
-*Bio: claws, mantis blades, tentacles, extra arms, digitigrade legs. Chrome: piston arms, mono-blades, grapple lines, servo-arms, hydraulic legs.*  
-**Unlocks:** Wave, Snare.
-
-- **Root — Natural Weapons.** Claws, blades, or pistons: a melee weapon (**d8**, Grit or Moxie) that can't be disarmed and doesn't need a free hand.
-- **Extra Arm.** A third limb. Hold one more item, and draw, stow, or interact without using your Quick action. Once per turn, when you hit with a melee attack, deal **+1 damage die** (one more of that attack's dice); **Push:** also knock the target Prone (not Huge).
-- **Grapnel.** Your melee reach is 10 ft. As your Move, you can pull yourself up to 30 ft to any surface you can see, or yank an unheld object to your hand.
-- **Crusher Grip.** Once per turn when you hit with a natural weapon, the target is **Held**. Huge creatures and Bosses require a **Push**.
-- **Spring Legs.** +10 ft speed. Jump 20 ft long or 10 ft high as part of your move, climb at full speed, and take half falling damage.
-- **Apex — Flurry.** When you take the Attack action with natural weapons, make a second attack with half the damage dice (round up).
-
-## SENSES
-*Bio: compound eyes, pit organs, bat ears, whiskers, a third eye. Chrome: optic suites, targeting HUD, radar, audio filters.*  
-**Unlocks:** Glare, Veil.
-
-- **Root — Keen.** See in darkness out to 60 ft. Advantage on checks to notice hidden things. Bright light can't Blind you.
-- **Target Lock.** *Quick:* mark a creature you can see. Once per turn, your attack against it deals **+1 damage die** (one more of that attack's dice). The mark lasts until combat ends or you mark another.
-- **Threat Sense.** You and your group can't be surprised. *Reaction:* when an ally within 30 ft makes a defense roll, add your Nerve to it (declare before rolling).
-- **Analyzer.** You can **Analyze** as a Quick action once per turn.
-- **Long Sight.** Double the range of your ranged attacks and ranged Surges. Ignore partial cover. Read lips at 300 ft.
-- **Apex — Deadeye.** Your ranged attacks (weapons, Spit, Mind Spike, ranged Surges) Crit on 18–20. Once per round, **Push** to reroll a missed attack.
-
-## GLANDS
-*Bio: venom sacs, acid glands, healing bile, spore pods. Chrome: chem injectors, nanite reservoirs, drug pumps, nozzle ports.*  
-**Unlocks:** Burst, Toxin, Corrode, Mend.
-
-- **Root — Spit.** A ranged natural attack (**d8**, 30 ft, Nerve or Gumption), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.
-- **Regenerate.** At the start of your turn, if you're at half HP or less (and not Down), regain **Rank + 1** HP.
-- **Stim Gland.** *Action* (or *Quick* with **Push**): you or a creature you touch regains **Rank d6 + Gumption** HP and ends Burning or Poisoned. Twice per Breather.
-- **Adrenal Dump.** The first time each combat you drop to half HP or less, gain **2 × Rank + Grit** temporary HP and advantage on your next attack.
-- **Purge.** Once per combat, *Quick:* lose Flux equal to **Rank + 1** and take that much damage (ignores Armor).
-- **Apex — Living Pharmacy.** Stim Gland affects you and every ally within 15 ft at once. Your Mend Surges cost no Flux.
-
-## WIRING
-*Bio: hyper-fast nerves, eel-organs, adrenal crystals. Chrome: reflex boosters, synthetic muscle, capacitor banks, plasma coils.*  
-**Unlocks:** Shock, Blaze, Haste.
-
-- **Root — Quickened.** +10 ft speed. You can **Dash** as a Quick action. Your group has advantage on initiative checks.
-- **Reflex Spike.** *Reaction,* **Push:** when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker with half the damage dice (round up).
-- **Capacitor.** Once per turn when you hit with a melee attack, deal **+1 damage die** (one more of that attack's dice) as Shock. **Push:** the target is also Dazed.
-- **Slipstream.** You never provoke Opportunity Strikes, can move through enemies' spaces, and take **no** damage when you succeed on a Dodge against an area attack.
-- **Overclock.** Once per Breather, take one extra Action on your turn, then gain 1 Flux.
-- **Apex — Blur.** You get two Moves each turn. If you've moved 20+ ft this turn, roll your first Dodge each round with advantage until your next turn.
-
-## MIND
-*Bio: swollen cortex, psionic nodules, pheromone glands, a voice that echoes. Chrome: neural coprocessor, wetware deck, voice modulator, antenna crown.*  
-**Unlocks:** Dread, Link.
-
-- **Root — Uplink.** Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. **Mind Spike:** a ranged attack (**d8**, 60 ft, Nerve or Chutzpah), Psychic damage.
-- **Intrude.** *Action:* Gumption or Chutzpah + Rank vs a creature's TN (or a device's DC): read its surface thoughts, or seize an unattended device for 1 minute. In combat, a Mook machine obeys you until the end of next round; any other machine is Dazed.
-- **Puppet.** *Action,* **Push:** Chutzpah + Rank vs the TN of a non-Boss creature. On success, it immediately moves up to its speed where you choose, or makes one attack against a target you choose: an enemy target simply takes the attack's Damage (no roll, no rider); a player target defends normally.
-- **Iron Will.** Advantage on Resist, and you can't be Shaken. Allies within 30 ft get +1 to Resist.
-- **Precog.** *Reaction,* **Push:** when you or an ally within 30 ft is about to make a d20 roll (declare before rolling), they roll it with advantage.
-- **Apex — Hive Mind.** Prime one extra Surge at the start of each combat. Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll.
-
----
-
-## Building With Trees: Sample Archetypes
-
-| Archetype | Trees | Plays like |
+| Form | Leans toward… | …or toward |
 |---|---|---|
-| **Brick** | Hide + Limbs | Stands in the doorway, holds enemies, hits back |
-| **Stalker** | Limbs + Wiring | Darts in, Dazes, darts out |
-| **Spotter** | Senses + Mind | Long-range damage, marks targets, protects minds |
-| **Doc** | Glands + Mind | Heals, poisons, and talks everyone down |
-| **Sparkplug** | Wiring + Glands | Burns and shocks crowds with Bursts |
-| **Mouth** | Mind + Hide | Taunts everything, then survives it |
+| **Juggernaut** | Doorway-holder: Plating, Menace, Living Wall, Bulwark | Brawler: Limbs Crusher Grip, Rend, Flurry |
+| **Skitter** | Duelist: Capacitor, Reflex Spike, Kinetic Battery | Runner and skirmisher: Slipstream, Arc Jump, Spring Legs, Pounce |
+| **Oracle** | Sniper: Target Lock, Long Sight, Deadeye | Spotter: Analyzer, Weak Spot, Spotter, Precog |
+| **Alembic** | Medic: Stim Gland, Antibodies, Living Pharmacy | Poisoner: Spit, Catalyst, Spore Cloud, Burst Surges |
+| **Siren** | Commander: Commanding Voice, Hive Mind, Haste Surges | Controller: Puppet, Psychic Scream, Snare Waves |
