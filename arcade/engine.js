@@ -28,7 +28,8 @@ const sgn = n => (n >= 0 ? "+" + n : "\u2212" + Math.abs(n));
 const clone = o => JSON.parse(JSON.stringify(o));
 
 /* ------------------------------------------------------------------ tables */
-const DIFFS = { easy: { name: "Easy", size: 5 }, medium: { name: "Medium", size: 4 }, hard: { name: "Hard", size: 3 } };
+// Difficulty = party size (the request) plus a threat factor on top of the book's budgets (calibrated by tools/arcade_test.js).
+const DIFFS = { easy: { name: "Easy", size: 5, threat: 1.25 }, medium: { name: "Medium", size: 4, threat: 1.5 }, hard: { name: "Hard", size: 3, threat: 1.7 } };
 const HARD_BUDGET = { 1: 1, 2: 1.75, 3: 2.75, 4: 4, 5: 5.5, 6: 7 };          // ch 10 §5
 const UNITS_MR = { "-3": 1 / 3, "-2": 0.5, "-1": 0.75, "0": 1, "1": 1.5, "2": 2, "3": 3 };
 const Q = { s: 0.30, m: 0.45, l: 0.65 };                                     // chance another freelancer is caught (party of 4)
@@ -97,7 +98,7 @@ function newRun(opts) {
   const diff = DIFFS[opts.difficulty] ? opts.difficulty : "medium";
   const chars = opts.characters.map(c => RULES.normalize(c));
   const run = { v: 1, app: "mutagen-arcade", rules: D.version, engine: VERSION, id: "run" + Date.now().toString(36), seed: opts.seed != null ? opts.seed : Math.floor(Math.random() * 1e9),
-    difficulty: diff, size: chars.length, hardcore: !!opts.hardcore, partyName: opts.partyName || "The Freelancers", level: 1, step: "minion",
+    difficulty: diff, threat: opts.threat != null ? opts.threat : DIFFS[diff].threat, size: chars.length, hardcore: !!opts.hardcore, partyName: opts.partyName || "The Freelancers", level: 1, step: "minion",
     pcs: chars.map((s, i) => newRunPC(s, i)), enc: {}, stats: { fights: 0, wins: 0, losses: 0, retries: 0, rounds: 0, downs: 0, deaths: 0, overloads: 0, kills: 0, startedAt: Date.now(), endedAt: null },
     history: [], snapshot: null, startLevel: chars[0] ? chars[0].level : 1 };
   run.level = run.startLevel;
@@ -118,7 +119,7 @@ function ensureEncounters(run) {
   const L = run.level; if (run.enc[L]) return run.enc[L];
   const save = _seed, saveRs = _rs; setSeed((run.seed + L * 7919) >>> 0);
   const P = run.pcs.filter(p => !p.dead).length || run.size;
-  const m = buildMinions(L, P, 1), boss = bossFor(L);
+  const m = buildMinions(L, P, run.threat || 1), boss = bossFor(L);
   if (save === null) _seed = null; else { _seed = save; _rs = saveRs; }
   run.enc[L] = { minion: m.names, units: m.units, budget: m.budget, boss };
   return run.enc[L];
@@ -317,7 +318,7 @@ class Fight {
     const enc = ensureEncounters(run);
     this.foes = [];
     if (kind === "boss") {
-      const sc = { hp: P / 4, dmg: P / 4, centre: true };
+      const th = run.threat || 1, sc = { hp: P / 4 * th, dmg: P / 4 * (1 + (th - 1) / 2), centre: true };
       const f = makeFoe(BY[enc.boss], 0, sc); f.centre = true;
       f.attacks.forEach(a => { if (a.tmpl) a.tmpl = scaledSummon(a.tmpl, sc); });
       this.foes.push(f); this.title = (f.boss ? "Boss: " : "Centrepiece: ") + f.name;
