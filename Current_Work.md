@@ -369,7 +369,7 @@ Owner request: "make the battle simulator a little bit more RPG like. Have a vir
 | Dash | Adds your speed again this turn (Afterimage also Veiled). Pounce needs 3+ squares moved. |
 | Careful move | Each square costs 2; no Opportunity Strikes. |
 | Opportunity Strike | Enemy: once per round per enemy, when a freelancer leaves its reach. Freelancer: uses the Reaction when an enemy leaves reach (Lash Tail also on entering, and knocks Prone). Slipstream: no OS, can pass through enemies. |
-| Weapons | Melee reach 1 (Reach weapons/Grapnel 2). Ranged: listed range, up to 2× at disadvantage; disadvantage when an enemy is adjacent. A ranged enemy attacking from adjacency gives the defender advantage. |
+| Weapons | Melee reach 1 square, or the weapon's listed reach; Grapnel adds 1. Ranged: listed range, up to 2× at disadvantage; disadvantage when an enemy is adjacent. A ranged enemy attacking from adjacency gives the defender advantage. |
 | Actions | Help 6 sq (30 ft); Patch, Stim Gland, Antibodies 1 (touch); Analyze, Taunt, Menace, Crown, Puppet, Intrude 12 (60 ft); Target Lock 24; Rally 12. |
 | Surge shapes | Strike reach 1 (Grapnel 2, Reach twist 3). Bolt 12 (×2 with Reach, ×2 with Long Sight). Burst: range 12, radius 2 (Reach: radius 4). Wave: cone 3 or line 6 (Reach: 6 / 12). Pulse: radius 2 around you (Reach: 4). Infuse: ally within 6 (Reach: 12). |
 | Wild Surges | Wild 2: radius-2 burst on yourself (not you). Wild 3: range 12. Wild 8: teleport. Wild 10: pulse radius 4. |
