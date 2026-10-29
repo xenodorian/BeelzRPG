@@ -60,7 +60,7 @@ T runs 1–10. It sets the numbers; the ratings tell you who it's for.
 | **Brute** | −1 | ×2 | ×1½ | 1; usually Huge | T − 2 | T + 3 |
 | **Elite** | ±0 | ×2 | ×1 | 2 attacks | T − 2 | T + 3 |
 | **Heavy** (a Brute with the Heavy package, §4) | −1 | ×2 | ×1½ Area | 1 | T + 1 | T + 2 |
-| **Boss** | +1 | ×1 **per freelancer** | ×1 for 4 freelancers (×¼ per freelancer) | 1 + one **Interrupt** (an action right after any player's turn, once per round); ends one condition on itself each Enemy Phase; **Shift** at half HP | **T + 1** | T + 4 |
+| **Boss** | +1 | ×1 **per freelancer** | ×1 for 4 freelancers (×¼ per freelancer) | 1 + one **Interrupt** (one action, no Move, right after any player's turn, once per round); ends one condition on itself at the start of its turn each Enemy Phase; **Shift** at half HP | **T + 1** | T + 4 |
 
 *Typical ratings are measured at T2, T5 and T8 with no Traits (`tools/sim_results/09_builder_traits.md`). A Soldier's MR is its T: that's what the table is calibrated on.*
 
@@ -72,13 +72,13 @@ Pick 1–3. **ΔBR / ΔMR** is how much each Trait moves the ratings (measured; 
 | Trait | Effect | ΔBR | ΔMR |
 |---|---|---|---|
 | **Pack** | +1 TN and +Bonus damage for each earlier attack by a Pack ally on the same target this round (max +3 TN / +3 Bonus) | 0 | **+1** |
-| **Flanker** | Attacks with advantage (the target defends with disadvantage) while another Flanker is fighting | 0 | **+1** |
+| **Flanker** | Attacks with advantage (the target defends with disadvantage) while another Flanker is fighting (on a grid: while another Flanker is adjacent to the same target) | 0 | **+1** |
 | **Overwhelm** | When a freelancer is attacked by a third Overwhelm creature in one round, they are Prone and Held | 0 | +½ |
-| **Crowd** | +Bonus ÷ 2 damage per other enemy fighting (max ×3) | 0 | +½ |
+| **Crowd** | +Bonus ÷ 2 damage per other enemy fighting (on a grid: within 10 ft of the target) (max ×3) | 0 | +½ |
 | **Linked** | Damage to one Linked creature is split evenly among all Linked creatures alive | 0 | +½ |
 | **Frenzy** | +Bonus damage per ally killed this fight (max +3 Bonus) | 0 | +½ |
 | **Leader** | Other enemies deal +Bonus damage | 0 | +½ |
-| **Mender** | Instead of attacking, heals the most-hurt non-Mook ally below 60% HP for ¼ of the T row's HP | 0 | 0 |
+| **Mender** | Instead of attacking, heals the most-hurt non-Mook ally within 30 ft below 60% HP for ¼ of the T row's HP | 0 | 0 |
 | **Shield Wall** | +1 Guard per other Shield Wall ally fighting (max +2, Mooks +3) | 0 | 0 |
 | **Explosive** | When it dies, everything within 10 ft takes ½ its Damage (**Area**, Endure) | 0 | +½ |
 
@@ -90,13 +90,13 @@ Pick 1–3. **ΔBR / ΔMR** is how much each Trait moves the ratings (measured; 
 | **Engulf +X** | The Area attack deals +X (2 × Bonus) to everyone caught for each freelancer caught beyond the first (max +2X) | (in Heavy) | (in Heavy) |
 | **Friendly fire** | The Area attack also hits its allies in the area | (in Heavy) | (in Heavy) |
 | **Apex** | While it is the only enemy standing: +2 TN and ×1½ Damage (Engulf is added after) | **+1½** | +½ |
-| **Bulky** | Before using an Area attack, roll a d6 for each non-Mook ally fighting; on any 1–3 it uses its Single attack instead | 0 | **−4** |
+| **Bulky** | Won't catch its friends: before using an Area attack, roll a d6 for each non-Mook ally fighting; on any 1–3 it uses its Single attack instead. On a grid, skip the dice: it uses its Single attack whenever its Area would catch a non-Mook ally | 0 | **−4** |
 | **Interference** | Only one Interference creature can use an Area attack each Enemy Phase | 0 | 0 to −½ |
-| **Territorial** | While a rival of its kind lives, on d6 1–4 it attacks the rival instead | 0 | about −1 |
+| **Territorial** | While a rival of its kind is within 15 ft, on d6 1–4 it attacks the rival instead | 0 | about −1 |
 
 **Every Heavy needs at least one horde penalty** (Bulky, Interference or Territorial). Without one, four Heavies are a massacre (MR +4).
 
-**Who's caught by an Area?** Whoever is inside it. The sims assume a party of 4 that isn't trying to bunch up or spread out: a 10-ft area catches the target and about 1 in 3 of the others, 20 ft about 1 in 2, 30 ft about 2 in 3, and each freelancer beyond four adds ~8% to those odds. If your table fights shoulder to shoulder in corridors, Heavies hit harder than their rating; tell players that spreading out is the counter.
+**Who's caught by an Area?** Whoever is inside it. The ratings assume a party of 4 that isn't trying to bunch up or spread out: a 10-ft area catches the target and about 1 in 3 of the others, 20 ft about 1 in 2, 30 ft about 2 in 3, and each freelancer beyond four adds ~8% to those odds. On a battle map Heavies catch more (about 3¼ of 4 freelancers per Area in the arcade's grid fights, even with the party spreading out), so **on a grid a Heavy costs ×1¼ units** (§5). If your table fights shoulder to shoulder in corridors, Heavies hit harder than their rating; tell players that spreading out is the counter.
 
 **Solo and utility Traits:**
 
@@ -112,8 +112,8 @@ Pick 1–3. **ΔBR / ΔMR** is how much each Trait moves the ratings (measured; 
 | **Regenerating X** | Regains X HP (T row HP ÷ 10) at the start of each Enemy Phase unless it took Blaze or Corrode damage since its last one | 0 | 0 |
 | **Damage Gate** | The first time it would drop below half HP it stops at half (extra damage is lost) and Shifts | — | — |
 | **Cowardly** | At half HP or less, it surrenders on a d6 roll of 4–6 at the start of each Enemy Phase | −½ | 0 |
-| **Mutagenic X** | When it damages a player, they gain X Flux | 0 | 0 |
-| **Purger** | Ostrander antimutagen. When it damages a player, they lose one Primed Surge of their choice | 0 | 0 |
+| **Mutagenic X** | When a player fails their defense against its attack, they gain X Flux | 0 | 0 |
+| **Purger** | Ostrander antimutagen. When a player fails their defense against its attack, they lose one Primed Surge of their choice | 0 | 0 |
 | **Damper Field** | While it lives, every Unleash costs +1 Flux | 0 | 0 |
 | **Rider** (Grabby: Held · Venomous: Poisoned · Corrosive: Exposed · Shocking: Dazed · Fiery: Burning, its Rank = T ÷ 2 round up · Terrifying: uses Resist, Shaken · Blinding: Blinded) | Applies when a player fails the defense roll. Chrome freelancers defend against Shock with disadvantage, as always | 0 | 0 |
 | **Resistant / Vulnerable (type)** | Half / double damage from one damage type | 0 | 0 |
@@ -149,9 +149,10 @@ Pick 1–3. **ΔBR / ΔMR** is how much each Trait moves the ratings (measured; 
 
 Value at most **one** creature per encounter by BR (the centrepiece); everything else uses MR. A centrepiece Boss already scaled for the party (§6) is worth the whole Hard budget.
 
-**4. Check the stage.** Freelancers double in power at each Evolution, so ratings don't carry across one:
+**4. Check the stage and the map.** Freelancers double in power at each Evolution, so ratings don't carry across one:
 - A creature rated in the party's **next** stage (e.g. MR 4 against level 3) counts **double** its units. Avoid more than one.
 - A creature rated in the party's **previous** stage (e.g. MR 3 against level 4) counts as **one step lower** than the table says.
+- **Playing on a grid?** Count each **Heavy** at **×1¼** its units. Everything else costs the same on a map as off it (the evidence is in §7).
 
 **Worked example.** Four level-5 freelancers, Hard fight, budget 4: a Glasshide as the centrepiece (BR 5 → 4 units) is the whole fight. Or a Bloom Knight (MR 5 → 1) + two Stitchwork Brood (MR 6 → 1½ each) = 4. For a Standard fight (3 units), take 3 Cleaner Hounds (MR 5 → 1 each).
 
@@ -165,7 +166,7 @@ Use the budget table above, plus three adjustments the sims found:
 - **From Evolution II, lone big targets melt.** Four L7 freelancers can deal 150+ damage a round. Elites and Bosses rated for them already account for that, but anything rated in the previous stage dies before it acts. Use the stage rule above.
 - **Heavies want room; Packs want company.** Put a Heavy in an open hall with the party bunched at a chokepoint and it lives up to its BR. Put four Rats on one freelancer and they live up to their MR.
 - **Final Form** (level 10) turns one fight per Lockdown into a rout. The ratings assume it's off. Save the finale's real threat for the Boss's Shift.
-- **On a battle map,** Areas catch more freelancers than the ratings assume unless the party spreads out (the ratings model a party that neither clumps nor spreads on purpose). The [arcade](../arcade/index.html), which plays every fight on a grid, needed about 20% less enemy strength than off-map to hit the same win rates. If your table uses a grid, start Heavies one step lower or remind players to spread out. See [Playing on a Grid](06_Combat.md#optional-playing-on-a-grid).
+- **On a battle map** the budgets hold, except for Heavies. Book-budget Hard fights played on a grid in the arcade engine (1,200 fights for a party of 4, all levels, `tools/grid_budget.js`) stayed fair: 94% won, someone Down in 31%, a death in 4%, 4 rounds. Fights with a Heavy ran hot: a death in 7% and someone Down in 39%, because a Heavy's Area caught 3¼ of 4 freelancers on average against the 2½–3 the ratings assume. With Heavy fights cut to ×0.8 they matched the rest (death 2%, Down 30%), hence the **×1¼ units for Heavies on a grid** in §5. See [Positioning](06_Combat.md#positioning-theatre-of-the-mind-or-grid). (The arcade's own difficulty factors are a video-game setting, not a tabletop rule: see the [Arcade vs Tabletop appendix](14_Arcade_vs_Tabletop.md).)
 - Terrain, objectives ("hold the pump for 3 rounds"), and fleeing enemies matter more than numbers. Use them.
 
 ## Writing a Stat Block

@@ -34,6 +34,7 @@
 | 11 | [Starter Mission: *Pumpstation 9*](chapters/11_Starter_Mission.md) |
 | 12 | [Quick Reference](chapters/12_Quick_Reference.md) |
 | 13 | [Character Building Guide](chapters/13_Character_Building_Guide.md) |
+| 14 | [Appendix: Arcade vs Tabletop](chapters/14_Arcade_vs_Tabletop.md) |
 | — | [Character Sheet (Markdown)](sheets/Character_Sheet.md) · [Printable HTML](sheets/Character_Sheet.html) |
 | — | **[Character Builder (web app)](https://xenodorian.github.io/BeelzRPG/builder/)** · [offline file](builder/index.html) |
 | — | **[Arcade: Gauntlet mode (web game)](https://xenodorian.github.io/BeelzRPG/arcade/)** · [offline file](arcade/index.html) · [how it works](#arcade-gauntlet-mode) |

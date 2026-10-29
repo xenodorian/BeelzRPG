@@ -376,8 +376,8 @@ Owner request: "make the battle simulator a little bit more RPG like. Have a vir
 | Surge shapes | Strike reach 1 (Grapnel 2, Reach twist 3). Bolt 12 (×2 with Reach, ×2 with Long Sight). Burst: range 12, radius 2 (Reach: radius 4). Wave: cone 3 or line 6 (Reach: 6 / 12). Pulse: radius 2 around you (Reach: 4). Infuse: ally within 6 (Reach: 12). |
 | Wild Surges | Wild 2: radius-2 burst on yourself (not you). Wild 3: range 12. Wild 8: teleport. Wild 10: pulse radius 4. |
 | Nodes | Siren Song 6; Scream radius 6; Panacea 6; Living Pharmacy 3; Spotter 12; Spore Cloud 3; Bulwark / Fortress (half) 2; Fortress intercept 6; Living Wall 1; Threat Sense / Precog 6; Omen 12; Hardening / Heat Vent / explode 2; Chain jumps 3 from the first target; Phase Step teleports up to 12. |
-| Items | Grenades etc.: radius-2 burst within 6. Launcher: radius-2 burst within 12. |
-| Enemy areas | "N ft around" = radius N÷5 around the creature; "N-ft burst" = radius N÷10 at its range; "N-ft cone" = cone N÷5; unlabelled small/medium/large = radius 2/4/6. |
+| Items | Grenades etc.: radius-2 burst within 6. Launcher: radius-2 burst within 18 (90 ft), no long range. |
+| Enemy areas | "N ft around" = radius N÷5 around the creature; "N-ft burst" = radius N÷5 at its range; "N-ft cone" = cone N÷5; unlabelled small/medium/large = radius 2/4/6. |
 | Who an area hits | Freelancer Burst/Wave: every enemy in the footprint; allies inside roll Dodge (success = half). Pulse and Scream: enemies only. Enemy areas with friendly fire hit their allies too; Bulky enemies won't fire if a non-mook ally would be caught. |
 
 ### Enemy AI on the grid
@@ -442,6 +442,73 @@ Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13�
 - **Size:** about 1.8 MB (art about 1 MB).
 - **Test:** `CHROME=/path/to/chrome node tools/single_test.js` (27 checks, puppeteer-core, network blocked). Covers all chapters and images, TOC, cross-links, search, builder save → arcade sees it, a full auto-played arcade run to victory inside the file, embedded art, sheet, share link, phone layout, no console errors.
 
+## Rules Audit 2026-10-29 (owner request: text vs battle simulator)
+Owner request: "Review the rules of the text against the battle simulator you've built and updated incrementally, and update the ttrpg system rules to match any changes you've made to the mechanics since then. Then, compile all the individual rules … into a single coherent document."
+
+**Method.** Every mechanic in `arcade/engine.js` + `arcade/grid.js` (the grid simulator) and in `tools/encounter_sim.py` / `tools/balance_sim.py` (the off-map rating sims) was read against chapters 1–13. Each difference got one of three verdicts:
+- **(a) Rule:** a real mechanic or clarification the simulator needed; it is now the tabletop rule (chapters, Quick Reference, sheet, builder data updated).
+- **(b) Arcade-only:** a video-game convenience, difficulty knob or modelling abstraction. Not a rule; listed in the new appendix [ch 14 Arcade vs Tabletop](chapters/14_Arcade_vs_Tabletop.md).
+- **(c) Sim bug:** the text was right and the simulator was wrong; the simulator was fixed (with a regression test).
+
+**Big decision: the grid is now an equal option.** Ch 6's "Optional: Playing on a Grid" is replaced by **Positioning: Theatre of the Mind or Grid** (a distance table for both, ranges, Areas, grid specifics), and Opportunity Strikes got their own section.
+
+| # | Mechanic | Text said | Simulator did | Verdict | Resolution |
+|---|---|---|---|---|---|
+| 1 | Grid status | "Optional" sidebar | Every arcade fight is on a grid | (a) | Ch 6 *Positioning*: theatre of the mind **or** grid, equal; ch 1, 0, 12 updated |
+| 2 | Opportunity Strike limit | Enemies get one whenever you leave reach | One per enemy per round; Dazed enemies can't | (a) | Ch 6 *Opportunity Strikes*: one per round per creature (freelancers: their Reaction); Dazed can't |
+| 3 | Freelancer OS weapon | "one weapon attack" | Best **melee** weapon | (a) | "one melee weapon attack" |
+| 4 | Move carefully | Grid-only optional rule | Always available (half speed, no OS) | (a) | Core rule in both modes |
+| 5 | Teleports / pushes / Slipstream | Silent | Never provoke | (a) | Stated in ch 6 |
+| 6 | Ranges of actions | Help/Analyze/Taunt/Rally had none ("can hear you") | Help 30 ft, Analyze/Taunt 60 ft in sight, Rally 60 ft, Grapple/Shove in reach | (a) | Ch 6 action table + QR |
+| 7 | Long range | "double the listed range with disadvantage" | Not for Area weapons (Launcher), grenades, Surges | (a) | Ch 6 *Ranges*, ch 8 |
+| 8 | Shooting next to an enemy | Players only: disadvantage | Also enemies: a shooter with a freelancer adjacent → target defends with advantage | (a) | Ch 6 *Ranges* |
+| 9 | Line of sight | Implicit | Needed for ranged attacks, Analyze, Taunt, Target Lock, Area centres; creatures don't block | (a) | Ch 6 *Ranges* and *On a Grid* |
+| 10 | Area footprints | Burst radius, cone, line only in the grid sidebar | Burst N ft = square of N÷5 around a point; cone = quarter-circle N÷5 deep; line 1 wide; walls cut Areas | (a) | Ch 6 *Areas (both ways)*, ch 4 cross-ref |
+| 11 | Allies in your Area | Ch 4: Burst/Wave hit allies (Dodge for half) | Same; Pulse/Scream hit only chosen | (a) clarify | Ch 6 *Areas*; ch 4 adds "a Pulse hits only who you choose" |
+| 12 | Area catch odds (theatre of mind) | Only in ch 10 | Off-map sim: 30/45/65% per other freelancer | (a) | Guidance copied to ch 6 *Areas*; ch 10 keeps it |
+| 13 | Boss sheds a condition | "at the end of every Enemy Phase" (but every enemy condition ends then anyway, so it did nothing) | Both sims: at the **start** of the Boss's turn | (a) fix | Ch 6 Conditions, ch 6 Round, ch 10 Role table, QR |
+| 14 | Burning | Damage at start of turn; "spend Move to douse" (meaningless: it ends after one turn anyway) | Burns once at the start of its next turn, then ends | (a) clarify | Ch 6 table + QR; Mend/Stim Gland put it out first |
+| 15 | Shaken / Blinded enemies | Attack with disadvantage | Their targets defend with advantage | (a) clarify | Ch 6 table (player-facing wording) |
+| 16 | Dazed | No Reaction | So no Opportunity Strikes | (a) clarify | Ch 6 table |
+| 17 | Enemy turn order | "declares them all" | Enemies resolve one at a time; start-of-turn effects first (Burning, Regenerating, Boss shed) | (a) clarify | Ch 6 *The Round* |
+| 18 | Boss Interrupt | "an action right after any player's turn" | One action with **no Move** | (a) | Ch 6, ch 10 Role table, QR |
+| 19 | Wait | "Players take turns in any order" | Explicit Wait (go later if you haven't acted) | (a) | Ch 6 *The Round*, QR |
+| 20 | Everyone Down | Silent | Fight lost | (a) | Ch 6 *Going Down*: the fight is lost; GM decides capture etc. |
+| 21 | Knit after a fight | "end of each combat" | Only for standing freelancers | (c) | Engine: Knit also stands a Down Bio freelancer up (any healing does, ch 6). Test added |
+| 22 | Mutagenic / Purger | "When it damages a player" | Both sims: only on a **failed** defense (not the half damage of a successful Area defense) | (a) | Ch 5, ch 10 Traits, QR: "fails their defense against its attack". Ratings were measured this way |
+| 23 | Sticky Relay (Fault) | "highest slot always Wild, even if a Surge is written there" | Builder/arcade: one fewer slot, so one fewer Surge known; arcade drops the extra Surge (the earlier "surge cap fix") | (a) | Ch 5 table + builder text: "you know one Surge fewer" |
+| 24 | Flanker | "while another Flanker is fighting" | Grid: another Flanker adjacent to the same target | (a) grid variant | Ch 10 Traits |
+| 25 | Crowd | "per other enemy fighting" | Grid: per other enemy within 10 ft of the target | (a) grid variant | Ch 10 Traits |
+| 26 | Bulky | d6 per non-Mook ally | Grid: won't fire if its Area would catch a non-Mook ally | (a) grid variant | Ch 10 Traits (both ways) |
+| 27 | Territorial / Mender | No range | Rival within 15 ft / heals within 30 ft | (a) grid variant | Ch 10 Traits |
+| 28 | Threat ratings vs grid | Ch 10 §7: "arcade needed ~20% less enemy strength… start Heavies one step lower" | New `tools/grid_budget.js` (book Hard budget, no arcade factors, fully rested, LG/Emergence/FF off): party of 4, 1,200 fights: win 94%, Down 31%, death 4%, 3.9 rounds = fair. Heavy fights: death 7%, Down 39%, Areas catch 3.25 of 4. At ×0.8: Heavy fights death 2%, Down 30% | (a) | **Ratings unchanged. On a grid, Heavies cost ×1¼ units** (ch 10 §4 step 4, §7, QR). The 20% was the arcade's own difficulty factors (a 20-fight run with no rests between levels), not the book's budget |
+| 29 | Emergence | Enemies within 30 ft that can see you are Shaken | Arcade Shook every non-Boss on the map | (c) | Engine fixed (30 ft + line of sight); test |
+| 30 | Hardening (Wild 4) | "Your speed is 0 until your next turn" | Not applied | (c) | Engine fixed |
+| 31 | Linger | Enemy that **enters** or starts its turn there | Only "starts its turn" | (c) | Engine: entering also triggers (once per area per enemy per round); test |
+| 32 | EMP grenade | Chrome freelancers inside defend with disadvantage | Not applied | (c) | Engine fixed |
+| 33 | Quickened | Dash as a Quick action | Missing | (c) | Engine: "Dash (Quickened: Quick)"; test |
+| 34 | Ward Militia | Brace as a Quick action once per combat | Missing | (c) | Engine fixed |
+| 35 | Blur | Two Moves; Dodge advantage only if you moved 20+ ft | Advantage always, one Move | (c) | Engine fixed |
+| 36 | Initiative | Ambush / first-strike branches | Always the Moxie group check | (b) | Appendix |
+| 37 | Haste | Move + Action | Action only (no Move) | (b) | Appendix |
+| 38 | Mitosis | Move + attack; you Dodge for it | Attacks at end of turn; 35% of attacks go for it | (b) | Appendix |
+| 39 | Scars/injury timing | Immediate | From the next fight | (b) | Appendix |
+| 40 | Reactions, Last Gasp, Splice table, Bloom Lore, Hive Mind, Puppet, Echo, Perfect Expression | Player choices | Automatic | (b) | Appendix |
+| 41 | Juice reroll | Allowed | Not offered (dice resolve at once) | (b) | Appendix |
+| 42 | Enemy stats | Hidden until Analyze | Visible | (b) | Appendix |
+| 43 | Difficulty factors, Mercy, GRAFT recovery, fixed level rhythm, centrepiece "bosses" | — | Arcade settings | (b) | Appendix |
+| 44 | Enemy AI tendencies | "Elites and Bosses should feel smart" | Areas maximise freelancers caught; melee flank; ranged keep out of reach; Dash when nothing in reach; Bosses/Hunters lowest HP half the time; stalemate breaker | (a) as GM guidance | Ch 9 *Default tactics* (guidance, not a rule) |
+| 45 | Off-map sim abstractions | — | Area catch chance Q, 15%/10% friction (the "wasted enemy actions"), Held melee loses half its actions, Fortress 50% | (b) | Appendix *Simulators*; the v2 arcade has no friction (real movement instead) |
+| 46 | Not modelled in the arcade | Cover, difficult terrain, elevation, Shaken approach limit, Swarm sharing squares, Adaptive, Arc Jump, Wall Run, Many Hands' 2nd grab, Extra Arm Push, Spore Cloud "from outside" | — | (b) | Appendix |
+
+Checked and **consistent** (no change): Rank/attack/defense maths, crits (nat 20 dice twice; nat 20 defense → Exposed), Area hit/miss/half, Armor min 1, Poisoned half damage, Exposed −2, Prone adv/dis, Held speed 0, Down (Endure DC 10 at end of Enemy Phase, nat 20 up, damage while Down = mark, 2 vs a Boss on a failed defense, 3 = dead), Injury table, Last Gasp (skip damage, stay at 1), Overload (Rank d6, can't drop below 1, skipped when Down), Priming (doubles Amped, Wild separate, Misfire free Churn), Churn lock, Primed maximum, Signatures once per round, missed Strike/Bolt stays Primed, Chain 15 ft, Final Form, Pack, Overwhelm, Linked, Frenzy, Leader, Shield Wall, Explosive (10 ft Endure), Heavy recharge, Engulf (+X per extra freelancer, max 2X), Apex, Interference, Shielded, Swarm, Regenerating, Damage Gate, Cowardly, Damper Field, Boss party scaling (HP ×P, Damage ×P/4, summons too), the encounter budget and unit tables, rests (Breather half HP + Knit, Flux 0, marks cleared; Lockdown full), Bulwark/Living Wall/Fortress/Threat Sense/Omen ranges.
+
+Stale doc fixed: the *Arcade v2* grid table said an enemy "N-ft burst" has radius N÷10 and the Launcher reaches 60 ft; the engine uses radius N÷5 (as ch 6 says) and 90 ft (18 squares).
+
+**Tests added:** `arcade_test.js` checks Linger-on-enter (and once per round), Quickened's Quick Dash, Emergence range, Knit standing a Down freelancer up, plus the stalemate breaker. `tools/grid_budget.js` writes `tools/sim_results/13_grid_budget_p{3,4,5}.md` and `13_grid_budget_p4_x0.8.md`.
+
+**Creatures that ran hot on the grid** (party of 4, book budget; small samples, the off-map ratings stay authoritative): Ostrander Paladin (as an L6/8 centrepiece: 58% won), The Drowned Choir (65%, death 30%), Hunter-Killer Unit (80%), Drain Beast (death 14%). Logged as Open Question 24.
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -498,7 +565,9 @@ Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13�
 | `tools/build_single.py` | Builds the single-file edition `dist/Mutagen.html` (+ root copy `Mutagen.html`) | Re-run after any chapter/builder/arcade/art change |
 | `tools/single_test.js` | Offline headless-Chrome test of `dist/Mutagen.html` (27 checks) | `CHROME=… node tools/single_test.js` |
 | `Mutagen.html`, `dist/Mutagen.html` | **Generated** single-file edition: rules, builder, arcade, sheet | Don't edit by hand |
-| `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling | Raw results of the enemy calibration |
+| `tools/grid_budget.js` | Grid check of the ch 10 budgets: fresh party vs the book's Hard budget on the arcade map (no arcade difficulty factors) | `node tools/grid_budget.js [N=60] [party=4] [threat=1] [seed=7000]` → `tools/sim_results/13_grid_budget_*.md` |
+| `chapters/14_Arcade_vs_Tabletop.md` | Appendix: what the arcade does differently from the book | Update when the engine gains a convenience or knob |
+| `tools/sim_results/` | 00 expectations, 01 table, 02 before + pass 1, 03 pass 2, 04 final ratings (md/csv/json), 05/05b step value, 06 difficulty, 07/07b mixed validation, 08 party budget, 09/09b trait deltas, 10 seed-2 repeat, 11 starter mission, 12 boss scaling, 13 grid budget | Raw results of the enemy calibration |
 
 ## Style Guide
 - **Format:** GitHub-flavoured Markdown, one chapter per file, numeric prefixes (`NN_Name.md`). Images via relative paths (`../art/x.jpg`).
@@ -902,6 +971,8 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 21. **Area positioning is the biggest assumption.** Heavies' ratings assume a party that neither clumps nor spreads on purpose (catch odds 30/45/65% for 10/20/30 ft). A table that fights in corridors will find Heavies above their BR. *(2026-10-29, arcade v2 evidence: on a real grid the first build of the arcade's auto-player caught 2.6 freelancers per enemy Area and lost far more; even after it learned to spread out, the arcade needed threat ×1.0/1.22/1.38 instead of ×1.25/1.6/1.75 off-map, i.e. positioning makes fights ~20% harder. ch 10 §7 now says so; ratings left unchanged.)*
 22. **Evolution-wall clustering.** Many ratings sit at 6.8–7.0. If a finer scale is wanted between L6 and L7, rate with half-levels (impossible with real characters) or publish fractional ratings.
 23. **Drowned Choir BR** is 7–8 depending on seed (flat danger curve); published as 8.
+24. **Grid outliers** (`tools/sim_results/13_grid_budget_p4.md`, book Hard budget, party of 4): Ostrander Paladin 58% won, Drowned Choir 65% won / 30% deaths, Hunter-Killer Unit 80%, Drain Beast 14% deaths; L10 group fights 67% won, L2 group fights 20% deaths. Small samples (20–60 fights each) and off-map ratings say they're fine, so the ratings stand. If tables report the same, raise those ratings by 1 on a grid.
+25. **Arcade simplifications worth building** (ch 14): Haste's Move, cover and difficult terrain, Juice reroll of a d20, Adaptive, Arc Jump, Wall Run.
 
 ## Hosting (GitHub Pages)
 

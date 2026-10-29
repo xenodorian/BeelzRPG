@@ -29,7 +29,7 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 | **Pulse** | Hide | Any creatures you choose within 10 ft of you | Grit | (Rank+1)**d6** |
 | **Infuse** | base | You or one ally within 30 ft | — (no roll) | Uses an Infuse Effect |
 
-**Area Shapes** (Burst, Wave, Pulse): roll one attack and compare it to each target's Guard. **Hit:** full damage + Effect. **Miss:** half damage, no Effect. Allies in a Burst or Wave are hit too (they roll Dodge against your attack total; success = half damage, no rider).
+**Area Shapes** (Burst, Wave, Pulse): roll one attack and compare it to each target's Guard. **Hit:** full damage + Effect. **Miss:** half damage, no Effect. Allies in a Burst or Wave are hit too (they roll Dodge against your attack total; success = half damage, no rider); a Pulse hits only the creatures you choose. Footprints on a grid (a 10-ft radius is 5×5 squares, a 15-ft cone is 3 squares deep) are in [Combat](06_Combat.md#areas-both-ways).
 
 **Attack stat.** A Surge uses its Shape's attack stat, **or** the stat of the tree that unlocked its Effect, whichever you prefer:
 

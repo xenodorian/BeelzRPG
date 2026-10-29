@@ -31,8 +31,10 @@ HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve (Splice −1) · Speed 
 **Turn:** Move + Action + Quick; 1 Reaction per round.  
 **Actions:** Attack · Unleash · Dash · Brace · Help · Patch · Analyze · Taunt · Rally · Grapple/Shove · Other  
 **Quick:** draw, stim, Churn, Target Lock, talk  
-**Reactions:** Opportunity Strike when an enemy leaves your reach; enemies get one on you if you leave theirs (move at half speed to avoid it).  
-**Grid (optional):** 1 square = 5 ft, diagonals = 1; burst radius 10 ft = 2 squares; reach 1 square.  
+**Reactions:** Opportunity Strike when an enemy leaves your reach (melee weapon attack); each enemy gets one per round on you if you leave its reach (move carefully, at half speed, to avoid it). Dazed: no Reactions.  
+**Ranges:** Help 30 ft · Analyze/Taunt/Rally 60 ft · Patch touch · ranged weapons to 2× range at disadvantage (not Areas/grenades) · enemy adjacent to a shooter = disadvantage.  
+**Positioning:** theatre of the mind (Close 5 ft · Near 30 ft · Far 120 ft · Distant) or grid (1 square = 5 ft, diagonals = 1; 30 ft = 6 squares; 10-ft burst = 5×5 squares; 15-ft cone 3 deep; line 1 wide; walls block sight and Areas).  
+**Wait:** go later in the Player Phase if you haven't acted. **Boss Interrupt:** one action (no Move) after any player's turn, once per round.  
 **Damage:** Rank × weapon die + stat. Armor −X per hit (min 1). Area: miss/successful defense = half.
 
 ## Surges
@@ -66,11 +68,11 @@ HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve (Splice −1) · Speed 
 Gain Flux: Unleash, Churn, Push. Over Limit → **Overload:** take Rank d6 (min 1 HP left), roll d12 Bloom (Bio) / Glitch (Chrome) / both, pick (Splice), Flux → 0. Breather/Lockdown → Flux 0. **Last Gasp:** once per Lockdown, at 0 HP Overload instead and stay at 1 HP.
 
 ## Conditions (until end of affected creature's next turn)
-**Blinded** dis. on attacks, attackers adv. · **Burning** 2×source Rank dmg at turn start; spend Move to end · **Dazed** no Quick/Reaction/Specials; Boss 1 action · **Exposed** −2 Guard / −2 defense · **Held** speed 0 · **Poisoned** half damage dealt · **Prone** melee adv./ranged dis. against; stand = ½ speed · **Shaken** dis. on attacks & checks, can't approach source · **Veiled** adv. on defense & next attack  
+**Blinded** dis. on attacks, attackers adv. · **Burning** 2×source Rank dmg at the start of its next turn, then out · **Dazed** no Quick/Reaction/Specials; Boss 1 action · **Exposed** −2 Guard / −2 defense · **Held** speed 0 · **Poisoned** half damage dealt · **Prone** melee adv./ranged dis. against; stand = ½ speed · **Shaken** dis. on attacks & checks, can't approach source · **Veiled** adv. on defense & next attack  
 *Enemy advantage = player rolls defense with disadvantage.*
 
 ## Down
-0 HP: Prone, crawl 5 ft. End of each Enemy Phase: Endure DC 10, fail = Death mark (nat 20: up at 1 HP). Damage while Down = mark. 3 marks = dead. Any healing = up. Roll Injury (d6).
+0 HP: Prone, crawl 5 ft. End of each Enemy Phase: Endure DC 10, fail = Death mark (nat 20: up at 1 HP). Damage while Down = mark (2 on a failed defense vs a Boss). 3 marks = dead. Any healing = up. Roll Injury (d6). Everyone Down = the fight is lost. Bosses end one condition at the start of their turn.
 
 ## Rest
 **Breather** (1 hr, 2 per Lockdown): regain ½ Max HP (+Knit, which also triggers after each combat), Flux 0, clear Death marks. **Lockdown** (8 hr safe): full reset.
@@ -88,4 +90,4 @@ Gain Flux: Unleash, Churn, Push. Over Limit → **Overload:** take Rank d6 (min 
 **Roles** (Guard / HP / Dmg → typical BR / MR): Mook −1/×¼/×½ → T−5/T−3 · Soldier → T−3/**T** · Skirmisher +1/×¾ → T−3/T · Artillery ×¾/×¾, Area → T−3/T+1 · Controller ×½ + rider → T−4/T−2 · Brute −1/×2/×1½ → T−2/T+3 · Elite ×2, 2 attacks → T−2/T+3 · Heavy (Brute + Area, Engulf, Recharge, a horde penalty) → T+1/T+2 · Boss +1/×1 per PC/×PC÷4, Interrupt, Shift → T+1/T+4.  
 **BR N** = 1 of it is a fair fight for 4 level-N PCs · **MR N** = 4 of it are. **Fair:** win 90%+, someone Down 40–60%, death ≤5%, 3–7 rounds. Group Traits (Pack, Flanker +1 MR; Overwhelm, Crowd, Linked, Frenzy, Leader +½ MR). Horde penalties (Bulky −4 MR, Territorial ≈ −1).  
 **Budget (Hard = fair)** = 1 unit per PC (2 PCs 1¾ · 3: 2¾ · 4: 4 · 5: 5½ · 6: 7). Easy ×½ · Standard ×¾ · Hard ×1 · Deadly ×1¼.  
-**Units** by rating − party level (−3/−2/−1/0/+1/+2/+3): group, by MR: ⅓ ½ ¾ **1** 1½ 2 3 · one centrepiece, by BR: 1½ 2 3 **4** 6 8 11. Next-stage creature ×2; previous-stage creature one step lower. Heavies vs 5+ PCs ×1½.
+**Units** by rating − party level (−3/−2/−1/0/+1/+2/+3): group, by MR: ⅓ ½ ¾ **1** 1½ 2 3 · one centrepiece, by BR: 1½ 2 3 **4** 6 8 11. Next-stage creature ×2; previous-stage creature one step lower. Heavies vs 5+ PCs ×1½; Heavies on a grid ×1¼. Mutagenic/Purger: on a failed defense.

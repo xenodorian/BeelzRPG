@@ -16,7 +16,7 @@ SITE = 'https://xenodorian.github.io/BeelzRPG/'
 CHAPTERS = ['00_Introduction', '01_Core_Rules', '02_Character_Creation', '02A_Forms_and_Evolution', '03_Augment_Trees',
             '03_Trees/Hide', '03_Trees/Limbs', '03_Trees/Senses', '03_Trees/Glands', '03_Trees/Wiring', '03_Trees/Mind',
             '04_Surges', '05_Flux_and_Overload', '06_Combat', '07_Advancement', '08_Gear', '09_Running_the_Game',
-            '10_Threats', '11_Starter_Mission', '12_Quick_Reference', '13_Character_Building_Guide']
+            '10_Threats', '11_Starter_Mission', '12_Quick_Reference', '13_Character_Building_Guide', '14_Arcade_vs_Tabletop']
 key_of = lambda ch: ch.replace('/', '-')
 
 # ------------------------------------------------------------------ art

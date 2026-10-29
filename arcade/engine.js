@@ -462,7 +462,17 @@ class Fight {
     if (!path || path.length < 2) return;
     this.ev({ t: "move", id: e.id, path }); const end = path[path.length - 1];
     this.pcStrikes(e, path);
-    if (!e.dead) e.pos = { x: end.x, y: end.y };
+    if (!e.dead) { e.pos = { x: end.x, y: end.y }; this.lingerEnter(e, path); }
+  }
+  // Linger (ch 4): an enemy that enters a lingering area takes 2 × Rank and the rider (once per area per round)
+  lingerEnter(e, path) {
+    for (const l of this.lingers) {
+      if (e.dead) return; if (G.inCells(l.cells, path[0]) || !path.slice(1).some(p => G.inCells(l.cells, p))) continue;
+      l.hit = l.hit || {}; const k = e.id + "@" + this.round; if (l.hit[k]) continue; l.hit[k] = 1;
+      const src = this.pc(l.src); if (!src) continue;
+      const x = this.damageFoe(e, l.dmg, { src, psy: l.psy, area: true, quiet: true }); this.log(`${e.name} moves into ${l.name}: ${x} damage${l.rider ? " and " + riderName(l.rider) : ""}.`, "pc");
+      if (l.rider && !e.dead) this.riderFoe(src, l.rider, e);
+    }
   }
   /* ---------------- ranges: can c use opt on tgt from square "from"? → {ok, dis, why} */
   geoOf(c, opt) {
@@ -595,7 +605,7 @@ class Fight {
   beginTurn(c) {
     if (this.phase !== "player" || this.active || c.turnDone || !this.canAct(c)) return false;
     if (c.waitT && c.waited === this.round) { this.active = c; c.t = c.waitT; c.waitT = null; this.log(`${c.short}'s turn.`, "turn"); return true; }
-    this.active = c; c.turnNo++; c.t = { actions: 1, quick: c.cond.dazed ? 0 : 1, unleashed: false, churned: false, used: {}, move: this.speedSq(c), moved: 0 };
+    this.active = c; c.turnNo++; c.t = { actions: 1, quick: c.cond.dazed ? 0 : 1, unleashed: false, churned: false, used: {}, move: this.speedSq(c) * (c.nodes.has("blur") ? 2 : 1), moved: 0 };
     this.log(`${c.short}'s turn.`, "turn"); this.ev({ t: "turn", id: c.id });
     c.sigUsed = {}; delete c.cond.braced;
     if (c.cond.burning) { const b = c.cond.burning.v || 2; delete c.cond.burning; this.log(`${c.short} burns for ${b} Blaze, then douses the flames.`, "pc"); this.harmPC(c, b, { raw: true, src: "Burning" }); if (!this.canAct(c)) return this.endTurn(c), true; }
@@ -611,8 +621,8 @@ class Fight {
     c.emerged = true; const L = c.rp.emerge; c.rp.emerge = 0;
     const st = RULES.FORM[c.form].stages[L >= 7 ? 2 : 1], mat = c.rp.s.trees[RULES.FORM[c.form].trees[0]] === "chrome" ? "chrome" : "bio";
     this.log(`✶ ${c.short} EMERGES as a ${st.name}! ${st[mat]}`, "crit");
-    const t = 2 * c.level; if (t > c.tmp) c.tmp = t; this.log(`  ${c.short} gains ${t} temporary HP; enemies who see it are Shaken (not Bosses); the new Signature is Amped on its first use.`, "pc");
-    this.foesAlive().forEach(e => { if (!e.boss) this.condFoe(e, "shaken"); });
+    const t = 2 * c.level; if (t > c.tmp) c.tmp = t; this.log(`  ${c.short} gains ${t} temporary HP; enemies within 30 ft who see it are Shaken (not Bosses); the new Signature is Amped on its first use.`, "pc");
+    this.foesAlive().forEach(e => { if (!e.boss && this.within(c, e, 6)) this.condFoe(e, "shaken"); });
     c.emergeSig = c.sigs.length - 1;
   }
   endTurn(c) {
@@ -620,6 +630,7 @@ class Fight {
     if (c.mitosis && this.canAct(c)) { const w = this.bestWeapon(c); const t = w && this.pickTarget(c, w, this.foesAlive().filter(e => this.canHit(c, w, e).ok)); if (w && t) { this.log(`${c.short}'s Mitosis copy attacks.`, "pc"); this.attack(c, w, t, {}); } }
     if (c.t && c.t.ospike && this.condPC(c, "dazed")) { c.cond.dazed.keep = 1; }
     for (const k in c.cond) { const x = c.cond[k]; if (x && x.keep) { delete x.keep; continue; } if (x && x.at != null && x.round == null && x.at < c.turnNo) delete c.cond[k]; }
+    c.blurReady = c.nodes.has("blur") && !!c.t && (c.t.moved || 0) >= 4;
     c.turnDone = true; this.active = null; this.haste = null;
     if (this.checkEnd()) return;
     this.interrupt();
@@ -653,7 +664,7 @@ class Fight {
     this.foes.forEach(e => { if (e.dominated) e.dominated = false; });
     this.pcs.forEach(c => {
       const rp = c.rp;
-      if (won && this.canAct(c) && c.bioN) { const k = c.R * c.bioN; c.hp = Math.min(c.maxhp, c.hp + k); this.log(`${c.short}'s Knit: +${k} HP.`, "pc"); }
+      if (won && !c.dead && c.bioN) { const k = c.R * c.bioN, wasDown = c.down; if (c.down) { c.down = false; c.hp = 0; } c.hp = Math.min(c.maxhp, c.hp + k); this.log(`${c.short}'s Knit: +${k} HP${wasDown ? " and gets back up" : ""}.`, "pc"); }
       rp.hp = c.dead ? 0 : c.hp; rp.dead = c.dead; rp.marks = c.marks; rp.juice = c.juice;
       if (c.flags.overgrowth) rp.overgrowth = true; if (c.flags.molt) rp.molt = true;
     });
@@ -749,7 +760,7 @@ class Fight {
     if (sg.twists && sg.twists.includes("linger") && caught.length) { this.lingers.push({ cells, dmg: 2 * c.R, rider: sg.rider, until: this.round + 1, src: c.id, name: sg.name, psy: sg.psy }); this.log(`  ${sg.name} lingers until the end of next round.`, "pc"); }
     // allies inside your Burst/Wave Dodge your roll: success = half (ch 4)
     allies.forEach(al => {
-      const dr = d20(0), dd = dr.v + al.def.dodge, ok = dr.v !== 1 && dd >= tot; const dm = ok ? Math.floor(base / 2) : base;
+      const dr = d20(o.chromeDis && al.chrome ? -1 : 0), dd = dr.v + al.def.dodge, ok = dr.v !== 1 && dd >= tot; const dm = ok ? Math.floor(base / 2) : base;
       this.log(`  ${al.short} is inside the ${sg.shape || "area"}! Dodge ${dr.txt}${sgn(al.def.dodge)}=${dd} vs ${tot}: ${ok ? "half" : "full"}.`, "pc bad");
       if (sg.noDamage) { if (!ok && (o.riders || []).length) o.riders.forEach(rd => this.condPC(al, rd)); return; }
       if (dm > 0) this.harmPC(al, Math.max(1, sg.psy ? dm : dm - al.armor), { src: c.short }); if (!ok && sg.rider) this.condPC(al, sg.rider);
@@ -911,7 +922,7 @@ class Fight {
     if (c.cond.veiled) { up = true; why.push("Veiled"); }
     if (c.cond.linked) { up = true; delete c.cond.linked; why.push("Link"); }
     if (c.cond.helped) { up = true; delete c.cond.helped; why.push("Help"); }
-    if (dfn === "dodge" && c.nodes.has("blur") && !c.rf.blur) { c.rf.blur = 1; up = true; why.push("Blur"); }
+    if (dfn === "dodge" && c.nodes.has("blur") && c.blurReady && !c.rf.blur) { c.rf.blur = 1; up = true; why.push("Blur"); }
     if (c.nodes.has("anchor") && a.rider === "held") { up = true; why.push("Anchor"); }
     if (c.cond.prone && a.melee !== false) { down = true; why.push("Prone"); }
     if (!o.area && a.melee === false && !o.os && e.pos && this.pcs.some(x => this.canAct(x) && G.dist(x.pos, e.pos) <= 1)) { up = true; why.push("shooter in melee"); }
@@ -1249,6 +1260,8 @@ class Fight {
         const Q_ = (id, label, o) => out.push(Object.assign({ id, label, kind: "quick", target: "none", targets: [], all: [], group: "Quick" }, o));
         if (!t.unleashed) Q_("churn", `Churn${c.flags.rootAccess ? " (Root Access: choose the result)" : ""}`, { flux: 1, group: "Churn", detail: `Roll your d${c.die}: that Surge is Primed (doubles → Amped). No Unleash this turn.` });
         c.primed.forEach((p, i) => { if (p.sg.wild === 12) Q_("un:" + i, `Perfect Expression (Quick, 0 Flux)`, { detail: "Prime any two of your Surges as Amped.", sg: p.sg, group: "Surge" }); });
+        if (c.nodes.has("quickened") && this.speedSq(c) > 0) Q_("qdash", "Dash (Quickened: Quick)", { group: "Move", detail: `Move again: +${this.speedSq(c) * 5} ft this turn.` });
+        if (c.rp.s.origin === "militia" && !c.flags.qbrace) Q_("qbrace", "Brace (Ward Militia: Quick, once per combat)", { group: "Other", detail: "Advantage on every defense roll until your next turn." });
         if (c.kit.stim > 0) Q_("stim", `Stim (${c.kit.stim})`, { group: "Items", detail: `Regain Rank d6 HP.` });
         if (c.kit.damper > 0 && !c.flags.damper && c.flux > 0) Q_("damper", "Damper", { group: "Items", detail: "Lose 2 Flux. One per combat." });
         if (c.nodes.has("targetlock")) Q_("lock", "Target Lock", Object.assign({ target: "enemy", geo: { range: 24 }, detail: `Mark a creature you can see${c.nodes.has("thousandeyes") ? " (up to three)" : ""}: +1 damage die against it once per turn.` }, E(this.inRange(c, 24))));
@@ -1328,6 +1341,7 @@ class Fight {
       case "un": case "sig": {
         const entry = verb === "un" ? c.primed[+arg] : { sg: c.sigs[+arg], amped: false, sig: true };
         this.unleash(c, entry, tgt, adv, ar); break; }
+      case "qbrace": c.flags.qbrace = true; // falls through
       case "brace": this.condPC(c, "braced"); this.log(`${c.short} braces (advantage on defense rolls until their next turn).`, "pc"); break;
       case "help": tgt.cond.helped = { round: this.round + 1 }; this.log(`${c.short} helps ${tgt.short}: advantage on their next roll.`, "pc"); break;
       case "patch": { c.kit.medkit--; const ok = this.check(c, "gumption", 10, KNACK_FOR.patch, `Patch ${tgt.short}`); const amt = ok ? roll(c.R, 6).t + c.st.gumption + (c.rp.s.origin === "clinicrat" ? c.R : 0) + (c.nodes.has("transmute") ? c.st.gumption : 0) : 1; this.heal(c, tgt, Math.max(1, amt), "Patch"); break; }
@@ -1337,7 +1351,7 @@ class Fight {
       case "rally": { c.flags.rallied = true; if (this.check(c, "chutzpah", 13, KNACK_FOR.rally, "Rally")) { const v = c.R + c.st.chutzpah; this.standing.filter(a => G.dist(a.pos, c.pos) <= 12).forEach(a => { if (a.flags.gotRally) return; a.flags.gotRally = true; if (v > a.tmp) a.tmp = v; }); this.log(`  Everyone who hears it gains ${v} temporary HP.`, "heal"); } break; }
       case "shove": case "grapple": { if (opt.kind === "quick") t.used.shoulder = 1; if (this.contest(c, "grit", this.guardOf(tgt), verb === "shove" ? "Shove" : "Grapple", tgt)) { const k = verb === "shove" ? "prone" : "held"; if (k === "prone" && tgt.tr.huge) this.log(`  ${tgt.name} is Huge: it doesn't go down.`, "pc"); else { this.condFoe(tgt, k); this.log(`  ${tgt.name} is ${COND_NAME[k]}.`, "pc"); } } break; }
       case "item": { c.kit[arg]--; const sg = this.areaOf(c, opt);
-        this.areaAttack(c, sg, null, Object.assign({}, ar, { riders: arg === "flashbang" ? ["blinded"] : [], onHit: arg === "emp" ? (e => { if (e.machine) { this.condFoe(e, "dazed"); this.log(`  ${e.name}'s circuits seize: Dazed.`, "pc"); } }) : null })); break; }
+        this.areaAttack(c, sg, null, Object.assign({}, ar, { chromeDis: arg === "emp", riders: arg === "flashbang" ? ["blinded"] : [], onHit: arg === "emp" ? (e => { if (e.machine) { this.condFoe(e, "dazed"); this.log(`  ${e.name}'s circuits seize: Dazed.`, "pc"); } }) : null })); break; }
       case "stimgland": { c.rp.breather.stimgland = (c.rp.breather.stimgland || 0) + 1; if (opt.kind === "quick") this.gainFlux(c, 1, "Stim Gland Push");
         const who = c.nodes.has("livingpharmacy") ? [c].concat(this.neighbours(c, 3), tgt).filter((x, i, a) => x && !x.dead && a.indexOf(x) === i) : [tgt];
         who.forEach(a => { this.heal(c, a, roll(c.R, 6).t + c.st.gumption + (c.nodes.has("transmute") ? c.st.gumption : 0), "Stim Gland"); delete a.cond.burning; delete a.cond.poisoned; }); break; }
@@ -1347,7 +1361,7 @@ class Fight {
       case "puppet": { this.gainFlux(c, 1, "Puppet Push"); if (this.contest(c, "chutzpah", tgt.tn, "Puppet", tgt)) { const a2 = tgt.attacks.find(x => !x.summon && !x.area) || tgt.attacks.find(x => !x.summon); const o2 = a2 && this.foesAlive().filter(x => x !== tgt && G.dist(x.pos, tgt.pos) <= Math.max(1, a2.reach || 0, a2.range || 0)).sort((a, b) => a.hp - b.hp)[0]; if (o2 && a2) { const x = this.damageFoe(o2, a2.dmg, { src: c }); this.log(`  ${tgt.name} turns and hits ${o2.name} with ${a2.n}: ${x}.`, "pc"); } else this.log(`  ${tgt.name} has nobody else to hit.`, "pc"); } break; }
       case "intrude": { const st = c.st.gumption >= c.st.chutzpah ? "gumption" : "chutzpah"; if (this.contest(c, st, tgt.tn, "Intrude", tgt)) { if (tgt.role === "mook") { tgt.dominated = true; tgt.cond.dominatedUntil = this.round + 1; this.log(`  ${tgt.name} obeys ${c.short} until the end of next round.`, "pc"); } else { this.condFoe(tgt, "dazed"); this.log(`  ${tgt.name} is Dazed.`, "pc"); } } break; }
       case "sporecloud": { c.flags.spore = true; this.gainFlux(c, 1, "Spore Cloud Push"); this.standing.filter(a => G.dist(a.pos, c.pos) <= 3).forEach(a => a.cond.veiled = { round: this.round + 1 }); this.log(`${c.short} exhales a Spore Cloud: everyone within 15 ft is Veiled until the end of next round.`, "pc"); break; }
-      case "dash": t.move += this.speedSq(c); if (c.nodes.has("afterimage")) { c.cond.veiled = { at: c.turnNo + 1 }; this.log(`${c.short} Dashes and leaves an Afterimage (Veiled until their next turn).`, "pc"); } else this.log(`${c.short} Dashes (+${this.speedSq(c) * 5} ft).`, "pc"); break;
+      case "qdash": case "dash": t.move += this.speedSq(c); if (c.nodes.has("afterimage")) { c.cond.veiled = { at: c.turnNo + 1 }; this.log(`${c.short} Dashes and leaves an Afterimage (Veiled until their next turn).`, "pc"); } else this.log(`${c.short} Dashes (+${this.speedSq(c) * 5} ft).`, "pc"); break;
       case "churn": this.churn(c, extra && extra.slot); break;
       case "stim": { c.kit.stim--; this.heal(c, c, roll(c.R, 6).t, "Stim"); break; }
       case "damper": { c.kit.damper--; c.flags.damper = true; c.flux = Math.max(0, c.flux - 2); this.log(`${c.short} uses a Damper: Flux ${c.flux}/${c.limit}.`, "pc"); break; }
@@ -1419,7 +1433,7 @@ class Fight {
     switch (sg.wild) {
       case 2: return this.areaAttack(c, sg, tgt, Object.assign({ cells: G.burst(this.map, c.pos, 2), excludeSelf: true }, adv));
       case 3: { const ts = [tgt].concat(shuffle(this.foesAlive().filter(e => e !== tgt && this.canHit(c, sg, e).ok)).slice(0, 2)); ts.forEach(e => { if (!e.dead) this.attack(c, sg, e, adv); }); this.condPC(c, "dazed"); this.log(`  ${c.short} is Dazed by the backlash.`, "pc"); return; }
-      case 4: [c].concat(this.neighbours(c, 2).filter(x => this.canAct(x))).forEach(a => { const v = roll(c.R + 1, 6).t + c.st.grit; if (v > a.tmp) a.tmp = v; a.cond.shell = { round: this.round + 1 }; this.log(`  ${a.short} hardens: ${v} temporary HP, +1 Armor.`, "heal"); }); return;
+      case 4: if (c.t) c.t.move = 0; [c].concat(this.neighbours(c, 2).filter(x => this.canAct(x))).forEach(a => { const v = roll(c.R + 1, 6).t + c.st.grit; if (v > a.tmp) a.tmp = v; a.cond.shell = { round: this.round + 1 }; this.log(`  ${a.short} hardens: ${v} temporary HP, +1 Armor.`, "heal"); }); return;
       case 5: { this.attack(c, sg, tgt, adv); const d = roll(c.R, 6); this.log(`  Blood Price: ${c.short} pays ${d.t} HP.`, "pc bad"); this.harmPC(c, d.t, { noTemp: true }); return; }
       case 6: { const al = tgt && tgt.side === "pc" ? tgt : this.standing.find(a => a !== c && a.primed.some(p => !p.sg.wild)); const p = al && al.primed.filter(x => !x.sg.wild).sort((a, b) => this.surgeValue(al, b.sg) - this.surgeValue(al, a.sg))[0];
         if (!p) { this.log(`  Echo: no ally has a Surge Primed to copy. It fizzles.`, "pc"); return; }

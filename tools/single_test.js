@@ -32,15 +32,15 @@ const frameOf = async (p, tab) => { await p.evaluate(t => MutagenShell.go('#' + 
     const imgs = [...document.querySelectorAll('#doc img')];
     return { chaps, links: document.querySelectorAll('#doc a[href^="#"]').length, badLinks, imgs: imgs.length, imgBad: imgs.filter(i => !i.complete || !i.naturalWidth).map(i => i.dataset.art), toc: document.querySelectorAll('#toc a').length };
   });
-  ok(r.chaps === 21, `rules: 21 chapters rendered (${r.chaps})`);
+  ok(r.chaps === 22, `rules: 22 chapters rendered (${r.chaps})`);
   ok(r.links > 100 && !r.badLinks.length, `rules: ${r.links} in-page links all resolve ${r.badLinks.slice(0, 5)}`);
   ok(r.imgs >= 9 && !r.imgBad.length, `rules: ${r.imgs} embedded images load ${r.imgBad}`);
   ok(await p.evaluate(() => { const t = document.querySelector('#doc table'); return !!t && document.querySelectorAll('#doc table').length > 60; }), 'rules: tables rendered');
   await p.click('#toc a[href="#06_Combat"]'); await sleep(300);
   ok(await p.evaluate(() => location.hash === '#06_Combat' && Math.abs(document.getElementById('06_Combat').getBoundingClientRect().top - document.getElementById('doc').getBoundingClientRect().top) < 30), 'TOC: click jumps to Combat');
   await p.evaluate(() => { location.hash = '#01_Core_Rules--time-and-distance'; }); await sleep(300);
-  await p.click('[id="01_Core_Rules"] a[href="#06_Combat--optional-playing-on-a-grid"]'); await sleep(300);
-  ok(await p.evaluate(() => location.hash === '#06_Combat--optional-playing-on-a-grid'), 'cross-chapter link (ch 1 → ch 6 grid note) works');
+  await p.click('[id="01_Core_Rules"] a[href="#06_Combat--positioning-theatre-of-the-mind-or-grid"]'); await sleep(300);
+  ok(await p.evaluate(() => location.hash === '#06_Combat--positioning-theatre-of-the-mind-or-grid'), 'cross-chapter link (ch 1 → ch 6 grid note) works');
   await p.type('#q', 'last gasp'); await sleep(200);
   const sr = await p.evaluate(() => [...document.querySelectorAll('#res a')].map(a => a.textContent).slice(0, 3));
   ok(sr.length && /Last Gasp/i.test(sr[0]), 'search: "last gasp" → ' + sr[0]);

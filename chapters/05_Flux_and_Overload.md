@@ -10,7 +10,7 @@ Every Surge, every Push, every Churn floods your cells (or circuits) with Mutage
   - **Unleash** a Surge: 1, +1 per Twist (0 if Amped).
   - **Churn:** 1.
   - **Push** an Augment: 1.
-  - Are hit by a **Mutagenic** threat: as its stat block says.
+  - Fail your defense against a **Mutagenic** threat's attack: as its stat block says.
 - Your **Flux Limit** = **4 + Rank + Nerve** (minimum 4; Splice −1). Nerve rises at each Evolution, so your Limit does too: from 4–8 at level 1 to 9–16 at level 7 (one less for a Splice), highest for Oracles and lowest for Sirens.
 - **Signature Surges** cost Flux like any Surge. Unleashing one every round is the fastest way to Overload; that's the price of always being ready.
 - Flux **drops to 0** when you take a Breather or a Lockdown, and when you Overload.
@@ -69,11 +69,11 @@ Permanent, but survivable. A clinic can remove one for **200 Scrip** between mis
 | 2 | **Wrong Face.** Unaugmented people are unsettled; disadvantage on Chutzpah checks to charm them (advantage to intimidate). | **Static Voice.** Same, but through a speaker grille. |
 | 3 | **Hollow Bones.** −2 Max HP per Rank, +5 ft speed. | **Drained Cell.** −1 Flux Limit, +1 Armor (heavier shielding). |
 | 4 | **Second Mouth.** It whispers. Once per session, the GM tells you something true you'd rather not know. | **Ghost Process.** Once per session, the GM controls one of your Reactions. |
-| 5 | **Brittle Shell.** Armor −1, but Regenerate (Glands) works for you even if you don't have it, at half value. | **Sticky Relay.** The highest slot on your Sequence is always Wild, even if a Surge is written there. |
+| 5 | **Brittle Shell.** Armor −1, but Regenerate (Glands) works for you even if you don't have it, at half value. | **Sticky Relay.** The highest slot on your Sequence is always Wild, so you know one Surge fewer than the level table says (if your Sequence was full, erase the Surge in that slot). |
 | 6 | **Hunger for Change.** Gain +1 Flux at the start of every combat. Your first Surge each combat is Amped. | **Feedback Loop.** Gain +1 Flux at the start of every combat. Your first Surge each combat is Amped. |
 
 ## Last Gasp
 Once per Lockdown, when you would drop to 0 HP, you may **Overload on purpose** instead: skip the damage step, roll on your table, and stay at **1 HP**. Your body refuses to die, and pays for it.
 
 ## Mutagenic Threats
-Some enemies are **Mutagenic** (see [Threats](10_Threats.md)). When their attack damages you, you also gain the listed Flux. This is how the city slowly changes you.
+Some enemies are **Mutagenic** (see [Threats](10_Threats.md)). When you fail your defense against their attack, you also gain the listed Flux (a successful defense against an Area keeps it out, even though you take half damage). This is how the city slowly changes you.

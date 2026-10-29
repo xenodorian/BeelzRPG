@@ -315,7 +315,7 @@ const MUTAGEN = {
     { id: "staticvoice", name: "Static Voice", text: "Disadvantage to charm unaugmented people; advantage to intimidate." },
     { id: "drainedcell", name: "Drained Cell", text: "-1 Flux Limit, +1 Armor.", fx: { flux: -1, armor: 1 } },
     { id: "ghostprocess", name: "Ghost Process", text: "Once per session the GM controls one of your Reactions." },
-    { id: "stickyrelay", name: "Sticky Relay", text: "Your highest Sequence slot is always Wild.", fx: { stickyRelay: true } },
+    { id: "stickyrelay", name: "Sticky Relay", text: "Your highest Sequence slot is always Wild, so you know one Surge fewer.", fx: { stickyRelay: true } },
     { id: "feedbackloop", name: "Feedback Loop", text: "+1 Flux at the start of every combat; your first Surge each combat is Amped." }
   ],
   // Injuries (ch 6): last until your next Lockdown. fx: hp, flux, speed

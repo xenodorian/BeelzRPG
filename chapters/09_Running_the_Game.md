@@ -20,6 +20,13 @@ Pick the DC from the [Core Rules](01_Core_Rules.md#difficulty-dc) table: **13 wh
 - Let the fiction override the grid: a Brute can smash a wall, a Skirmisher can jump down a stairwell.
 - **Area attacks catch whoever is inside.** Be honest about positions. Heavies (big Area, Engulf) are built to punish a bunched-up party; tell players that spreading out is the counter, and don't line them up in a corridor for the Heavy unless they walked into it.
 - **Packs focus.** Pack, Flanker and Overwhelm creatures gang up on one freelancer; that's their whole point. Everyone else should still spread attacks.
+- **Default tactics** (what the [arcade](14_Arcade_vs_Tabletop.md)'s enemies do, and a good baseline for yours):
+  - Area attackers aim where they catch the most freelancers and the fewest friends; Bulky ones won't fire into their own allies.
+  - Melee enemies close in and flank; ranged enemies stay out of melee reach and shoot.
+  - Anything with no target in reach Dashes toward one.
+  - Elites, Bosses and Hunters go for the freelancer with the lowest HP about half the time; everyone else picks a target that makes sense in the fiction.
+  - A Taunted enemy goes for its taunter if it can.
+  - Bosses use their Interrupt on the first good opening each round and summon when their minions are thin.
 
 ## Missions
 GRAFT contracts follow a simple shape. Each is about one session.

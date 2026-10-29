@@ -23,7 +23,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 | **Shotgun** | d10 | Nerve | 30 ft | 2 | Loud | 60 |
 | **Launcher** | d6 | Nerve | 90 ft | 2 | **Area** (10-ft radius); 3 shots per mission | 150 |
 
-**Area weapons** work like area Surges: one attack, compare to each Guard, half damage on a miss.
+**Area weapons** work like area Surges: one attack, compare to each Guard, half damage on a miss. They can't fire at long range. **Ranges** are in feet; on a grid divide by 5 (Pistol 12 squares, Rifle 24, Shotgun 6, Launcher 18, thrown 4). Other ranged weapons can shoot to double their range with disadvantage ([Ranges](06_Combat.md#ranges-both-ways)).
 
 ### Mods (one per weapon, 100 Scrip each)
 

@@ -47,7 +47,7 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 | 3 | [Augment Trees](03_Augment_Trees.md) | The six 10-node skill trees ([one file each](03_Trees/)), Bio vs Chrome |
 | 4 | [Surges](04_Surges.md) | Building Surges, the Sequence, Priming, Wild Surges |
 | 5 | [Flux & Overload](05_Flux_and_Overload.md) | Instability, Bloom and Glitch tables |
-| 6 | [Combat](06_Combat.md) | Turns, actions, damage, conditions, going Down |
+| 6 | [Combat](06_Combat.md) | Turns, actions, Opportunity Strikes, positioning (theatre of the mind or grid), damage, conditions, going Down |
 | 7 | [Advancement](07_Advancement.md) | Level table, Samples |
 | 8 | [Gear](08_Gear.md) | Modular weapons, armor, kit, Scrip |
 | 9 | [Running the Game](09_Running_the_Game.md) | GM rules, missions, generators |
@@ -55,3 +55,6 @@ Gritty, weird, and a little funny. Bodies are strange and that is not tragic by 
 | 11 | [Starter Mission](11_Starter_Mission.md) | *Pumpstation 9* |
 | 12 | [Quick Reference](12_Quick_Reference.md) | Everything on one page |
 | 13 | [Character Building Guide](13_Character_Building_Guide.md) | Step-by-step build, leveling, archetypes, worked example |
+| 14 | [Arcade vs Tabletop](14_Arcade_vs_Tabletop.md) | What the web battle simulator does differently from these rules, and why |
+
+Prefer one book? **[The Mutagen Rulebook](../rulebook/Mutagen_Rulebook.md)** compiles all of these chapters into a single numbered document with a full table of contents and a glossary (also as a [print-ready PDF](../rulebook/Mutagen_Rulebook.pdf)).

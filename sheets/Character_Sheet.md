@@ -14,12 +14,12 @@
 | Chutzpah | | | | | | | |
 *Base +3/+2/+1/+0/−1 · Evo I +5/+3/+2/+1/+0 · Evo II +8/+4/+3/+2/+1 · Final Form: primary +2 while active.*
 
-| HP | Max HP | Temp HP | Armor (max 4/5/6) | Speed | Juice (max 3) |
-|---|---|---|---|---|---|
-| | | | | | ○ ○ ○ |
+| HP | Max HP | Temp HP | Armor (max 4/5/6) | Speed (ft · squares) | Reach | Juice (max 3) |
+|---|---|---|---|---|---|---|
+| | | | | | 5 ft · 1 sq | ○ ○ ○ |
 
 **Flux:** ☐☐☐☐☐☐☐☐☐☐☐☐☐☐ **Limit:** __ (4 + Rank + Nerve; Splice −1)  
-**Death marks:** ☐☐☐ **Breathers used:** ☐☐ **Last Gasp used:** ☐ **Final Form used:** ☐ (level 10, once per Lockdown)
+**Reaction (1/round):** ☐ **Death marks:** ☐☐☐ **Breathers used:** ☐☐ **Last Gasp used:** ☐ **Final Form used:** ☐ (level 10, once per Lockdown)
 
 **Knacks:** ______________ · ______________ · ______________ · ______________ · ______________ · ______________
 
@@ -60,7 +60,7 @@
 
 ## Attacks
 
-| Weapon | Attack (stat + Rank) | Damage (Rank × die + stat) | Range / notes |
+| Weapon | Attack (stat + Rank) | Damage (Rank × die + stat) | Range (ft · squares) / notes |
 |---|---|---|---|
 | | | | |
 | | | | |

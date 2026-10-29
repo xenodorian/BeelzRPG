@@ -111,6 +111,24 @@ A.Saves.deleteChar(party[0].name, st); ok(Object.keys(A.Saves.chars(st)).length 
     F4.phase = 'player'; F4.round = 6; F4.lastHarm = 2; F4.pcs.forEach(x => { x.turnDone = false; x.reactions = 1; });
     const c4 = F4.pcs[0], d0 = G.dist(c4.pos, r4.pos); F4.beginTurn(c4); A.aiMove(F4, c4, false);
     ok(G.dist(c4.pos, r4.pos) < d0, `stalemate: the auto-player closes in on a rooted enemy it can't hit (${d0} → ${G.dist(c4.pos, r4.pos)} squares)`); }
+  // rules audit 2026-10-29: Linger on entering, Quickened Dash as a Quick action, Emergence range, Knit stands a Down freelancer up
+  { seeded(11); const run5 = A.newRun({ difficulty: 'medium', characters: [R.randomChar(1), R.randomChar(1), R.randomChar(1), R.randomChar(1)], seed: 11 });
+    const F5 = A.startFight(run5); A.autoSetup(F5); F5.map = open(16, 9); F5.foes = F5.foes.slice(0, 2); const [e1, e2] = F5.foes;
+    [e1, e2].forEach(e => { e.hp = e.maxhp = 999; e.armor = 0; e.cond = {}; }); e1.pos = { x: 12, y: 4 }; e2.pos = { x: 4, y: 4 };
+    F5.pcs.forEach((x, i) => x.pos = { x: 0, y: i * 2 }); F5.phase = 'player'; F5.round = 2; F5.pcs.forEach(x => { x.turnDone = false; x.reactions = 1; });
+    F5.lingers = [{ cells: [{ x: 9, y: 4 }, { x: 9, y: 3 }, { x: 9, y: 5 }], dmg: 4, rider: null, until: 3, src: F5.pcs[0].id, name: 'Test Linger', psy: false }];
+    const h1 = e1.hp; F5.moveFoe(e1, [{ x: 12, y: 4 }, { x: 11, y: 4 }, { x: 10, y: 4 }, { x: 9, y: 4 }, { x: 8, y: 4 }]);
+    ok(e1.hp === h1 - 4 && F5.logs.some(l => /moves into Test Linger/.test(l.t)), 'Linger: an enemy that moves into the area takes its damage');
+    const h1b = e1.hp; F5.moveFoe(e1, [{ x: 8, y: 4 }, { x: 9, y: 4 }, { x: 10, y: 4 }]); ok(e1.hp === h1b, 'Linger: once per area per enemy per round');
+    const c5 = F5.pcs[0]; c5.nodes.add('quickened'); F5.beginTurn(c5); const m0 = c5.t.move;
+    ok(F5.options(c5).some(o => o.id === 'qdash' && o.kind === 'quick'), 'Quickened: Dash is offered as a Quick action');
+    ok(F5.perform(c5, 'qdash').ok && c5.t.move === m0 + F5.speedSq(c5) && c5.t.actions === 1 && c5.t.quick === 0, 'Quickened Dash spends the Quick action, not the Action');
+    F5.perform(c5, 'end');
+    const c6 = F5.pcs[1]; c6.pos = { x: 1, y: 4 }; e2.cond = {}; e1.cond = {}; e1.pos = { x: 15, y: 8 }; c6.rp.emerge = 4; c6.emerged = false; F5.beginTurn(c6);
+    ok(e2.cond.shaken && !e1.cond.shaken, 'Emergence: only enemies within 30 ft who can see it are Shaken');
+    F5.perform(c6, 'end');
+    const c7 = F5.pcs.find(x => x.bioN > 0); if (c7) { c7.down = true; c7.hp = 0; F5.finish(true); ok(!c7.down && c7.hp > 0, 'Knit at the end of a won fight stands a Down Bio freelancer up'); }
+  }
 }
 
 // ---- 3. level-ups and evolutions
