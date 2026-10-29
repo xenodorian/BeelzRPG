@@ -29,7 +29,7 @@ const clone = o => JSON.parse(JSON.stringify(o));
 
 /* ------------------------------------------------------------------ tables */
 // Difficulty = party size (the request) plus a threat factor on top of the book's budgets (calibrated by tools/arcade_test.js).
-const DIFFS = { easy: { name: "Easy", size: 5, threat: 1.1 }, medium: { name: "Medium", size: 4, threat: 1.22 }, hard: { name: "Hard", size: 3, threat: 1.38 } };
+const DIFFS = { easy: { name: "Easy", size: 5, threat: 1.0 }, medium: { name: "Medium", size: 4, threat: 1.22 }, hard: { name: "Hard", size: 3, threat: 1.38 } };
 const HARD_BUDGET = { 1: 1, 2: 1.75, 3: 2.75, 4: 4, 5: 5.5, 6: 7 };          // ch 10 §5
 const UNITS_MR = { "-3": 1 / 3, "-2": 0.5, "-1": 0.75, "0": 1, "1": 1.5, "2": 2, "3": 3 };
 // Grid ranges (1 square = 5 ft; see Current_Work.md "Arcade grid"): ch 4 Shapes and ch 6/8 weapon ranges in squares.
@@ -379,7 +379,7 @@ class Fight {
     this.initiative();
     this.pcs.forEach(c => { if (this.canAct(c) || c.down) this.rollPrimeDice(c); });
   }
-  log(t, cls) { this.logs.push({ t, cls: cls || "" }); if (this.onLog) this.onLog(t, cls); }
+  log(t, cls) { this.logs.push({ t, cls: cls || "" }); if (this.events) this.ev({ t: "log", text: t, cls: cls || "" }); if (this.onLog) this.onLog(t, cls); }
   // ---------------- mid-battle save: everything but the links back into the run (re-made by Fight.restore)
   toJSON() {
     const pcs = this.pcs.map(c => { const o = Object.assign({}, c); delete o.rp; delete o.kit; o.nodes = [...c.nodes]; const own = c.surges.concat(c.sigs);
@@ -401,7 +401,7 @@ class Fight {
   byId(id) { return this.pc(id) || this.foe(id); }
   // freelancers within r squares of c (default: adjacent)
   neighbours(c, r) { r = r || 1; return this.pcs.filter(x => x !== c && !x.dead && x.pos && c.pos && G.dist(x.pos, c.pos) <= r); }
-  ev(e) { this.events.push(e); }
+  ev(e) { if (!this.events) return; this.events.push(e); if (this.events.length > 4000) this.events.splice(0, 2000); }
   /* ---------------- the grid */
   at(x, y) { return this.pcs.find(c => !c.dead && c.pos && c.pos.x === x && c.pos.y === y) || this.foes.find(e => !e.dead && !e.fled && e.hp > 0 && e.pos && e.pos.x === x && e.pos.y === y) || null; }
   free(x, y) { return G.inB(this.map, x, y) && !this.map.blocked.has(G.key(x, y)) && !this.at(x, y); }
@@ -508,7 +508,7 @@ class Fight {
   initiative() {
     const tn = Math.max(...this.foes.map(e => e.tn)); const quick = this.standing.some(c => c.nodes.has("quickened"));
     let ok = 0; const parts = [];
-    this.standing.forEach(c => { const r = d20(quick ? 1 : 0); const bonus = c.rp.s.origin === "militia" ? 2 : 0; const tot = r.v + c.st.moxie + bonus; if (r.v !== 1 && tot >= tn) ok++; parts.push(`${c.short} ${r.txt}${sgn(c.st.moxie + bonus)}=${tot}`); });
+    this.standing.forEach(c => { const r = d20(quick ? 1 : 0); const bonus = c.rp.s.origin === "militia" ? 2 : 0; const tot = r.v + c.st.moxie + bonus; c.init = tot + c.st.moxie / 100; if (r.v !== 1 && tot >= tn) ok++; parts.push(`${c.short} ${r.txt}${sgn(c.st.moxie + bonus)}=${tot}`); });
     this.playersFirst = ok * 2 >= this.standing.length;
     this.log(`Initiative (Moxie group check vs TN ${tn}${quick ? ", Quickened: advantage" : ""}): ${parts.join(", ")} → ${this.playersFirst ? "freelancers go first" : "enemies go first"}.`, "sys");
   }
@@ -585,12 +585,18 @@ class Fight {
   }
   playerPhase() { this.phase = "player"; this.pcs.forEach(c => c.turnDone = false); this.autoSkipDown(); }
   autoSkipDown() { this.pcs.forEach(c => { if (!this.canAct(c)) { c.turnDone = true; c.skipped = true; } else c.skipped = false; }); if (this.phase === "player" && this.pcs.every(c => c.turnDone)) this.endPlayerPhase(); }
-  pending() { return this.pcs.filter(c => !c.turnDone && this.canAct(c)); }
+  // freelancers still to act this Player Phase, in initiative order (a freelancer who Waits goes to the back)
+  pending() { return this.pcs.filter(c => !c.turnDone && this.canAct(c)).sort((a, b) => ((a.waited === this.round) - (b.waited === this.round)) || ((b.init || 0) - (a.init || 0)) || a.idx - b.idx); }
+  order() { return this.pcs.slice().sort((a, b) => ((b.init || 0) - (a.init || 0)) || a.idx - b.idx); }
+  // Wait: hand the turn to someone else before doing anything (the Player Phase may go in any order, ch 6)
+  canWait(c) { const t = c && c.t; return !!t && this.active === c && !this.haste && t.actions >= 1 && !t.moved && !t.unleashed && !t.churned && !t.qspent && this.pending().length > 1; }
+  waitTurn(c) { if (!this.canWait(c)) return false; c.waitT = c.t; this.active = null; c.waited = this.round; this.log(`${c.short} waits.`, "turn"); return true; }
   // ---------------- turns
   beginTurn(c) {
     if (this.phase !== "player" || this.active || c.turnDone || !this.canAct(c)) return false;
+    if (c.waitT && c.waited === this.round) { this.active = c; c.t = c.waitT; c.waitT = null; this.log(`${c.short}'s turn.`, "turn"); return true; }
     this.active = c; c.turnNo++; c.t = { actions: 1, quick: c.cond.dazed ? 0 : 1, unleashed: false, churned: false, used: {}, move: this.speedSq(c), moved: 0 };
-    this.log(`${c.short}'s turn.`, "turn");
+    this.log(`${c.short}'s turn.`, "turn"); this.ev({ t: "turn", id: c.id });
     c.sigUsed = {}; delete c.cond.braced;
     if (c.cond.burning) { const b = c.cond.burning.v || 2; delete c.cond.burning; this.log(`${c.short} burns for ${b} Blaze, then douses the flames.`, "pc"); this.harmPC(c, b, { raw: true, src: "Burning" }); if (!this.canAct(c)) return this.endTurn(c), true; }
     if (c.cond.prone) { delete c.cond.prone; c.t.move = Math.max(0, c.t.move - Math.ceil(this.speedSq(c) / 2)); this.log(`${c.short} stands up (half their speed).`, "pc"); }
@@ -769,9 +775,10 @@ class Fight {
       const ls = this.foesAll().filter(x => x !== e && x.tr.link);
       if (ls.length) { const share = Math.floor(dm / (ls.length + 1)); ls.forEach(x => { x.hp -= share; this.afterHit(x, o.src); }); dm -= share * ls.length; if (!o.quiet) this.log(`  (Linked: the wound spreads, ${share} to each of ${ls.length} other${ls.length > 1 ? "s" : ""})`, "foe"); }
     }
-    e.hp -= dm;
+    e.hp -= dm; this.ev({ t: "dmg", id: e.id, n: dm });
     if (o.src && o.src.rp) { o.src.rp.stats.dmg += dm; this.stats.dealt += dm; }
     this.afterHit(e, o.src);
+    if (e.dead) this.ev({ t: "die", id: e.id });
     return dm;
   }
   afterHit(e, src) {
@@ -801,7 +808,7 @@ class Fight {
   heal(src, c, amt, label) {
     if (!c || c.dead || amt <= 0) return 0;
     const wasDown = c.down; if (c.down) { c.down = false; c.hp = 0; }
-    const before = c.hp; c.hp = Math.min(c.maxhp, c.hp + amt); const got = c.hp - before;
+    const before = c.hp; c.hp = Math.min(c.maxhp, c.hp + amt); const got = c.hp - before; if (got) this.ev({ t: "heal", id: c.id, n: got });
     if (src && src.rp) src.rp.stats.heals += got;
     this.log(`  ${c.short} regains ${got} HP${label ? " (" + label + ")" : ""}${wasDown ? " and stands up!" : ""} → ${c.hp}/${c.maxhp}.`, "heal");
     if (wasDown && this.phase === "player" && c.skipped) { c.turnDone = false; c.skipped = false; }
@@ -815,7 +822,7 @@ class Fight {
     if (c.tmp && !o.noTemp) { const x = Math.min(c.tmp, dm); c.tmp -= x; dm -= x; if (x) this.log(`  (${x} soaked by temporary HP)`, "pc"); }
     if (dm <= 0) return 0;
     if (o.floor1) { const was = c.hp; c.hp = Math.max(1, c.hp - dm); return was - c.hp; }
-    c.rp.stats.taken += dm; this.stats.taken += dm;
+    c.rp.stats.taken += dm; this.stats.taken += dm; this.ev({ t: "dmg", id: c.id, n: dm });
     const was = c.hp; c.hp -= dm;
     if (c.hp > 0) {
       if (c.nodes.has("adrenaldump") && !c.flags.adrenal && c.hp <= c.maxhp / 2) { c.flags.adrenal = true; const t = 2 * c.R + c.st.grit; if (t > c.tmp) c.tmp = t; c.cond.adrenal = { at: c.turnNo + 1 }; this.log(`  ${c.short}'s Adrenal Dump: ${t} temporary HP and advantage on the next attack.`, "pc"); }

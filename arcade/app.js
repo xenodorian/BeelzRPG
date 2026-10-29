@@ -152,110 +152,337 @@ function viewMap() {
   <h3>The party</h3>${partyStatus(run)}</section>`;
 }
 
-/* ------------------------------------------------------------------ battle */
+/* ------------------------------------------------------------------ battle: virtual-tabletop map + JRPG command menu + HUDs */
+const G = window.MutagenGrid;
+const store = (k, d) => { try { const v = localStorage.getItem("mutagen.arcade.ui." + k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } };
+const keep = (k, v) => { try { localStorage.setItem("mutagen.arcade.ui." + k, JSON.stringify(v)); } catch (e) { } };
+Object.assign(ui, { menu: { lv: "root" }, cur: null, careful: false, aimMode: "cone", zoom: store("zoom", typeof innerWidth !== "undefined" && innerWidth < 640 ? 36 : 46), speed: store("speed", "normal"), autoSwitch: store("autoSwitch", true), selFoe: null, hover: null, logOpen: store("logOpen", false), anim: null });
+const COND_ABBR = { prone: "Pr", held: "Hd", dazed: "Dz", blinded: "Bl", shaken: "Sh", poisoned: "Po", exposed: "Ex", burning: "Bu", veiled: "Ve", linked: "Li", shell: "+A", braced: "Br", helped: "He", spotted: "Sp", adrenal: "Ad", redmist: "RM", targeterr: "TE", cocoon: "Co", weakspot: "WS" };
+const THEME_ART = { pumpstation: "setting_halcyon.jpg", streets: "cover.jpg", camp: "setting_halcyon.jpg", clinic: "clinic.jpg", rustyard: "threat_drainbeast.jpg", bloom: "surge.jpg" };
+const colName = x => String.fromCharCode(65 + x), sqName = p => p ? colName(p.x) + (p.y + 1) : "—";
+const ft = n => n * 5 + " ft";
 function startFight() {
-  const run = ui.run; ui.F = A.startFight(run); run.inFight = true; saveRun();
-  ui.pendingOpt = null; ui.view = "battle"; render(true);
+  const run = ui.run; ui.F = A.startFight(run); run.inFight = true; persist();
+  resetMenu(); ui.view = "battle"; render(true);
 }
+function persist() { if (ui.run && ui.F) A.saveFight(ui.run, ui.F); saveRun(); }
+function resetMenu() { ui.menu = { lv: "root" }; const c = actor(); if (c && c.pos) ui.cur = { x: c.pos.x, y: c.pos.y }; }
 const pct = (a, b) => Math.max(0, Math.min(100, 100 * a / Math.max(1, b)));
 function condTags(cond, foe) { return Object.keys(cond).filter(k => cond[k] && A.COND_NAME[k] && k !== "shieldused").map(k => `<span class="tag ${foe ? "foe" : ["veiled", "linked", "shell", "braced", "helped", "spotted", "adrenal"].includes(k) ? "" : "bad"}">${A.COND_NAME[k]}</span>`).join(""); }
-function pcCard(F, c) {
-  const act = F.active === c || (F.haste && F.haste.to === c.id);
-  return `<div class="card pcard ${act ? "act" : ""} ${c.down ? "down" : ""} ${c.dead ? "dim" : ""}" aria-label="${esc(c.name)}"><b>${esc(c.short)}</b> <span class="small">L${c.level} ${esc(c.stageName)}${c.ffActive ? " · ★ FINAL FORM" : ""}</span>
+function actor() { const F = ui.F; if (!F) return null; return F.haste ? F.pc(F.haste.to) : F.active; }
+function foeFocus() { const F = ui.F, c = actor(); const id = ui.hover && F.foe(ui.hover) ? ui.hover : ui.selFoe; let e = id && F.foe(id); if (e && (e.dead || e.fled)) e = null;
+  if (!e) { const live = F.foesAll(); e = c && c.pos ? live.slice().sort((a, b) => G.dist(a.pos, c.pos) - G.dist(b.pos, c.pos))[0] : live[0]; } return e || null; }
+// the per-mode overlays on the map
+function overlays() {
+  const F = ui.F, c = actor(), m = ui.menu, out = { cls: {}, mark: {}, tok: {}, info: "" };
+  const add = (p, k) => { const key = p.x + "," + p.y; out.cls[key] = (out.cls[key] ? out.cls[key] + " " : "") + k; };
+  if (!c || !c.pos || F.phase !== "player" || ui.anim) return out;
+  const reachCells = careful => { const r = F.reach(c, careful); const res = []; r.forEach(n => { if (n.cost > 0) res.push(n); }); return res; };
+  if ((m.lv === "root" || m.lv === "move") && c.t && c.t.move > 0 && !F.haste) {
+    const careful = m.lv === "move" && ui.careful;
+    reachCells(careful).forEach(n => { add(n, m.lv === "move" ? "mv" : "mv faint"); if (m.lv === "move" && !careful && !c.nodes.has("slipstream") && osOnPath(F, c, G.pathOf(n))) out.mark[n.x + "," + n.y] = "⚠"; });
+    if (m.lv === "move" && ui.cur) { const n = F.reach(c, careful).get(G.key(ui.cur.x, ui.cur.y)); if (n && n.cost) G.pathOf(n).forEach(p => add(p, "path")); }
+  }
+  const o = m.opt && F.options(c).find(x => x.id === m.opt);
+  if (o && (m.lv === "target" || m.lv === "aim")) {
+    const g = o.geo || {};
+    const R = g.range || g.reach || 0, long = g.long ? 2 * g.range : 0;
+    if (R && R < 40) for (let y = 0; y < F.map.h; y++) for (let x = 0; x < F.map.w; x++) { const d = G.dist(c.pos, { x, y }); if (d === 0 || F.map.blocked.has(G.key(x, y))) continue;
+      if (d <= R && (d <= 1 || G.los(F.map, c.pos, { x, y }))) add({ x, y }, "rng"); else if (long && d <= long && G.los(F.map, c.pos, { x, y })) add({ x, y }, "rng long"); }
+    if (m.lv === "target") (o.all || []).forEach(t => { out.tok[t.id] = t.ok ? (t.dis ? "tgt dis" : "tgt") : "no"; });
+    if (m.lv === "aim") {
+      const aim = ui.cur || c.pos, chk = F.aimCheck(c, o, aim);
+      const cells = F.optionCells(c, o, aim, ui.aimMode); cells.forEach(p => add(p, chk.ok ? "aoe" : "aoe bad"));
+      const foes = F.foesAlive().filter(e => G.inCells(cells, e.pos)), al = F.pcs.filter(x => !x.dead && G.inCells(cells, x.pos) && !(o.sg && o.sg.geo && o.sg.geo.self && x === c) && !(o.sg && o.sg.shape === "pulse") && o.id !== "scream");
+      foes.forEach(e => out.tok[e.id] = "tgt"); al.forEach(x => out.tok[x.id] = "ally-hit");
+      out.info = chk.ok ? `Catches ${foes.length ? foes.map(e => e.name).join(", ") : "no enemies"}${al.length ? ` — and ${al.map(x => x.short).join(", ")} (allies Dodge for half)` : ""}.` : `Can't aim there: ${chk.why}.`;
+      out.aimOk = chk.ok && foes.length + al.length > 0;
+    }
+  }
+  return out;
+}
+function osOnPath(F, c, path) {
+  return F.foesAlive().some(e => { if (e.cond.dazed || e.osUsed === F.round) return false; const a = e.attacks.find(x => !x.area && !x.summon && x.reach); if (!a) return false;
+    let inside = G.dist(path[0], e.pos) <= a.reach; for (let i = 1; i < path.length; i++) { const now = G.dist(path[i], e.pos) <= a.reach; if (inside && !now) return true; inside = now; } return false; });
+}
+function tokenHTML(F, x, ov, pos) {
+  const isPC = x.side === "pc", p = pos || x.pos; if (!p) return "";
+  const hp = isPC ? x.hp : Math.max(0, x.hp), max = x.maxhp, act = actor() === x;
+  const conds = Object.keys(x.cond || {}).filter(k => x.cond[k] && COND_ABBR[k]);
+  const state = x.dead ? "dead" : x.down ? "down" : x.fled ? "fled" : "";
+  const mat = isPC ? (x.material === "chrome" ? "chrome" : x.material === "splice" ? "splice" : "bio") : "";
+  const num = !isPC && /\s(\d+)$/.exec(x.name); const ini = num ? x.name[0].toUpperCase() + num[1] : (isPC ? x.short : x.name).replace(/[^A-Za-z0-9 ]/g, "").split(" ").filter(Boolean).map(w => w[0]).join("").slice(0, 2).toUpperCase();
+  const label = `${x.name}${isPC ? "" : x.boss ? " (boss)" : ""}, ${sqName(p)}, HP ${hp} of ${max}${state ? ", " + state : ""}${conds.length ? ", " + conds.map(k => A.COND_NAME[k]).join(", ") : ""}${ov.tok[x.id] === "no" ? ", out of reach" : ov.tok[x.id] ? ", target" : ""}`;
+  return `<button type="button" class="tok ${isPC ? "pc " + mat : "foe"} ${x.boss || x.centre ? "big" : ""} ${state} ${act ? "act" : ""} ${x.dominated ? "dom" : ""} ${ov.tok[x.id] || ""} ${ui.selFoe === x.id ? "sel" : ""}" data-tok="${x.id}" data-fkey="tok-${x.id}" style="--x:${p.x};--y:${p.y};--hp:${pct(hp, max)}" aria-label="${esc(label)}" title="${esc(label)}">
+    <span class="ring"></span><span class="face">${esc(ini)}</span>${x.dead ? `<span class="st">✝</span>` : x.down ? `<span class="st">✚</span>` : ""}${ov.tok[x.id] === "no" ? `<span class="st">✕</span>` : ov.tok[x.id] && ov.tok[x.id] !== "ally-hit" ? `<span class="st tg">◎</span>` : ov.tok[x.id] === "ally-hit" ? `<span class="st">!</span>` : ""}
+    ${conds.length ? `<span class="cb">${conds.slice(0, 3).map(k => COND_ABBR[k]).join(" ")}</span>` : ""}</button>`;
+}
+function mapHTML(F, posOverride) {
+  const m = F.map, ov = overlays(); let cells = "";
+  for (let y = 0; y < m.h; y++) for (let x = 0; x < m.w; x++) {
+    const k = x + "," + y, ob = m.obst[G.key(x, y)], cur = ui.cur && ui.cur.x === x && ui.cur.y === y;
+    cells += `<div class="cell ${ob ? "ob ob-" + ob : ""} ${ov.cls[k] || ""} ${cur ? "cur" : ""}" data-x="${x}" data-y="${y}">${ov.mark[k] ? `<b class="mk">${ov.mark[k]}</b>` : ""}</div>`;
+  }
+  const toks = F.pcs.concat(F.foes).filter(x => !(x.fled) && (!x.dead || x.side === "pc" || (posOverride && posOverride[x.id] && !posOverride[x.id].dead))).map(x => tokenHTML(F, x, ov, posOverride && posOverride[x.id] ? posOverride[x.id] : null)).join("");
+  const cc = ui.cur ? F.at(ui.cur.x, ui.cur.y) : null;
+  return { html: `<div class="mapwrap theme-${m.theme}" style="--art:url(../art/${THEME_ART[m.theme] || "cover.jpg"})"><div class="mapscroll" id="mapScroll">
+    <div id="map" class="map theme-${m.theme}" role="application" tabindex="0" data-fkey="map" aria-roledescription="battle map" aria-label="Battle map, ${m.w} by ${m.h} squares, 5 feet each. ${esc(m.themeName)}. Arrow keys move the cursor, Enter acts on the cursor square, Escape goes back." style="--cs:${ui.zoom}px;--w:${m.w};--h:${m.h}">
+    <div class="cells">${cells}</div>${toks}<div id="fx"></div></div></div>
+    <div class="maptools"><span class="small">${esc(m.themeName)} · ${m.w}×${m.h} squares · 1 square = 5 ft</span><span class="small" id="curInfo" aria-live="polite">${ui.cur ? `Cursor ${sqName(ui.cur)}${cc ? ": " + esc(cc.name) : ""}` : ""}</span>
+    <span class="row"><button type="button" data-act="zoom" data-v="-1" aria-label="Zoom out">−</button><button type="button" data-act="zoom" data-v="1" aria-label="Zoom in">+</button></span></div></div>`, ov };
+}
+function pcHUD(F, c) {
+  if (!c) { const n = F.pending()[0]; c = n || F.pcs.find(x => !x.dead); }
+  if (!c) return `<div class="hud"><p class="small">No freelancer standing.</p></div>`;
+  const t = c.t && F.active === c ? c.t : null, mat = c.material === "chrome" ? "chrome" : c.material === "splice" ? "splice" : "bio";
+  return `<div class="hud pchud" aria-label="Active freelancer">
+  <div class="hrow"><div class="portrait ${mat}" style="background-image:url(../art/char_${mat}.jpg)" role="img" aria-label="${esc(c.formName)} portrait"></div>
+  <div><b class="nm">${esc(c.name)}</b><div class="small">L${c.level} ${esc(c.formName)} · ${esc(c.stageName)}${c.ffActive ? " · ★ FINAL FORM" : ""}</div>${F.active === c ? `<span class="tag">ACTIVE · ${sqName(c.pos)}</span>` : `<span class="tag dim">${c.turnDone ? "acted" : "waiting"}</span>`}</div></div>
   ${c.dead ? `<div class="tag bad">DEAD</div>` : c.down ? `<div class="tag bad">DOWN · Death marks ${c.marks}/3</div>` : ""}
-  <div class="bar ${c.hp < c.maxhp / 3 ? "low" : ""}" role="img" aria-label="HP ${c.hp} of ${c.maxhp}${c.tmp ? ", " + c.tmp + " temporary" : ""}"><i style="width:${pct(c.hp, c.maxhp)}%"></i>${c.tmp ? `<i class="tmp" style="left:${pct(c.hp, c.maxhp)}%;width:${pct(c.tmp, c.maxhp)}%"></i>` : ""}</div>
-  <div class="small">HP <b>${c.hp}</b>/${c.maxhp}${c.tmp ? ` (+${c.tmp})` : ""} · Armor ${c.armor + (c.cond.shell ? 1 : 0)} · Juice ${"●".repeat(c.juice)}${"○".repeat(Math.max(0, 3 - c.juice))}</div>
-  <div class="bar flux" role="img" aria-label="Flux ${c.flux} of ${c.limit}"><i style="width:${pct(c.flux, c.limit)}%"></i></div><div class="small">Flux <b>${c.flux}</b>/${c.limit} · Dodge ${sgn(c.def.dodge)} Endure ${sgn(c.def.endure)} Resist ${sgn(c.def.resist)}</div>
-  <div>${condTags(c.cond)}</div>
-  <div class="small">Primed: ${c.primed.map(p => `<span class="tag ${p.amped ? "amp" : ""}">${esc(p.sg.name)}${p.amped ? " ★" : ""}</span>`).join("") || "—"}${c.sigs.length ? ` · Sig: ${c.sigs.map(s => `<span class="tag ${c.sigUsed[s.key] ? "dim" : ""}">${esc(s.name)}</span>`).join("")}` : ""}</div>
-  ${F.phase === "player" && !F.active && !F.haste && !c.turnDone && F.canAct(c) ? `<button class="pri" data-act="turn" data-id="${c.id}" style="margin-top:4px">Take ${esc(c.short)}'s turn</button>` : c.turnDone && F.phase === "player" ? `<div class="small">✓ acted</div>` : ""}</div>`;
+  <div class="lbl">HP <b>${c.hp}</b>/${c.maxhp}${c.tmp ? ` <span class="tmpv">+${c.tmp} temp</span>` : ""}</div>
+  <div class="bar ${c.hp < c.maxhp / 3 ? "low" : ""}" role="img" aria-label="HP ${c.hp} of ${c.maxhp}"><i style="width:${pct(c.hp, c.maxhp)}%"></i>${c.tmp ? `<i class="tmp" style="left:${pct(c.hp, c.maxhp)}%;width:${pct(c.tmp, c.maxhp)}%"></i>` : ""}</div>
+  <div class="lbl">Flux <b>${c.flux}</b> / Limit ${c.limit}${c.flux >= c.limit - 1 ? ` <span class="warnv">⚠ near Overload</span>` : ""}</div>
+  <div class="bar flux" role="img" aria-label="Flux ${c.flux} of limit ${c.limit}"><i style="width:${pct(c.flux, c.limit)}%"></i></div>
+  <div class="nums"><div><span>Seq. die</span>d${c.die}</div><div><span>Dodge</span>${sgn(c.def.dodge)}</div><div><span>Endure</span>${sgn(c.def.endure)}</div><div><span>Resist</span>${sgn(c.def.resist)}</div><div><span>Armor</span>${c.armor + (c.cond.shell ? 1 : 0)}</div><div><span>Speed</span>${F.speedSq(c) * 5} ft</div><div><span>Juice</span>${"●".repeat(c.juice)}${"○".repeat(Math.max(0, 3 - c.juice))}</div><div><span>Reaction</span>${c.reactions > 0 ? "ready" : "used"}</div></div>
+  ${t ? `<div class="acts" aria-label="Actions remaining"><span class="${t.actions > 0 ? "on" : ""}">${t.actions > 0 ? "◆" : "◇"} Action${t.actions > 1 ? " ×" + t.actions : ""}</span><span class="${t.quick > 0 && !c.cond.dazed ? "on" : ""}">${t.quick > 0 && !c.cond.dazed ? "◆" : "◇"} Quick</span><span class="${t.move > 0 ? "on" : ""}">${t.move > 0 ? "◆" : "◇"} Move ${t.move * 5} ft</span>${t.churned ? `<span>Churned</span>` : ""}</div>` : ""}
+  <div class="small"><b>Primed:</b> ${c.primed.map(p => `<span class="tag ${p.amped ? "amp" : ""}">${esc(p.sg.name)}${p.amped ? " ★Amped" : ""}</span>`).join("") || "—"}${c.sigs.length ? `<br><b>Signature:</b> ${c.sigs.map(s => `<span class="tag ${c.sigUsed[s.key] ? "dim" : ""}">${esc(s.name)}${c.sigUsed[s.key] ? " (used)" : ""}</span>`).join("")}` : ""}</div>
+  <div>${condTags(c.cond)}</div></div>`;
 }
-function foeCard(F, e) {
-  return `<div class="card ecard ${e.dead || e.fled ? "dead" : ""}"><b>${esc(e.name)}</b> <span class="tag foe">${esc(e.boss ? "BOSS" : e.role)}</span>${e.machine ? `<span class="tag dim">machine</span>` : ""}${e.dominated ? `<span class="tag">on your side</span>` : ""}${e.shifted ? `<span class="tag foe">Shifted</span>` : ""}
-  ${e.dead ? `<div class="small">✝ down</div>` : e.fled ? `<div class="small">surrendered</div>` : `<div class="bar foe" role="img" aria-label="HP ${e.hp} of ${e.maxhp}"><i style="width:${pct(e.hp, e.maxhp)}%"></i></div>
-  <div class="small">HP <b>${e.hp}</b>/${e.maxhp} · Guard ${F.guardOf(e)} · TN ${e.tn} · Armor ${e.armor}${e.actions > 1 ? ` · ${e.actions} actions` : ""}${e.interrupts ? ` · ${e.interrupts} Interrupt` : ""}</div>
-  <div class="small">${e.attacks.map(a => `${esc(a.n)}${a.summon ? "" : ` (${a.dmg}${a.area ? ", Area" : ""}${a.rider ? ", " + esc(a.rider) : ""})`}${a.recharge && !e.charge[a.n] ? " ⟳" : ""}`).join(" · ")}</div>
-  <div>${condTags(e.cond, true)}</div>`}</div>`;
+function foeHUD(F, e) {
+  if (!e) return `<div class="hud foehud"><p class="small">No enemy targeted.</p></div>`;
+  const P = F.P, rt = e.spec.ratings || {}, c = actor();
+  const traits = Object.keys(e.tr).filter(k => e.tr[k]).map(k => k[0].toUpperCase() + k.slice(1));
+  const d = c && c.pos && e.pos ? G.dist(c.pos, e.pos) : null;
+  return `<div class="hud foehud" aria-label="Targeted enemy">
+  <div class="hrow"><div class="portrait foe ${e.boss ? "boss" : ""}" role="img" aria-label="enemy"><span>${esc(e.name.split(" ").map(w => w[0]).join("").slice(0, 2))}</span></div>
+  <div><b class="nm">${esc(e.name)}</b><div class="small">${esc(e.boss ? "BOSS" : e.role)} · Tier ${e.T}${rt["b" + P] != null ? ` · BR ${rt["b" + P]}` : ""}${rt["m" + P] != null ? ` · MR ${rt["m" + P]}` : ""}</div>
+  <span class="tag foe">${sqName(e.pos)}${d != null ? ` · ${d * 5} ft away` : ""}</span>${e.dominated ? `<span class="tag">on your side</span>` : ""}${e.shifted ? `<span class="tag foe">Shifted</span>` : ""}</div></div>
+  ${e.dead ? `<div class="small">✝ down</div>` : `<div class="lbl">HP <b>${Math.max(0, e.hp)}</b>/${e.maxhp}</div><div class="bar foe" role="img" aria-label="HP ${e.hp} of ${e.maxhp}"><i style="width:${pct(e.hp, e.maxhp)}%"></i></div>
+  <div class="nums"><div><span>Guard</span>${F.guardOf(e)}</div><div><span>TN</span>${e.tn}</div><div><span>Armor</span>${e.armor}</div><div><span>Speed</span>${esc(e.speedTxt)}</div></div>
+  <div class="small">${e.actions > 1 ? `${e.actions} actions · ` : ""}${e.interrupts ? `${e.interrupts} Interrupt · ` : ""}${traits.length ? "Traits: " + esc(traits.join(", ")) : "No special traits"}</div>
+  <ul class="atks">${e.attacks.map(a => `<li><b>${esc(a.n)}</b>${a.summon ? " (summons)" : ` · ${a.dmg} dmg · ${a.area ? `Area: ${esc(a.area === true ? "" : String(a.shape || a.rng || a.area))}` : a.reach ? `reach ${a.reach * 5} ft` : a.range ? `${a.range * 5} ft` : ""}${a.d ? " vs " + esc(a.d) : ""}${a.rider ? " · " + esc(A.COND_NAME[a.rider] || a.rider) : ""}`}${a.recharge && !e.charge[a.n] ? " ⟳ recharging" : ""}</li>`).join("")}</ul>
+  <div>${condTags(e.cond, true)}</div>${e.spec.tactics ? `<p class="small tac">${esc(e.spec.tactics)}</p>` : ""}`}</div>`;
 }
-function optButton(o, i) {
-  const k = o.kind === "quick" ? "Quick" : o.kind === "free" ? "Free" : "Action";
-  return `<button class="opt ${o.over ? "over" : ""}" data-act="opt" data-o="${esc(o.id)}" ${i < 9 ? `aria-keyshortcuts="${i + 1}"` : ""}><span>${i < 9 ? `<span class="k">[${i + 1}]</span> ` : ""}${esc(o.label)}${o.detail ? `<small>${esc(o.detail)}</small>` : ""}${o.over ? `<small style="color:var(--warn)">⚠ This pushes you past your Flux Limit: you will Overload.</small>` : ""}</span><span><span class="fx">${o.flux != null && o.flux !== undefined ? o.flux + " Flux" : ""}</span><br><span class="k">${k}</span></span></button>`;
+function orderBar(F) {
+  const ord = F.order(); const c = actor();
+  const chip = x => `<li class="oc ${x.side} ${x === c ? "now" : ""} ${x.turnDone || x.dead || x.down ? "done" : ""}" title="${esc(x.name)}"><span>${esc(x.short || x.name)}</span>${x.dead ? " ✝" : x.down ? " ✚" : x.turnDone ? " ✓" : x === c ? " ◀" : ""}</li>`;
+  const foes = F.foesAll();
+  return `<ol class="order" aria-label="Turn order, round ${F.round}"><li class="oc lab">Round ${F.round || 1}</li>${!F.playersFirst && F.round <= 1 && F.phase !== "player" ? `<li class="oc foe">Enemy Phase (${foes.length})</li>` : ""}${ord.map(chip).join("")}<li class="oc foe ${F.phase === "enemy" ? "now" : ""}">Enemy Phase · ${foes.map(e => esc(e.name)).slice(0, 4).join(", ")}${foes.length > 4 ? ` +${foes.length - 4}` : ""}</li></ol>`;
 }
-function centerPanel(F) {
+// ---- the JRPG command menu
+const ROOTS = [["move", "Move"], ["attack", "Attack"], ["surge", "Surges"], ["churn", "Churn"], ["items", "Items / Kit"], ["other", "Defend / Other"], ["wait", "Wait"], ["end", "End Turn"]];
+function groupOf(o) { if (o.id === "move") return "move"; if (o.id === "end") return "end"; if (o.id === "churn") return "churn"; if (o.id.startsWith("atk:")) return "attack"; if (/^(un|sig):/.test(o.id)) return "surge"; if (o.group === "Items") return "items"; return "other"; }
+function targetSummary(F, o) {
+  if (o.target === "enemy" || o.target === "ally") { if (o.targets.length) return `${o.targets.length} in range`; const w = (o.all || [])[0]; return w ? "none in range" : "no targets"; }
+  if (o.target === "area") { const b = F.autoAim(actor(), o); return b ? `best aim: ${b.foes.length} enem${b.foes.length === 1 ? "y" : "ies"}` : "nothing in reach"; }
+  return "";
+}
+function optRow(F, o, i) {
+  const kind = o.kind === "quick" ? "Quick" : o.kind === "free" ? "Free" : o.kind === "move" ? "Move" : "Action";
+  const blocked = (o.target === "enemy" || o.target === "ally") && !o.targets.length;
+  const why = blocked ? ((o.all || []).find(x => !x.ok) || {}).why || "no valid target" : "";
+  return `<button type="button" class="cmd opt ${o.over ? "over" : ""}" data-act="opt" data-o="${esc(o.id)}" ${blocked ? `aria-disabled="true" data-why="${esc(why)}"` : ""} data-fkey="opt-${esc(o.id)}"><span>${i < 9 ? `<span class="k">${i + 1}</span>` : ""}${esc(o.label)}${o.detail ? `<small>${esc(o.detail)}</small>` : ""}${blocked ? `<small class="why">✕ ${esc(why)}${/range|reach|sight/.test(why) ? " — move first" : ""}</small>` : (o.target !== "none" && o.target !== "move" ? `<small class="ok">${esc(targetSummary(F, o))}</small>` : "")}${o.over ? `<small class="warnv">⚠ past your Flux Limit: you will Overload</small>` : ""}</span><span class="meta">${o.flux != null ? `<span class="fx">${o.flux} Flux</span>` : ""}<span class="k">${kind}</span></span></button>`;
+}
+function menuHTML(F) {
   const run = ui.run;
+  if (ui.anim) return `<div class="menu" role="region" aria-label="Enemy turn"><h3>${F.phase === "enemy" || ui.anim.enemy ? "Enemy Phase" : "Resolving…"}</h3><p id="banner" class="banner" aria-live="polite">…</p><div class="row"><button type="button" data-act="skipAnim" data-focus data-fkey="skip">Skip ▶▶ (Space)</button></div></div>`;
   if (F.phase === "won" || F.phase === "lost") {
     const won = F.phase === "won";
-    return `<div class="card ${won ? "on" : "bad"}"><p class="big">${won ? "VICTORY" : "DEFEAT"}</p><p>${esc(F.title)} · ${F.stats.rounds} rounds · dealt ${F.stats.dealt}, took ${F.stats.taken}${F.stats.downs ? ` · ${F.stats.downs} Down` : ""}${F.stats.deaths ? ` · ${F.stats.deaths} dead` : ""}</p>
-    <button class="pri" data-act="afterFight" data-focus>${won ? (F.kind === "minion" ? "Take a Breather →" : run.level >= 10 ? "Claim victory →" : "Level up →") : "Continue →"}</button></div>`;
+    return `<div class="menu"><div class="card ${won ? "on" : "bad"}"><p class="big">${won ? "VICTORY" : "DEFEAT"}</p><p>${esc(F.title)} · ${F.stats.rounds} rounds · dealt ${F.stats.dealt}, took ${F.stats.taken}${F.stats.downs ? ` · ${F.stats.downs} Down` : ""}${F.stats.deaths ? ` · ${F.stats.deaths} dead` : ""}</p>
+    <button class="pri" data-act="afterFight" data-focus>${won ? (F.kind === "minion" ? "Take a Breather →" : run.level >= 10 ? "Claim victory →" : "Level up →") : "Continue →"}</button></div></div>`;
   }
   if (F.phase === "prime") {
-    return `<h3>Prime</h3><p class="small">Every freelancer rolls their Sequence die Prime times. Doubles make that Surge Amped (0 Flux). You may spend Juice to set a die to any face before locking in.</p>
-    ${F.pcs.filter(c => c.primeDice && !c.dead).map(c => `<div class="card"><b>${esc(c.short)}</b> <span class="small">d${c.die} × ${c.prime} · Juice ${c.juice}</span><div class="dice">${c.primeDice.map((v, j) => { const sg = F.slotOf(c, v); return `<span class="die" title="${esc(sg ? sg.name : "Wild")}">${v}</span>${c.juice > 0 ? `<select aria-label="${esc(c.short)} die ${j + 1}: spend Juice to set" data-act="setDie" data-id="${c.id}" data-j="${j}"><option value="">Juice…</option>${Array.from({ length: c.die }, (_, x) => `<option value="${x + 1}">${x + 1}: ${esc((F.slotOf(c, x + 1) || { name: "Wild" }).name)}</option>`).join("")}</select>` : ""}`; }).join(" ")}</div>
-    <div class="small">${c.primeDice.map(v => esc((F.slotOf(c, v) || { name: "Wild slot" }).name)).join(" · ")}</div></div>`).join("")}
-    <div class="row"><button class="pri" data-act="lockPrime" data-focus>Lock in Prime →</button><button data-act="autoAll">Auto-battle</button></div>`;
+    return `<div class="menu"><h3>Prime</h3><p class="small">Every freelancer rolls their Sequence die Prime times. Doubles make that Surge Amped (0 Flux). You may spend Juice to set a die to any face before locking in.</p>
+    <div class="cards">${F.pcs.filter(c => c.primeDice && !c.dead).map(c => `<div class="card"><b>${esc(c.short)}</b> <span class="small">d${c.die} × ${c.prime} · Juice ${c.juice}</span><div class="dice">${c.primeDice.map((v, j) => { const sg = F.slotOf(c, v); return `<span class="die" title="${esc(sg ? sg.name : "Wild")}">${v}</span>${c.juice > 0 ? `<select aria-label="${esc(c.short)} die ${j + 1}: spend Juice to set" data-act="setDie" data-id="${c.id}" data-j="${j}"><option value="">Juice…</option>${Array.from({ length: c.die }, (_, x) => `<option value="${x + 1}">${x + 1}: ${esc((F.slotOf(c, x + 1) || { name: "Wild" }).name)}</option>`).join("")}</select>` : ""}`; }).join(" ")}</div>
+    <div class="small">${c.primeDice.map(v => esc((F.slotOf(c, v) || { name: "Wild slot" }).name)).join(" · ")}</div></div>`).join("")}</div>
+    <div class="row"><button class="pri" data-act="lockPrime" data-focus>Lock in Prime →</button><button data-act="autoAll">Auto-battle</button></div></div>`;
   }
   if (F.phase === "setup") {
-    return `<h3>Ready</h3><p class="small">Primed Surges are shown on each card.${F.pcs.some(c => F.canFinalForm(c)) ? " Level 10: a freelancer can enter Final Form now (once per Lockdown)." : ""}</p>
+    return `<div class="menu"><h3>Ready</h3><p class="small">The freelancers deploy on the left, the enemies on the right. Primed Surges show in each HUD.${F.pcs.some(c => F.canFinalForm(c)) ? " Level 10: a freelancer can enter Final Form now (once per Lockdown)." : ""}</p>
     ${F.pcs.filter(c => F.canFinalForm(c)).map(c => `<button data-act="final" data-id="${c.id}">★ ${esc(c.short)}: FINAL FORM</button>`).join(" ")}
     ${F.pcs.filter(c => F.firmwareOptions(c)).map(c => `<div class="row small"><span>${esc(c.short)}'s Firmware: swap</span><select data-fw="p" data-id="${c.id}">${c.primed.map((p, j) => `<option value="${j}">${esc(p.sg.name)}</option>`).join("")}</select><span>for</span><select data-fw="s" data-id="${c.id}">${F.firmwareOptions(c).map(s => `<option value="${s.key}">${esc(s.name)}</option>`).join("")}</select><button data-act="fw" data-id="${c.id}">Swap</button></div>`).join("")}
-    <p class="small">${F.playersFirst ? "Initiative: the freelancers go first." : "Initiative: the enemies go first!"}</p><div class="row"><button class="pri" data-act="begin" data-focus>Begin the fight →</button><button data-act="autoAll">Auto-battle</button></div>`;
+    <p class="small">${F.playersFirst ? "Initiative: the freelancers go first." : "Initiative: the enemies go first!"}</p><div class="row"><button class="pri" data-act="begin" data-focus>Begin the fight →</button><button data-act="autoAll">Auto-battle</button></div></div>`;
   }
-  if (F.phase === "player") {
-    const hc = F.haste ? F.pc(F.haste.to) : null; const c = hc || F.active;
-    if (!c) return `<h3>Round ${F.round} · your move</h3><p class="small">Pick who acts next (any order). Down allies can be Patched or healed back up.</p>
-      <div class="opts">${F.pending().map((x, i) => `<button class="opt" data-act="turn" data-id="${x.id}" ${i === 0 ? "data-focus" : ""}><span>${esc(x.short)} <small>HP ${x.hp}/${x.maxhp} · Flux ${x.flux}/${x.limit} · ${x.primed.length} Primed</small></span></button>`).join("")}</div>
-      <div class="row" style="margin-top:8px"><button data-act="autoRound">Auto: rest of round</button><button data-act="autoAll">Auto-battle</button><button data-act="endPhase">End Player Phase</button></div>`;
-    const opts = F.options(c);
-    if (ui.pendingOpt) { const o = opts.find(x => x.id === ui.pendingOpt); if (o) return `<h3>${esc(c.short)}: ${esc(o.label)}</h3><p class="small">Choose a target.</p><div class="opts">${o.targets.map((id, i) => { const t = F.byId(id); return `<button class="opt" data-act="target" data-t="${id}" ${i === 0 ? "data-focus" : ""}><span>${i < 9 ? `<span class="k">[${i + 1}]</span> ` : ""}${esc(t.name)} <small>HP ${t.hp}/${t.maxhp}${t.side === "foe" ? ` · Guard ${F.guardOf(t)} · TN ${t.tn}` : ""}</small></span></button>`; }).join("")}</div><button data-act="cancelOpt" style="margin-top:6px">← Back (Esc)</button>`; ui.pendingOpt = null; }
-    const groups = { action: [], quick: [], free: [] }; opts.forEach(o => groups[o.kind].push(o));
-    let n = 0; const list = arr => arr.map(o => optButton(o, n++)).join("");
-    return `<h3>${hc ? `${esc(c.short)} is Hasted` : `${esc(c.short)}'s turn`}</h3><p class="small">${hc ? "One immediate Action (not Unleash) with advantage." : `Action ${c.t.actions > 0 ? "ready" : "used"} · Quick ${c.t.quick > 0 && !c.cond.dazed ? "ready" : "used"}${c.t.churned ? " · Churned (no Unleash)" : ""} · Flux ${c.flux}/${c.limit}`}</p>
-    <div class="opts">${groups.action.length ? `<div class="grp">Action</div>${list(groups.action)}` : ""}${groups.quick.length ? `<div class="grp">Quick action</div>${list(groups.quick)}` : ""}${groups.free.length ? `<div class="grp">Free</div>${list(groups.free)}` : ""}</div>
-    ${hc ? `<button data-act="skipHaste" style="margin-top:6px">Skip the Haste action</button>` : `<div class="row" style="margin-top:8px"><button data-act="autoTurn">Auto this turn</button><button data-act="autoAll">Auto-battle</button></div>`}`;
+  if (F.phase !== "player") return `<div class="menu"><p>…</p></div>`;
+  const c = actor();
+  if (!c) return `<div class="menu"><h3>Round ${F.round} · Player Phase</h3><p class="small">Pick who acts next (any order).</p><div class="cmds">${F.pending().map((x, i) => `<button type="button" class="cmd" data-act="turn" data-id="${x.id}" ${i === 0 ? "data-focus" : ""} data-fkey="turn-${x.id}"><span><span class="k">${i + 1}</span>${esc(x.short)} <small>HP ${x.hp}/${x.maxhp} · Flux ${x.flux}/${x.limit}</small></span></button>`).join("")}</div>${autoRow(F)}</div>`;
+  const opts = F.options(c), m = ui.menu, hc = F.haste && F.haste.to === c.id;
+  const head = `<div class="mhead"><b>${hc ? `${esc(c.short)} is Hasted — one Action (not Unleash) with advantage` : `${esc(c.short)}'s turn`}</b>${m.lv !== "root" ? `<button type="button" class="back" data-act="back" data-fkey="back">← Back (Esc)</button>` : ""}</div>`;
+  if (m.lv === "move") {
+    return `<div class="menu" role="region" aria-label="Move">${head}<p class="small">Move ${c.t.move * 5} ft left (diagonals count as 5 ft). Click a lit square, or move the cursor with the arrow keys and press Enter. ⚠ marks squares whose path leaves an enemy's reach and provokes an Opportunity Strike.</p>
+    <label class="inl"><input type="checkbox" id="careful" ${ui.careful ? "checked" : ""}> Move carefully: half speed, no Opportunity Strikes (C)</label>
+    <div class="row"><button type="button" class="pri" data-act="moveHere" data-focus data-fkey="moveHere">Move to ${sqName(ui.cur)} (Enter)</button></div></div>`;
   }
-  return `<p>…</p>`;
+  const o = m.opt && opts.find(x => x.id === m.opt);
+  if (m.lv === "target" && o) {
+    const list = (o.all || []).slice().sort((a, b) => b.ok - a.ok);
+    return `<div class="menu" role="region" aria-label="Choose a target">${head}<p class="small"><b>${esc(o.label)}</b> — choose a target (↑/↓, Enter, or click a token on the map). Range is lit on the map; long range shown fainter.</p>
+    <div class="cmds">${list.map((t, i) => { const x = F.byId(t.id); return `<button type="button" class="cmd" data-act="target" data-t="${t.id}" ${t.ok ? "" : `aria-disabled="true" data-why="${esc(t.why)}"`} ${i === 0 && t.ok ? "data-focus" : ""} data-fkey="tg-${t.id}"><span><span class="k">${i + 1}</span>${esc(x.name)} <small>${sqName(x.pos)} · HP ${Math.max(0, x.hp)}/${x.maxhp}${x.side === "foe" ? ` · Guard ${F.guardOf(x)}` : ""}${c.pos && x.pos ? ` · ${G.dist(c.pos, x.pos) * 5} ft` : ""}</small>${t.ok ? (t.dis ? `<small class="warnv">disadvantage: ${esc(t.why)}</small>` : "") : `<small class="why">✕ ${esc(t.why)}</small>`}</span></button>`; }).join("") || `<p class="small">No targets.</p>`}</div></div>`;
+  }
+  if (m.lv === "aim" && o) {
+    const ov = overlays(); const wave = (o.sg && o.sg.shape === "wave");
+    return `<div class="menu" role="region" aria-label="Aim the area">${head}<p class="small"><b>${esc(o.label)}</b> — ${o.geo && (o.geo.self || o.geo.shape === "pulse") ? "centred on you." : "place the template: click a square or move the cursor (arrows), Enter to confirm."}${wave ? " T switches cone / line." : ""}</p>
+    <p class="banner" aria-live="polite">${esc(ov.info || "")}</p>
+    <div class="row"><button type="button" class="pri" data-act="confirmAim" ${ov.aimOk ? "" : `aria-disabled="true"`} data-focus data-fkey="confirmAim">Confirm (Enter)</button><button type="button" data-act="bestAim">Best aim</button>${wave ? `<button type="button" data-act="aimMode">${ui.aimMode === "cone" ? "15-ft cone → line" : "30-ft line → cone"} (T)</button>` : ""}</div></div>`;
+  }
+  if (m.lv === "list") {
+    const list = opts.filter(x => groupOf(x) === m.grp);
+    return `<div class="menu" role="region" aria-label="${esc(m.grp)}">${head}<div class="cmds">${list.map((x, i) => optRow(F, x, i)).join("") || `<p class="small">Nothing here right now.</p>`}</div></div>`;
+  }
+  // root
+  const roots = ROOTS.filter(([g]) => !(hc && (g === "move" || g === "wait" || g === "churn")));
+  const rows = roots.map(([g, label], i) => {
+    let en = false, sub = "";
+    if (g === "wait") { en = F.canWait(c); sub = en ? "let someone else go first" : "only before you act"; }
+    else if (g === "end") { en = !hc; sub = hc ? "" : "end " + c.short + "'s turn"; }
+    else { const L = opts.filter(x => groupOf(x) === g); en = L.length > 0; sub = g === "move" ? (en ? `${c.t.move * 5} ft left` : c.t.move > 0 ? "can't move" : "no movement left") : g === "churn" ? (en ? `d${c.die}, +1 Flux (Quick)` : c.t.unleashed ? "you Unleashed this turn" : "Quick used") : en ? `${L.length} option${L.length > 1 ? "s" : ""}` : g === "surge" ? (c.t.churned ? "Churned: no Unleash" : c.t.actions > 0 ? "nothing Primed" : "no Action left") : "none available"; }
+    return `<button type="button" class="cmd root" data-act="root" data-g="${g}" ${en ? "" : `aria-disabled="true"`} ${i === 0 ? "" : ""} data-fkey="root-${g}"><span><span class="k">${i + 1}</span>${label}</span><small>${esc(sub)}</small></button>`;
+  }).join("");
+  return `<div class="menu" role="region" aria-label="Commands">${head}<div class="cmds rootcmds">${rows}</div>${hc ? `<button data-act="skipHaste">Skip the Haste action</button>` : ""}${autoRow(F)}</div>`;
 }
-function viewBattle() {
-  const F = ui.F;
-  return `<section class="panel"><h2>Level ${F.level} · ${esc(F.title)}</h2><p class="small">${F.phase === "player" ? `Round ${F.round} · Player Phase` : F.phase === "prime" ? "Prime" : F.phase === "setup" ? "Before the first round" : ""} · ${esc(ui.run.partyName)} · ${A.DIFFS[ui.run.difficulty].name}</p>
-  <div class="battle"><div class="side"><h3>Freelancers</h3>${F.pcs.map(c => pcCard(F, c)).join("")}</div>
-  <div class="center">${centerPanel(F)}<h3>Combat log</h3><div id="log" role="log" aria-label="Combat log" tabindex="0">${F.logs.slice(-400).map(l => `<div class="${esc(l.cls)}">${esc(l.t)}</div>`).join("")}</div></div>
-  <div class="side"><h3>Enemies</h3>${F.foes.filter(e => !e.dominated || true).map(e => foeCard(F, e)).join("")}</div></div></section>`;
+function autoRow(F) {
+  return `<div class="row autorow"><button type="button" data-act="autoTurn">Auto: this turn</button><button type="button" data-act="autoRound">Auto: round</button><button type="button" data-act="autoAll">Auto: battle</button>
+  <label class="inl small">Enemy turns <select id="animSpeed" aria-label="Enemy turn animation speed">${["normal", "fast", "off"].map(s => `<option value="${s}" ${ui.speed === s ? "selected" : ""}>${s === "off" ? "instant" : s}</option>`).join("")}</select></label>
+  <label class="inl small"><input type="checkbox" id="autoSwitch" ${ui.autoSwitch ? "checked" : ""}> Auto-switch turns</label></div>`;
+}
+function viewBattle(posOverride) {
+  const F = ui.F, c = actor(), mp = mapHTML(F, posOverride);
+  return `<section class="panel bpanel"><div class="bhead"><h2>Level ${F.level} · ${esc(F.title)}</h2><span class="small">${F.phase === "player" ? `Round ${F.round} · Player Phase` : F.phase === "prime" ? "Prime" : F.phase === "setup" ? "Before the first round" : F.phase === "enemy" ? "Enemy Phase" : ""} · ${esc(ui.run.partyName)} · ${A.DIFFS[ui.run.difficulty].name}${ui.run.hardcore ? " · Permadeath" : ""}</span></div>
+  ${orderBar(F)}
+  <div class="vtt"><aside class="hudcol left">${pcHUD(F, c)}</aside><div class="mapcol">${mp.html}</div><aside class="hudcol right" id="foeHud">${foeHUD(F, foeFocus())}</aside></div>
+  <div class="dock" id="dock">${menuHTML(F)}</div>
+  <details class="logbox" ${ui.logOpen ? "open" : ""}><summary>Dice log (${F.logs.length})</summary><div id="log" role="log" aria-label="Combat log" tabindex="0">${F.logs.slice(-400).map(l => `<div class="${esc(l.cls)}">${esc(l.t)}</div>`).join("")}</div></details></section>`;
 }
 let lastLogLen = 0;
 function announce() { const F = ui.F; if (!F) return; const fresh = F.logs.slice(lastLogLen).map(l => l.t); lastLogLen = F.logs.length; if (fresh.length) $("#live").textContent = fresh.slice(-4).join(" "); }
-function doOpt(id, target) {
-  const F = ui.F; const c = F.haste ? F.pc(F.haste.to) : F.active; if (!c) return;
-  const o = F.options(c).find(x => x.id === id); if (!o) return;
-  if ((o.target === "enemy" || o.target === "ally") && !target) { if (o.targets.length === 0) { toast("No valid target."); return; } if (o.targets.length > 1) { ui.pendingOpt = id; render(true); return; } target = o.targets[0]; }
-  if (o.over && !confirm(`${o.label}: this pushes ${c.short} past their Flux Limit and they will Overload. Do it anyway?`)) return;
-  ui.pendingOpt = null; const r = F.perform(c, id, target); if (!r.ok) toast(r.msg);
-  afterAction();
+// begin the next freelancer's turn automatically (initiative order)
+function autoSwitch() {
+  const F = ui.F; if (!ui.autoSwitch) return; let g = 0;
+  while (F.phase === "player" && !F.active && !F.haste && g++ < 12) { const n = F.pending()[0]; if (!n) { F.endPlayerPhase(); continue; } F.beginTurn(n); if (F.active === n) { resetMenu(); ui.selFoe = null; break; } }
 }
-function afterAction() { announce(); if (ui.F.phase === "won" || ui.F.phase === "lost") { ui.run.inFight = false; } render(true); }
-function autoRest(all) {
-  const F = ui.F; let g = 0;
-  if (F.phase === "prime") { A.autoSetup(F); }
-  if (F.phase === "setup") { A.autoSetup(F); F.begin(); }
-  const round = F.round;
-  while (F.phase === "player" && g++ < 500) {
-    if (F.haste) { const a = F.pc(F.haste.to); const ch = A.aiChoose(F, a, F.options(a).filter(o => o.kind === "action")); if (!ch || ch.id === "end") F.haste = null; else F.perform(a, ch.id, ch.target); continue; }
-    if (F.active) { const c = F.active; const ch = A.aiChoose(F, c, F.options(c)); const r = F.perform(c, ch.id, ch.target); if (!r.ok) F.perform(c, "end"); continue; }
-    if (!all && F.round !== round) break;
-    const c = F.pending()[0]; if (!c) { F.endPlayerPhase(); continue; }
-    A.autoTurn(F, c);
-    if (!all && F.round !== round) break;
-    if (all && F.round > 60) { F.phase = "lost"; F.finish(false); break; }
+function snap(F) { const o = {}; F.pcs.concat(F.foes).forEach(x => { if (x.pos) o[x.id] = { x: x.pos.x, y: x.pos.y, hp: x.hp, dead: !!x.dead || !!x.fled }; }); return o; }
+// run something against the engine, then animate what happened (enemy turns, moves, hits) and re-render
+function doAct(fn, opts) {
+  const F = ui.F; if (!F || ui.anim) return; const before = snap(F); F.events = [];
+  fn(); if (!(opts && opts.noSwitch)) autoSwitch();
+  const evs = F.events; F.events = []; announce(); persist();
+  if (F.phase === "won" || F.phase === "lost") ui.run.inFight = false;
+  const anim = evs.filter(e => ["move", "atk", "area", "dmg", "heal", "die", "summon"].includes(e.t));
+  if (ui.speed !== "off" && anim.length && !(opts && opts.instant)) play(before, evs, opts && opts.focus);
+  else { if (!actor()) resetMenu(); render(true); }
+}
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+async function play(before, evs, focusKey) {
+  const F = ui.F; const k = ui.speed === "fast" ? 0.35 : 1; const enemy = evs.some(e => e.t === "log" && /^Enemy Phase/.test(e.text));
+  ui.anim = { skip: false, enemy }; const pos = JSON.parse(JSON.stringify(before));
+  render(false); const skipBtn = scr.querySelector("[data-act=skipAnim]"); if (skipBtn) skipBtn.focus({ preventScroll: true });
+  const map = $("#map"), fx = $("#fx"), banner = () => $("#banner");
+  const tok = id => map && map.querySelector(`[data-tok="${id}"]`);
+  const float = (id, txt, cls) => { const t = tok(id); if (!t || !fx) return; const p = pos[id] || {}; const d = document.createElement("div"); d.className = "float " + cls; d.textContent = txt; d.style.setProperty("--x", p.x); d.style.setProperty("--y", p.y); fx.appendChild(d); setTimeout(() => d.remove(), 1100 * k + 200); };
+  try {
+    for (const e of evs) {
+      if (ui.anim.skip) break;
+      if (e.t === "log") { const b = banner(); if (b && !/^\s/.test(e.text)) b.textContent = e.text; continue; }
+      if (e.t === "move") { const t = tok(e.id); if (!t) continue; for (const p of e.path.slice(1)) { if (ui.anim.skip) break; t.style.setProperty("--x", p.x); t.style.setProperty("--y", p.y); pos[e.id] = Object.assign(pos[e.id] || {}, { x: p.x, y: p.y }); await sleep((e.blink ? 60 : 140) * k); } continue; }
+      if (e.t === "atk") { const a = tok(e.id); if (a) a.classList.add("flash"); (e.to || []).forEach(id => { const t = tok(id); if (t) t.classList.add("hit"); }); await sleep(320 * k); if (a) a.classList.remove("flash"); (e.to || []).forEach(id => { const t = tok(id); if (t) t.classList.remove("hit"); }); continue; }
+      if (e.t === "area") { const els = (e.cells || []).map(p => map.querySelector(`.cell[data-x="${p.x}"][data-y="${p.y}"]`)).filter(Boolean); els.forEach(x => x.classList.add("blast")); const a = tok(e.id); if (a) a.classList.add("flash"); await sleep(420 * k); els.forEach(x => x.classList.remove("blast")); if (a) a.classList.remove("flash"); continue; }
+      if (e.t === "dmg") { float(e.id, "−" + e.n, "dmg"); const t = tok(e.id); const x = F.byId(e.id); if (t && x && pos[e.id]) { pos[e.id].hp -= e.n; t.style.setProperty("--hp", pct(pos[e.id].hp, x.maxhp)); } await sleep(160 * k); continue; }
+      if (e.t === "heal") { float(e.id, "+" + e.n, "heal"); const t = tok(e.id); const x = F.byId(e.id); if (t && x && pos[e.id]) { pos[e.id].hp = Math.min(x.maxhp, pos[e.id].hp + e.n); t.style.setProperty("--hp", pct(pos[e.id].hp, x.maxhp)); } await sleep(140 * k); continue; }
+      if (e.t === "die") { const t = tok(e.id); if (t) t.classList.add("dead"); await sleep(200 * k); continue; }
+    }
+  } catch (err) { /* animation is cosmetic */ }
+  ui.anim = null; if (!actor()) resetMenu(); render(true);
+  if (focusKey) { const f = scr.querySelector(`[data-fkey="${focusKey}"]`); if (f) f.focus(); }
+}
+// ---- doing things from the menu or the map
+function chooseOpt(id) {
+  const F = ui.F, c = actor(); if (!c) return; const o = F.options(c).find(x => x.id === id); if (!o) return;
+  if (o.id === "move") { ui.menu = { lv: "move" }; ui.cur = { x: c.pos.x, y: c.pos.y }; render(); focusMap(); return; }
+  if (o.id === "end") { doAct(() => F.perform(c, "end")); return; }
+  if (o.target === "enemy" || o.target === "ally") {
+    if (!o.targets.length) { const w = (o.all || []).find(x => !x.ok); toast(w ? `No target in range: ${w.why}. Move closer first.` : "No valid target."); return; }
+    ui.menu = { lv: "target", opt: id }; const t = F.byId(o.targets[0]); if (t && t.pos) ui.cur = { x: t.pos.x, y: t.pos.y }; if (t && t.side === "foe") ui.selFoe = t.id; render(true); return;
   }
-  afterAction();
+  if (o.target === "area") { ui.menu = { lv: "aim", opt: id }; const b = F.autoAim(c, o); ui.cur = b ? { x: b.aim.x, y: b.aim.y } : { x: c.pos.x, y: c.pos.y }; if (b && b.mode) ui.aimMode = b.mode; render(); focusMap(); return; }
+  if (o.over && !confirm(`${o.label}: this pushes ${c.short} past their Flux Limit and they will Overload. Do it anyway?`)) return;
+  doPerform(c, id, null, {});
+}
+function doPerform(c, id, target, extra) {
+  const F = ui.F; const o = F.options(c).find(x => x.id === id);
+  if (o && o.over && (o.target === "enemy" || o.target === "ally" || o.target === "area") && !confirm(`${o.label}: this pushes ${c.short} past their Flux Limit and they will Overload. Do it anyway?`)) return;
+  let res = null; doAct(() => { res = F.perform(c, id, target, extra); if (res && res.ok && F.active === c) ui.menu = { lv: "root" }; });
+  if (res && !res.ok) toast(res.msg);
+}
+function pickTarget(id) {
+  const F = ui.F, c = actor(), o = F.options(c).find(x => x.id === ui.menu.opt); if (!o) return;
+  const t = (o.all || []).find(x => x.id === id); if (!t) return toast("That isn't a target for " + o.label + ".");
+  if (!t.ok) return toast(`${F.byId(id).name}: ${t.why}.`);
+  doPerform(c, o.id, id, {});
+}
+function confirmAim() {
+  const F = ui.F, c = actor(), o = F.options(c).find(x => x.id === ui.menu.opt); if (!o) return;
+  const chk = F.aimCheck(c, o, ui.cur || c.pos); if (!chk.ok) return toast(`Can't aim there: ${chk.why}.`);
+  doPerform(c, o.id, null, { aim: ui.cur || c.pos, mode: ui.aimMode });
+}
+function moveTo(x, y) {
+  const F = ui.F, c = actor(); if (!c) return;
+  const n = F.reach(c, ui.menu.lv === "move" && ui.careful).get(G.key(x, y)); if (!n || !n.cost) return toast(F.map.blocked.has(G.key(x, y)) ? "That square is blocked." : F.at(x, y) ? "That square is occupied." : "Out of reach this turn.");
+  const careful = ui.menu.lv === "move" && ui.careful;
+  let res = null; doAct(() => { res = F.perform(c, "move", null, { x, y, careful }); if (F.active === c) ui.menu = { lv: c.t.move > 0 && ui.menu.lv === "move" ? "move" : "root" }; }, { focus: "map" });
+  if (res && !res.ok) toast(res.msg);
+}
+function focusMap() { const m = $("#map"); if (m) m.focus({ preventScroll: true }); }
+function back() {
+  const m = ui.menu, c = actor();
+  if ((m.lv === "target" || m.lv === "aim") && c) { const o = ui.F.options(c).find(x => x.id === m.opt); ui.menu = o ? { lv: "list", grp: groupOf(o) } : { lv: "root" }; }
+  else ui.menu = { lv: "root" };
+  if (c && c.pos) ui.cur = { x: c.pos.x, y: c.pos.y }; render(true);
+}
+function cellClick(x, y) {
+  const F = ui.F, c = actor(), m = ui.menu; if (!F || ui.anim) return;
+  ui.cur = { x, y }; const who = F.at(x, y);
+  if (m.lv === "target") { if (who) return pickTarget(who.id); return render(); }
+  if (m.lv === "aim") { const o = F.options(c).find(z => z.id === m.opt); if (o && F.aimCheck(c, o, { x, y }).ok && ui.lastAim && ui.lastAim.x === x && ui.lastAim.y === y) { ui.lastAim = null; return confirmAim(); } ui.lastAim = { x, y }; return render(); }
+  if ((m.lv === "move" || m.lv === "root") && c && c.t && c.t.move > 0 && !who && F.phase === "player" && !F.haste) { const n = F.reach(c, m.lv === "move" && ui.careful).get(G.key(x, y)); if (n && n.cost) return moveTo(x, y); }
+  if (who && who.side === "foe") ui.selFoe = who.id;
+  render();
+}
+function moveCursor(dx, dy) {
+  const F = ui.F; if (!ui.cur) { const c = actor(); ui.cur = c && c.pos ? { x: c.pos.x, y: c.pos.y } : { x: 0, y: 0 }; }
+  ui.cur = { x: Math.max(0, Math.min(F.map.w - 1, ui.cur.x + dx)), y: Math.max(0, Math.min(F.map.h - 1, ui.cur.y + dy)) };
+  const w = F.at(ui.cur.x, ui.cur.y); if (w && w.side === "foe") ui.selFoe = w.id;
+  render(); focusMap();
+  const cc = F.at(ui.cur.x, ui.cur.y); $("#live").textContent = `${sqName(ui.cur)}${cc ? ": " + cc.name + ", HP " + Math.max(0, cc.hp) + " of " + cc.maxhp : F.map.blocked.has(G.key(ui.cur.x, ui.cur.y)) ? ": blocked" : ""}`;
+}
+function cursorEnter() {
+  const F = ui.F, m = ui.menu; if (!ui.cur) return;
+  if (m.lv === "aim") return confirmAim();
+  if (m.lv === "target") { const w = F.at(ui.cur.x, ui.cur.y); if (w) return pickTarget(w.id); return toast("No creature on that square."); }
+  cellClick(ui.cur.x, ui.cur.y);
+}
+function autoRest(all) {
+  doAct(() => {
+    const F = ui.F; let g = 0;
+    if (F.phase === "prime") A.autoSetup(F);
+    if (F.phase === "setup") { A.autoSetup(F); F.begin(); }
+    const round = F.round;
+    while (F.phase === "player" && g++ < 600) {
+      if (F.haste) { const a = F.pc(F.haste.to); const ch = A.aiChoose(F, a, F.options(a).filter(o => o.kind === "action")); if (!ch || ch.id === "end") F.haste = null; else F.perform(a, ch.id, ch.target, ch.extra); continue; }
+      if (F.active) { A.autoTurnRest(F, F.active); continue; }
+      if (!all && F.round !== round) break;
+      const c = F.pending()[0]; if (!c) { F.endPlayerPhase(); continue; }
+      A.autoTurn(F, c);
+      if (!all && F.round !== round) break;
+      if (all && F.round > 60) { F.phase = "lost"; F.finish(false); break; }
+    }
+  }, { instant: all });
 }
 function autoThisTurn() {
-  const F = ui.F; let g = 0;
-  while (g++ < 20 && F.phase === "player" && (F.haste || F.active)) {
-    if (F.haste) { const a = F.pc(F.haste.to); const ch = A.aiChoose(F, a, F.options(a).filter(o => o.kind === "action")); if (!ch || ch.id === "end") F.haste = null; else F.perform(a, ch.id, ch.target); continue; }
-    const c = F.active; const ch = A.aiChoose(F, c, F.options(c)); const r = F.perform(c, ch.id, ch.target); if (!r.ok) F.perform(c, "end");
-  }
-  afterAction();
+  doAct(() => {
+    const F = ui.F; let g = 0;
+    while (g++ < 6 && F.phase === "player" && F.haste) { const a = F.pc(F.haste.to); const ch = A.aiChoose(F, a, F.options(a).filter(o => o.kind === "action")); if (!ch || ch.id === "end") F.haste = null; else F.perform(a, ch.id, ch.target, ch.extra); }
+    if (F.active) A.autoTurnRest(F, F.active);
+  });
 }
 function afterFight() {
   const run = ui.run, F = ui.F; const st = A.completeFight(run, F); run.inFight = false; ui.F = null; lastLogLen = 0;
@@ -265,7 +492,6 @@ function afterFight() {
   if (st === "boss") toast("Breather: everyone recovers half their HP, Flux resets to 0.");
 }
 
-/* ------------------------------------------------------------------ level-up */
 function initLevelUp() {
   const run = ui.run;
   ui.lv = run.pcs.map(rp => { if (rp.dead && run.hardcore) return null; const s = rp.s, plan = A.levelPlan(s, s.level + 1), auto = A.autoLevelChoices(s);
@@ -337,14 +563,20 @@ function viewEnd() {
 
 /* ------------------------------------------------------------------ render + events */
 function render(focus) {
-  const v = ui.view;
+  const v = ui.view; const ae = document.activeElement, fk = ae && ae.dataset ? ae.dataset.fkey : null;
+  const ms = $("#mapScroll"), sx = ms ? ms.scrollLeft : 0, sy = ms ? ms.scrollTop : 0, lg = $("#log"), lgAtEnd = !lg || lg.scrollTop + lg.clientHeight >= lg.scrollHeight - 8;
   scr.innerHTML = v === "title" ? viewTitle() : v === "party" ? viewParty() : v === "map" ? viewMap() : v === "battle" ? viewBattle() : v === "levelup" ? viewLevelUp() : v === "defeat" ? viewDefeat() : v === "end" ? viewEnd() : "";
-  const log = $("#log"); if (log) log.scrollTop = log.scrollHeight;
-  if (focus) { const f = scr.querySelector("[data-focus]") || scr.querySelector(".center .opt") || scr.querySelector("h2"); if (f && f.focus) { if (!f.hasAttribute("tabindex") && f.tagName === "H2") f.setAttribute("tabindex", "-1"); f.focus({ preventScroll: v !== "battle" }); } }
+  const log = $("#log"); if (log && lgAtEnd) log.scrollTop = log.scrollHeight;
+  const ms2 = $("#mapScroll"); if (ms2) { ms2.scrollLeft = sx; ms2.scrollTop = sy; }
+  if (v === "battle" && ui.cur && ms2) { const cs = ui.zoom, x = ui.cur.x * cs, y = ui.cur.y * cs; if (x < ms2.scrollLeft || x + cs > ms2.scrollLeft + ms2.clientWidth) ms2.scrollLeft = x - ms2.clientWidth / 2; if (y < ms2.scrollTop || y + cs > ms2.scrollTop + ms2.clientHeight) ms2.scrollTop = y - ms2.clientHeight / 2; }
+  const keepEl = fk && scr.querySelector(`[data-fkey="${fk}"]`);
+  if (keepEl && !focus) { keepEl.focus({ preventScroll: true }); return; }
+  if (focus) { const f = scr.querySelector("[data-focus]") || scr.querySelector(".dock .cmd:not([aria-disabled])") || scr.querySelector("h2"); if (f && f.focus) { if (!f.hasAttribute("tabindex") && f.tagName === "H2") f.setAttribute("tabindex", "-1"); f.focus({ preventScroll: true }); } }
 }
 function resume() {
   const run = A.Saves.run(); if (!run) return;
   ui.run = run; ui.difficulty = run.difficulty;
+  if (run.inFight && run.fight) { const F = A.resumeFight(run); if (F) { ui.F = F; lastLogLen = F.logs.length; resetMenu(); autoSwitch(); ui.view = "battle"; render(true); toast(`Battle resumed: round ${F.round}, positions as you left them.`); return; } }
   if (run.inFight && run.snapshot) { const snap = run.snapshot; Object.keys(run).forEach(k => { if (!["snapshot", "history", "stats"].includes(k)) delete run[k]; }); Object.assign(run, JSON.parse(JSON.stringify(Object.assign({}, snap, { stats: run.stats, history: run.history })))); run.inFight = false; run.snapshot = snap; toast("The interrupted fight restarts from the beginning."); }
   go(run.step === "levelup" ? (initLevelUp(), "levelup") : run.step === "defeat" ? "defeat" : ["victory", "gameover"].includes(run.step) ? "end" : "map");
 }
@@ -355,6 +587,9 @@ function startRun() {
 }
 function loadIntoSlot(i, s) { if (!s) return; const x = fitL1(s); ui.party[i] = x; ui.edit = null; render(); toast(`${x.name} joins slot ${i + 1}${s.level > 1 ? " (fitted to level 1)" : ""}.`); }
 scr.addEventListener("click", e => {
+  if (ui.view === "battle" && ui.F) { const tk = e.target.closest("[data-tok]"), ce = e.target.closest(".cell");
+    if (tk) { const x = ui.F.byId(tk.dataset.tok); if (x && x.pos) cellClick(x.pos.x, x.pos.y); return; }
+    if (ce) { cellClick(+ce.dataset.x, +ce.dataset.y); return; } }
   const b = e.target.closest("[data-act]"); if (!b || b.tagName === "SELECT") return;
   const act = b.dataset.act, i = +b.dataset.i, F = ui.F, run = ui.run;
   switch (act) {
@@ -382,19 +617,32 @@ scr.addEventListener("click", e => {
     case "fight": startFight(); break;
     case "saveQuit": saveRun(); toast("Run saved."); go("title"); break;
     case "abandon": if (confirm("Abandon this run? It is recorded as a loss.")) { A.abandonRun(run); A.Saves.addRecord(run); A.Saves.clearRun(); go("end"); } break;
-    case "lockPrime": F.resolvePrime(); afterAction(); break;
-    case "final": F.finalForm(F.pc(b.dataset.id)); afterAction(); break;
-    case "fw": { const c = F.pc(b.dataset.id); const p = +scr.querySelector(`[data-fw=p][data-id="${c.id}"]`).value, k = scr.querySelector(`[data-fw=s][data-id="${c.id}"]`).value; F.firmware(c, p, k); afterAction(); break; }
-    case "begin": F.begin(); afterAction(); break;
-    case "turn": F.beginTurn(F.pc(b.dataset.id)); afterAction(); break;
-    case "opt": doOpt(b.dataset.o); break;
-    case "target": { const id = ui.pendingOpt; ui.pendingOpt = null; doOpt(id, b.dataset.t); break; }
-    case "cancelOpt": ui.pendingOpt = null; render(true); break;
-    case "skipHaste": F.haste = null; afterAction(); break;
+    case "lockPrime": doAct(() => F.resolvePrime(), { noSwitch: true }); break;
+    case "final": doAct(() => F.finalForm(F.pc(b.dataset.id)), { noSwitch: true }); break;
+    case "fw": { const c = F.pc(b.dataset.id); const p = +scr.querySelector(`[data-fw=p][data-id="${c.id}"]`).value, k = scr.querySelector(`[data-fw=s][data-id="${c.id}"]`).value; doAct(() => F.firmware(c, p, k), { noSwitch: true }); break; }
+    case "begin": doAct(() => F.begin()); break;
+    case "turn": doAct(() => { F.beginTurn(F.pc(b.dataset.id)); resetMenu(); }, { noSwitch: true }); break;
+    case "root": { if (b.getAttribute("aria-disabled") === "true") { toast(b.querySelector("small") ? b.querySelector("small").textContent : "Not available."); break; } const g = b.dataset.g, c = actor();
+      if (g === "wait") { doAct(() => { F.waitTurn(c); }); break; }
+      if (g === "end") { doAct(() => F.perform(c, "end")); break; }
+      if (g === "move") { chooseOpt("move"); break; }
+      if (g === "churn") { chooseOpt("churn"); break; }
+      const L = F.options(c).filter(x => groupOf(x) === g); if (L.length === 1 && g !== "surge" && g !== "attack" && g !== "other" && g !== "items") { chooseOpt(L[0].id); break; }
+      ui.menu = { lv: "list", grp: g }; render(true); break; }
+    case "opt": if (b.getAttribute("aria-disabled") === "true") { toast(b.dataset.why ? `Can't: ${b.dataset.why}.` : "Not available."); break; } chooseOpt(b.dataset.o); break;
+    case "target": if (b.getAttribute("aria-disabled") === "true") { toast(`Can't target that: ${b.dataset.why}.`); break; } pickTarget(b.dataset.t); break;
+    case "back": back(); break;
+    case "moveHere": if (ui.cur) moveTo(ui.cur.x, ui.cur.y); break;
+    case "confirmAim": confirmAim(); break;
+    case "bestAim": { const c = actor(), o = F.options(c).find(x => x.id === ui.menu.opt); const bst = o && F.autoAim(c, o); if (bst) { ui.cur = { x: bst.aim.x, y: bst.aim.y }; if (bst.mode) ui.aimMode = bst.mode; } else toast("Nothing in reach of that template."); render(); break; }
+    case "aimMode": ui.aimMode = ui.aimMode === "cone" ? "line" : "cone"; render(); break;
+    case "zoom": ui.zoom = Math.max(26, Math.min(80, ui.zoom + 8 * +b.dataset.v)); keep("zoom", ui.zoom); render(); break;
+    case "skipAnim": if (ui.anim) ui.anim.skip = true; break;
+    case "skipHaste": doAct(() => { F.haste = null; }); break;
     case "autoTurn": autoThisTurn(); break;
     case "autoRound": autoRest(false); break;
     case "autoAll": autoRest(true); break;
-    case "endPhase": if (confirm("End the Player Phase? Freelancers who haven't acted lose their turn.")) { F.pcs.forEach(c => c.turnDone = true); F.endPlayerPhase(); afterAction(); } break;
+    case "endPhase": if (confirm("End the Player Phase? Freelancers who haven't acted lose their turn.")) doAct(() => { F.pcs.forEach(c => c.turnDone = true); F.endPlayerPhase(); }); break;
     case "afterFight": afterFight(); break;
     case "lvTab": ui.lvTab = i; render(); scr.querySelector(`[role=tab][data-i="${i}"]`).focus(); break;
     case "lvNode": { const lv = ui.lv[ui.lvTab], id = b.dataset.n; if (lv.sec.includes(id)) lv.sec = lv.sec.filter(x => x !== id); else { if (lv.sec.length >= lv.plan.secTert) lv.sec.shift(); lv.sec.push(id); } render(); const x = scr.querySelector(`[data-n="${id}"]`); if (x) x.focus(); break; }
@@ -407,6 +655,17 @@ scr.addEventListener("click", e => {
     case "saveFinal": run.pcs.forEach(rp => A.Saves.saveChar(rp.s, `${rp.s.name} (L${rp.s.level} gauntlet)`)); toast("Saved to the shared character list."); break;
   }
 });
+const act2 = fn => doAct(fn, { noSwitch: true });
+scr.addEventListener("toggle", e => { if (e.target.classList && e.target.classList.contains("logbox")) { ui.logOpen = e.target.open; keep("logOpen", ui.logOpen); const l = $("#log"); if (l) l.scrollTop = l.scrollHeight; } }, true);
+// hovering a token shows it in the enemy HUD; hovering squares moves the aim / move preview
+let hoverT = 0;
+scr.addEventListener("mouseover", e => {
+  if (ui.view !== "battle" || !ui.F || ui.anim) return; const tk = e.target.closest("[data-tok]");
+  if (tk && ui.F.foe(tk.dataset.tok) && ui.hover !== tk.dataset.tok) { ui.hover = tk.dataset.tok; const h = $("#foeHud"); if (h) h.innerHTML = foeHUD(ui.F, foeFocus()); }
+  const ce = e.target.closest(".cell") || (tk && ui.F.byId(tk.dataset.tok) && { dataset: { x: ui.F.byId(tk.dataset.tok).pos.x, y: ui.F.byId(tk.dataset.tok).pos.y } });
+  if (ce && (ui.menu.lv === "aim" || ui.menu.lv === "move") && (!ui.cur || ui.cur.x !== +ce.dataset.x || ui.cur.y !== +ce.dataset.y)) { const now = Date.now(); if (now - hoverT < 40) return; hoverT = now; ui.cur = { x: +ce.dataset.x, y: +ce.dataset.y }; render(); }
+});
+scr.addEventListener("mouseleave", () => { ui.hover = null; }, true);
 scr.addEventListener("change", e => {
   const el = e.target;
   if (el.dataset.ed) return editField(el);
@@ -414,17 +673,28 @@ scr.addEventListener("change", e => {
   const act = el.dataset.act, i = +el.dataset.i;
   if (act === "pregen" && el.value) loadIntoSlot(i, R.fromExample(el.value));
   else if (act === "loadChar" && el.value) loadIntoSlot(i, A.Saves.chars()[el.value]);
-  else if (act === "setDie" && el.value) { const F = ui.F; F.setPrimeDie(F.pc(el.dataset.id), +el.dataset.j, +el.value); afterAction(); }
+  else if (act === "setDie" && el.value) { const F = ui.F; act2(() => F.setPrimeDie(F.pc(el.dataset.id), +el.dataset.j, +el.value)); }
+  else if (el.id === "careful") { ui.careful = el.checked; render(); }
+  else if (el.id === "animSpeed") { ui.speed = el.value; keep("speed", ui.speed); }
+  else if (el.id === "autoSwitch") { ui.autoSwitch = el.checked; keep("autoSwitch", ui.autoSwitch); if (ui.autoSwitch && ui.F && !actor()) doAct(() => { }); }
   else if (el.id === "partySel" && el.value) { const p = A.Saves.parties()[el.value]; if (p) { ui.party = p.characters.map(fitL1); ui.partyName = p.name; ensureSlots(); ui.edit = null; render(); toast(`Loaded party "${p.name}".`); } }
   else if (el.id === "pname") ui.partyName = el.value;
   else if (el.id === "hc") ui.hardcore = el.checked;
 });
 scr.addEventListener("input", e => { const el = e.target; if (el.dataset.ed === "name" || el.dataset.ed === "sname" || el.dataset.ed === "sgname") editField(el); else if (el.dataset.lv && /name$|knack/.test(el.dataset.lv)) lvField(el); else if (el.id === "pname") ui.partyName = el.value; });
-// keyboard: 1-9 pick an option/target in battle, Esc backs out of target selection
+// keyboard: arrows move the map cursor (map focused) or walk the menu; Enter acts; Esc backs out; 1-9 pick a command
 document.addEventListener("keydown", e => {
-  if (ui.view !== "battle" || e.altKey || e.ctrlKey || e.metaKey) return; const tg = e.target.tagName; if (tg === "INPUT" || tg === "SELECT" || tg === "TEXTAREA") return;
-  if (e.key === "Escape" && ui.pendingOpt) { ui.pendingOpt = null; render(true); return; }
-  if (/^[1-9]$/.test(e.key)) { const bs = scr.querySelectorAll(".center .opts button"); const b = bs[+e.key - 1]; if (b) { e.preventDefault(); b.click(); } }
+  if (ui.view !== "battle" || !ui.F || e.altKey || e.ctrlKey || e.metaKey) return; const tg = e.target.tagName; if (tg === "INPUT" || tg === "SELECT" || tg === "TEXTAREA") return;
+  if (ui.anim) { if (e.key === " " || e.key === "Escape" || e.key === "Enter") { e.preventDefault(); ui.anim.skip = true; } return; }
+  const onMap = e.target.id === "map", dirs = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+  if (e.key === "Escape") { if (ui.menu.lv !== "root") { e.preventDefault(); back(); } return; }
+  if (onMap && dirs[e.key]) { e.preventDefault(); moveCursor(...dirs[e.key]); return; }
+  if (onMap && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); cursorEnter(); return; }
+  if ((e.key === "t" || e.key === "T") && ui.menu.lv === "aim") { ui.aimMode = ui.aimMode === "cone" ? "line" : "cone"; render(); return; }
+  if ((e.key === "c" || e.key === "C") && ui.menu.lv === "move") { ui.careful = !ui.careful; render(); return; }
+  if (!onMap && (e.key === "ArrowDown" || e.key === "ArrowUp") && e.target.closest && e.target.closest(".dock")) {
+    const bs = [...scr.querySelectorAll(".dock .cmds .cmd, .dock .row button")]; const k = bs.indexOf(e.target); if (k >= 0) { e.preventDefault(); const nx = bs[(k + (e.key === "ArrowDown" ? 1 : -1) + bs.length) % bs.length]; nx.focus(); const t = nx.dataset.t && ui.F.byId(nx.dataset.t); if (t && t.pos) { ui.cur = { x: t.pos.x, y: t.pos.y }; if (t.side === "foe") ui.selFoe = t.id; const fk = nx.dataset.fkey; render(); const f = scr.querySelector(`[data-fkey="${fk}"]`); if (f) f.focus(); } } return; }
+  if (/^[1-9]$/.test(e.key)) { const bs = scr.querySelectorAll(".dock .cmds .cmd"); const b = bs[+e.key - 1]; if (b) { e.preventDefault(); b.click(); } }
 });
 render(true);
 })();

@@ -51,6 +51,60 @@ A.Saves.deleteChar(party[0].name, st); ok(Object.keys(A.Saves.chars(st)).length 
   ok(['boss', 'defeat'].includes(run.step), 'after the minion fight comes the boss (or a defeat)');
 }
 
+// ---- grid: movement, Opportunity Strikes, ranges, line of sight, area footprints, save/resume positions
+{ const G = global.MutagenGrid;
+  const open = (w, h) => ({ w, h, theme: 'pumpstation', themeName: 'test', blocked: new Set(), obst: {} });
+  ok(G.burst(open(12, 8), { x: 5, y: 4 }, 2).length === 25, 'Burst radius 10 ft = 5×5 squares on open ground');
+  ok(G.around(open(12, 8), { x: 5, y: 4 }, 2).length === 24, '"around" leaves out the centre square');
+  ok(G.line(open(12, 8), { x: 2, y: 4 }, { x: 9, y: 4 }, 6).length === 6, '30-ft line = 6 squares');
+  const cone = G.cone(open(12, 8), { x: 2, y: 4 }, { x: 5, y: 4 }, 3); ok(cone.length >= 9 && cone.length <= 15 && cone.every(p => p.x > 2), `15-ft cone: ${cone.length} squares, all in front`);
+  { const m = open(12, 8); m.blocked.add(G.key(4, 4)); ok(!G.los(m, { x: 2, y: 4 }, { x: 6, y: 4 }), 'an obstacle blocks line of sight'); ok(G.los(m, { x: 2, y: 2 }, { x: 6, y: 2 }), 'clear line of sight'); ok(!G.burst(m, { x: 2, y: 4 }, 3).some(p => p.x === 5 && p.y === 4), 'a burst does not reach around a wall'); }
+  ok(G.dist({ x: 0, y: 0 }, { x: 3, y: 2 }) === 3, 'diagonals count as one square (5 ft)');
+  seeded(21); const run = A.newRun({ difficulty: 'medium', characters: [R.randomChar(1, 'juggernaut'), R.randomChar(1), R.randomChar(1), R.randomChar(1)], seed: 21 });
+  const F = A.startFight(run); A.autoSetup(F); F.map = open(12, 8);
+  F.foes = F.foes.slice(0, 1); const e = F.foes[0]; e.hp = e.maxhp = 999; e.attacks = [{ n: 'Claw', d: 'dodge', dmg: 3, melee: true, rng: 'melee' }]; A.attackGeo(e.attacks[0]); e.speedSq = 6;
+  F.pcs.forEach((c, i) => c.pos = { x: 0, y: i * 2 }); e.pos = { x: 6, y: 0 };
+  F.phase = 'player'; F.round = 1; F.pcs.forEach(c => { c.turnDone = false; c.reactions = 1; }); const c = F.pcs[0]; F.beginTurn(c);
+  ok(c.t.move === Math.floor(c.speed / 5), `move budget = speed / 5 (${c.t.move})`);
+  const R0 = F.reach(c, false); ok([...R0.values()].every(n => n.cost <= c.t.move), 'reachable squares stay within the budget');
+  ok(!F.perform(c, 'move', null, { x: 11, y: 7 }).ok, 'cannot move beyond speed');
+  ok(!F.perform(c, 'move', null, { x: 0, y: 2 }).ok, 'cannot end on an occupied square');
+  F.map.blocked.add(G.key(1, 0)); ok(!F.perform(c, 'move', null, { x: 1, y: 0 }).ok, 'cannot end on a blocked square'); F.map.blocked.delete(G.key(1, 0));
+  const w = c.weapons.find(x => x.melee) || c.weapons[0];
+  ok(!F.canHit(c, w, e).ok && /out of reach|out of range/.test(F.canHit(c, w, e).why), 'melee weapon out of reach says why');
+  const before = c.t.move; ok(F.perform(c, 'move', null, { x: 5, y: 0 }).ok && c.t.move === before - 5, 'move 25 ft costs 5 squares');
+  ok(F.canHit(c, c.weapons.find(x => x.melee) || w, e).ok, 'adjacent: melee in reach');
+  const opt = F.options(c).find(o => o.id === 'atk:' + w.key); ok(opt && opt.targets.includes(e.id), 'attack option lists the target in reach');
+  // careful vs normal movement out of reach
+  const logs0 = F.logs.length; F.perform(c, 'move', null, { x: 4, y: 0 }, true); // still adjacent? (4,0) is 2 away → leaves reach
+  ok(F.logs.slice(logs0).some(l => /Opportunity Strike as/.test(l.t)), 'leaving an enemy\'s reach provokes an Opportunity Strike');
+  const c2 = F.pcs[1]; F.endTurn(c); if (F.phase === 'player' && !F.active) { F.beginTurn(c2); c2.pos = { x: 6, y: 1 }; e.osUsed = 0; const l1 = F.logs.length; const r = F.perform(c2, 'move', null, { x: 6, y: 3, careful: true }); ok(r.ok && !F.logs.slice(l1).some(l => /Opportunity Strike as/.test(l.t)), 'careful movement (half speed) slips away without an Opportunity Strike'); ok(c2.t.move === Math.floor(c2.speed / 5) - 4, 'careful movement costs double'); }
+  // ranged: normal range, long range with disadvantage, beyond, line of sight
+  const shooter = F.pcs[2]; const gun = { name: 'Test gun', atk: 5, n: 1, s: 8, k: 0, ranged: true, melee: false, reach: 0, range: 4, long: true };
+  shooter.pos = { x: 0, y: 7 }; e.pos = { x: 4, y: 7 }; ok(F.canHit(shooter, gun, e).ok && !F.canHit(shooter, gun, e).dis, 'in range, no disadvantage');
+  e.pos = { x: 7, y: 7 }; ok(F.canHit(shooter, gun, e).ok && F.canHit(shooter, gun, e).dis, 'long range: disadvantage');
+  e.pos = { x: 10, y: 7 }; ok(!F.canHit(shooter, gun, e).ok, 'beyond double range: no shot');
+  e.pos = { x: 4, y: 7 }; F.map.blocked.add(G.key(2, 7)); ok(!F.canHit(shooter, gun, e).ok && /sight/.test(F.canHit(shooter, gun, e).why), 'no line of sight: no shot'); F.map.blocked.delete(G.key(2, 7));
+  // area: only creatures inside the footprint are caught
+  const sg = { name: 'Test Burst', atk: 20, n: 1, s: 4, k: 0, shape: 'burst', twists: [], area: true, geo: { range: 12, radius: 2 } };
+  F.foes.push(A.makeFoe(A.BY[e.base], 9, { hp: 1, dmg: 1 }, 'Far One')); const far = F.foes[1]; far.pos = { x: 11, y: 0 }; far.hp = 999;
+  e.pos = { x: 5, y: 4 }; const fh = far.hp, eh = e.hp; F.areaAttack(shooter, sg, null, { cells: F.areaCells(shooter, sg, { x: 5, y: 4 }) });
+  ok(e.hp < eh && far.hp === fh, 'the burst hits the enemy inside its footprint and not the one outside');
+  // save / resume keeps positions
+  const pos = JSON.stringify(F.pcs.map(x => x.pos).concat(F.foes.map(x => x.pos))); A.saveFight(run, F); const r2 = JSON.parse(JSON.stringify(run)); const F2 = A.resumeFight(r2);
+  ok(F2 && JSON.stringify(F2.pcs.map(x => x.pos).concat(F2.foes.map(x => x.pos))) === pos && F2.round === F.round && F2.phase === F.phase, 'mid-battle save/resume keeps positions, round and phase');
+  ok(F2.pcs[0].rp === r2.pcs[0] && F2.pcs[0].nodes instanceof Set, 'resumed fight is re-linked to the run');
+  // enemy AI: a melee enemy closes in and attacks; a ranged one keeps its distance
+  seeded(5); const run3 = A.newRun({ difficulty: 'medium', characters: [R.randomChar(1), R.randomChar(1), R.randomChar(1), R.randomChar(1)], seed: 5 });
+  const F3 = A.startFight(run3); A.autoSetup(F3); F3.map = open(14, 9); F3.foes = F3.foes.slice(0, 1); const m3 = F3.foes[0];
+  m3.attacks = [{ n: 'Bite', d: 'dodge', dmg: 2, melee: true, rng: 'melee' }]; A.attackGeo(m3.attacks[0]); m3.speedSq = 6; m3.pos = { x: 12, y: 4 }; m3.hp = m3.maxhp = 999;
+  F3.pcs.forEach((x, i) => x.pos = { x: 1, y: 1 + i * 2 }); F3.phase = 'player'; F3.round = 1; F3.pcs.forEach(x => x.turnDone = true);
+  F3.endPlayerPhase(); ok(F3.pcs.some(x => G.dist(x.pos, m3.pos) <= 1) || G.dist(m3.pos, { x: 1, y: 4 }) < 11, `melee enemy closes in (now at ${JSON.stringify(m3.pos)})`);
+  // Wait hands the turn on; pending follows initiative order
+  F3.startRound(); const ord = F3.pending().map(x => x.id); ok(ord.length === 4, 'four freelancers to act'); const first = F3.pending()[0]; F3.beginTurn(first);
+  ok(F3.canWait(first) && F3.waitTurn(first) && F3.pending()[F3.pending().length - 1] === first, 'Wait sends the freelancer to the back of the order');
+}
+
 // ---- 3. level-ups and evolutions
 for (const form of D.forms.map(f => f.id)) {
   seeded(100 + form.length); let s = R.randomChar(1, form);
@@ -129,9 +183,37 @@ ok(rates.easy.hcWins >= rates.hard.hcWins && rates.easy.hcWins + 3 >= rates.medi
   click('[data-act=start]'); ok(UI.view === 'map' && UI.run.pcs.length === 3, 'run started on the map');
   click('[data-act=fight]'); ok(UI.view === 'battle' && UI.F.phase === 'prime', 'battle: Prime phase');
   click('[data-act=lockPrime]'); ok(UI.F.phase === 'setup', 'Prime locked');
+  UI.speed = 'off';     // no enemy-turn animation in jsdom
+  ok($('#map') && doc.querySelectorAll('#map .cell').length === UI.F.map.w * UI.F.map.h, 'battle map grid drawn');
+  ok(doc.querySelectorAll('#map .tok').length >= UI.F.pcs.length + 1, 'tokens on the map');
   click('[data-act=begin]'); ok(['player', 'won', 'lost'].includes(UI.F.phase), 'fight begun');
-  if (UI.F.phase === 'player') { const t = $('[data-act=turn]'); click(t); ok(UI.F.active, 'turn begun');
-    const o = $('.center [data-act=opt]'); click(o); if (UI.pendingOpt) click('[data-act=target]'); ok(UI.F.logs.length > 5, 'an option resolved'); }
+  if (UI.F.phase === 'player') {
+    ok(UI.F.active && UI.menu.lv === 'root', 'auto-switch: the first freelancer\'s turn opens by itself');
+    ok(UI.F.active === UI.F.order().filter(x => UI.F.canAct(x))[0] || UI.F.active.waited, 'first in initiative order');
+    ok($('.pchud') && /HP/.test($('.pchud').textContent) && /Flux/.test($('.pchud').textContent) && /Seq/.test($('.pchud').textContent), 'active freelancer HUD');
+    ok($('#foeHud .foehud') && /Guard/.test($('#foeHud').textContent), 'enemy HUD');
+    ok($('.order') && $('.order .now'), 'turn-order bar marks who is acting');
+    const first = UI.F.active;
+    click('[data-act=root][data-g=move]'); ok(UI.menu.lv === 'move' && doc.querySelectorAll('.cell.mv').length > 0, 'Move shows reachable squares');
+    const mv = [...doc.querySelectorAll('.cell.mv')].pop(); const p0 = JSON.stringify(first.pos); click(mv); ok(JSON.stringify(first.pos) !== p0, 'clicking a lit square moves the token');
+    const kd = (k, el) => (el || doc.activeElement || doc.body).dispatchEvent(new w.KeyboardEvent('keydown', { key: k, bubbles: true }));
+    if (UI.menu.lv === 'move') { kd('Escape'); } ok(UI.menu.lv === 'root', 'Esc backs out to the command menu');
+    $('#map').focus(); const c0 = JSON.stringify(UI.cur); kd('ArrowDown', $('#map')); kd('ArrowRight', $('#map')); ok(JSON.stringify(UI.cur) !== c0, 'arrow keys move the map cursor');
+    click('[data-act=root][data-g=attack]'); ok(UI.menu.lv === 'list', 'Attack submenu');
+    const dis = [...doc.querySelectorAll('.dock [data-act=opt][aria-disabled=true]')]; if (dis.length) ok(/range|reach|sight|target/.test(dis[0].textContent), 'out-of-range attack disabled with a reason');
+    const okOpt = [...doc.querySelectorAll('.dock [data-act=opt]')].find(b => b.getAttribute('aria-disabled') !== 'true');
+    const l0 = UI.F.logs.length;
+    if (okOpt) { click(okOpt); if (UI.menu.lv === 'target') { ok(doc.querySelectorAll('#map .tok.tgt').length > 0, 'valid targets highlighted on the map'); click('.dock [data-act=target]:not([aria-disabled])'); } else if (UI.menu.lv === 'aim') { ok(doc.querySelectorAll('#map .cell.aoe').length > 0, 'area template previewed'); click('[data-act=confirmAim]'); } ok(UI.F.logs.length > l0, 'an attack resolved from the menu'); }
+    else { click('[data-act=back]'); }
+    if (UI.F.phase === 'player' && UI.F.active === first) click('[data-act=root][data-g=end]');
+    ok(UI.F.phase !== 'player' || UI.F.active !== first, 'the menu swaps to the next freelancer by itself');
+    // mid-battle save and resume (page reload)
+    if (UI.F.phase === 'player') {
+      const sv = JSON.parse(w.localStorage.getItem('mutagen.arcade.run')); ok(sv.fight && sv.fight.pcs.every(x => x.pos), 'the battle is saved mid-fight with positions');
+      const posBefore = JSON.stringify(UI.F.pcs.map(x => x.pos)); click('#btnHome'); ok(UI.view === 'title', 'left the battle'); click('[data-act=resume]');
+      ok(UI.view === 'battle' && JSON.stringify(UI.F.pcs.map(x => x.pos)) === posBefore, 'resumed the battle where it was left');
+    }
+  }
   click('[data-act=autoAll]'); ok(['won', 'lost'].includes(UI.F.phase), 'auto-battle finished the fight');
   // resume mid-run: reload the page from storage
   const won = UI.F.phase === 'won'; click('[data-act=afterFight]');
