@@ -43,4 +43,4 @@ GRAFT technically owns all Samples. Selling one on the black market pays 300 Scr
 GRAFT pays **200 + (100 × mission level) Scrip** per freelancer on completion (300 at level 1), plus bonuses the GM sets. See [Gear](08_Gear.md) for prices.
 
 ## Respec and Clinics
-Installing nodes happens off-screen at a clinic between missions. Removing a Scar or Fault costs 200 Scrip. A Lab Escapee's or Clinic Rat's Origin may change who does the work and what it costs.
+Installing nodes happens off-screen at a clinic between missions. Removing a Scar or Fault costs 200 Scrip (a Clinic Rat pays half; see [Origins](02_Character_Creation.md#origins-roll-d6-or-choose)).

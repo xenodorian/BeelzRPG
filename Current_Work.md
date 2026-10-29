@@ -406,6 +406,18 @@ First-try fights won (v2): 99.5% / 98.6% / 96.0%. Tuning sweeps of 100–200 run
 - On phones the map's width forced the whole page to zoom out; grid columns now use `minmax(0,1fr)` and the map scrolls inside its frame.
 - Numbered enemies of the same kind now get distinct tokens (S1, S2…).
 
+## Final Pass 2026-10-29 (owner request: system + builder review, simulator stress test, single-file build)
+### System (rules) review
+Read every chapter against the others, the threat table, the builder data and the arcade grid. Fixed:
+- ch 5: the Flux Limit range said "6–8 at level 1, 11–16 at level 7". Real range: **4–8** at level 1 (Sirens with Nerve −1 sit at 4) and **9–16** at level 7, one less for a Splice.
+- ch 8: Armor max said a flat 4. Now names the exceptions (Unbreakable 5, Siege Hide 6) and the one-armor-plus-Shield rule from ch 13, matching ch 2, ch 12 and the builder.
+- ch 7: "a Lab Escapee's or Clinic Rat's Origin may change … what it costs" (Lab Escapee has no such perk). Now: a Clinic Rat pays half, with a link to Origins.
+- ch 2A / ch 4: Signature rebuild now says "from level 5", matching ch 7 (at level 4 you've just built it).
+- ch 10: Warden Krell's summon read "Recharge 6–6" and summons lacked plurals ("2 Husk join"). Fixed in the text and in the generator (`tools/threat_blocks.py`).
+- Cross-references: ch 1 (distances) and ch 12 (Quick Reference) now point at the new optional grid rules in ch 6; ch 12 gained a Reactions/Opportunity Strike line and a grid line. ch 10 §7 gained a battle-map note (Areas hit more on a grid; arcade evidence), and Open Question 21 records that evidence.
+- Terminology: no remaining "Form" used for Material (Bio/Chrome) in the chapters, sheets, README or builder; no TODO/TBD left.
+Logged, not changed (judgement calls for the owner): Open Questions 1–11, 13–23 stand. Ch 10 ratings were calibrated off-map and are left as is.
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -858,7 +870,7 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 18. **Big enemy hits.** The v0.3 table makes a failed defense cost ~⅔ of an average freelancer's HP (defenses succeed ~50%). Same ratings could be reached with a higher TN and lower Damage (less swing, more chip damage). Worth a live-play check; `calibrate_table.py` can solve either way.
 19. **Patient Zero vs 3 freelancers** is still win 79% after Boss scaling (HP & Damage ×¾). Option: it Blooms 1 Husk instead of 2 for small parties.
 20. **Support Traits are cheap.** Mender and Damper Field barely move ratings in the sim (the AI heals and Surges simply). Either they're under-modelled or they need to be stronger.
-21. **Area positioning is the biggest assumption.** Heavies' ratings assume a party that neither clumps nor spreads on purpose (catch odds 30/45/65% for 10/20/30 ft). A table that fights in corridors will find Heavies above their BR.
+21. **Area positioning is the biggest assumption.** Heavies' ratings assume a party that neither clumps nor spreads on purpose (catch odds 30/45/65% for 10/20/30 ft). A table that fights in corridors will find Heavies above their BR. *(2026-10-29, arcade v2 evidence: on a real grid the first build of the arcade's auto-player caught 2.6 freelancers per enemy Area and lost far more; even after it learned to spread out, the arcade needed threat ×1.0/1.22/1.38 instead of ×1.25/1.6/1.75 off-map, i.e. positioning makes fights ~20% harder. ch 10 §7 now says so; ratings left unchanged.)*
 22. **Evolution-wall clustering.** Many ratings sit at 6.8–7.0. If a finer scale is wanted between L6 and L7, rate with half-levels (impossible with real characters) or publish fractional ratings.
 23. **Drowned Choir BR** is 7–8 depending on seed (flat danger curve); published as 8.
 

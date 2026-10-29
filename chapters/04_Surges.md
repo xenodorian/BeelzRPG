@@ -120,7 +120,7 @@ At **Evolution I** (level 4) you gain one **Signature Surge**, and at **Evolutio
 - **Always ready:** it's Primed at the start of every combat. When you Unleash it, it is Primed again at the start of your next turn, so you can Unleash each Signature **once per round**.
 - **Cost:** its normal Flux (1 + 1 per Twist). Doubles can't Amp it. Only [Emergence](02A_Forms_and_Evolution.md#emergence-the-moment-it-happens) (its first use) and Final Form make it free. Firmware can't swap it.
 - **Missed** Strike or Bolt Signatures are simply ready again next turn.
-- When you level up, you may **rebuild** one Signature Surge.
+- When you level up (from level 5), you may **rebuild** one Signature Surge.
 
 > **Why it's fair:** you still get one Action a turn, and every Unleash costs Flux. A freelancer who Unleashes a Signature every round Overloads about once every two fights, unless they have a high Flux Limit (Oracles) or take a turn off to swing a weapon.
 

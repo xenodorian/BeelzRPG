@@ -50,10 +50,12 @@ def trait_text(b):
         else: out.append('**%s**' % k)
     if b.get('armor'): out.insert(0, '**Armored %d**' % b['armor'])
     return ' · '.join(out)
+def rech(r): return 'Recharge 6' if r >= 6 else 'Recharge %d–6' % r
 def atk_text(a, b):
     if 'summon' in a:
-        t, c, mx = a['summon']; s = '*%s:* %d %s join the fight (max %d)' % (a['n'], c, t, mx)
-        if a.get('recharge'): s += ', Recharge %d–6' % a['recharge']
+        t, c, mx = a['summon']; tp = t if c == 1 or t.endswith(('s', 'Spawn')) else t + 's'
+        s = '*%s:* %d %s join%s the fight (max %d)' % (a['n'], c, tp, 's' if c == 1 else '', mx)
+        if a.get('recharge'): s += ', ' + rech(a['recharge'])
         tm = b.get('summoned', {}).get(t)
         if tm: s += ' — each: Guard %d · TN %d · HP %d · %s (%s) %d%s' % (tm['guard'], tm['tn'], tm['hp'], tm['attacks'][0]['n'], DEF[tm['attacks'][0]['d']].split(' ')[0], tm['attacks'][0]['dmg'], (', ' + RIDER[tm['attacks'][0]['rider']]) if tm['attacks'][0].get('rider') else '')
         return s
@@ -66,7 +68,7 @@ def atk_text(a, b):
     if a.get('psy'): s += ' (psychic: ignores Armor)'
     if a.get('extra'): s += '. **Engulf +%d:** +%d damage to everyone caught for each freelancer caught beyond the first (max +2 freelancers)' % (a['extra'], a['extra'])
     if a.get('ff'): s += '. **Friendly fire:** also hits its allies in the area'
-    if a.get('recharge'): s += '. Recharge %d–6' % a['recharge']
+    if a.get('recharge'): s += '. ' + rech(a['recharge'])
     if a.get('stagger'): s += '. Afterwards it skips its next Enemy Phase'
     return s
 def block(b):

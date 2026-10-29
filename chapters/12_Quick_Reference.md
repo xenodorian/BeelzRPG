@@ -31,6 +31,8 @@ HP 12 + 2×Grit, +5/level · Flux Limit 4 + Rank + Nerve (Splice −1) · Speed 
 **Turn:** Move + Action + Quick; 1 Reaction per round.  
 **Actions:** Attack · Unleash · Dash · Brace · Help · Patch · Analyze · Taunt · Rally · Grapple/Shove · Other  
 **Quick:** draw, stim, Churn, Target Lock, talk  
+**Reactions:** Opportunity Strike when an enemy leaves your reach; enemies get one on you if you leave theirs (move at half speed to avoid it).  
+**Grid (optional):** 1 square = 5 ft, diagonals = 1; burst radius 10 ft = 2 squares; reach 1 square.  
 **Damage:** Rank × weapon die + stat. Armor −X per hit (min 1). Area: miss/successful defense = half.
 
 ## Surges

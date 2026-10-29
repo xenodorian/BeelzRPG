@@ -41,7 +41,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 | **Smart-Link** | +1 to attack rolls. Counts as Chrome (needs Upkeep: 25 Scrip per mission). |
 
 ## Armor
-Armor reduces each hit by its value. **Total Armor (gear + Augments) maxes at 4.**
+Armor reduces each hit by its value. **Total Armor (gear + Augments) maxes at 4** (5 with Hide's *Unbreakable*, 6 with the Juggernaut's *Siege Hide*). You wear one armor, Light *or* Heavy, plus an optional Shield.
 
 | Armor | Armor | Notes | Cost |
 |---|---|---|---|

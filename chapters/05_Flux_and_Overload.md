@@ -11,7 +11,7 @@ Every Surge, every Push, every Churn floods your cells (or circuits) with Mutage
   - **Churn:** 1.
   - **Push** an Augment: 1.
   - Are hit by a **Mutagenic** threat: as its stat block says.
-- Your **Flux Limit** = **4 + Rank + Nerve** (minimum 4; Splice −1). Nerve rises at each Evolution, so your Limit does too: from 6–8 at level 1 to roughly 11–16 at level 7, highest for Oracles.
+- Your **Flux Limit** = **4 + Rank + Nerve** (minimum 4; Splice −1). Nerve rises at each Evolution, so your Limit does too: from 4–8 at level 1 to 9–16 at level 7 (one less for a Splice), highest for Oracles and lowest for Sirens.
 - **Signature Surges** cost Flux like any Surge. Unleashing one every round is the fastest way to Overload; that's the price of always being ready.
 - Flux **drops to 0** when you take a Breather or a Lockdown, and when you Overload.
 - Flux never stops you from acting. You can always choose to go over.

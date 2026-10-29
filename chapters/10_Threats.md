@@ -165,6 +165,7 @@ Use the budget table above, plus three adjustments the sims found:
 - **From Evolution II, lone big targets melt.** Four L7 freelancers can deal 150+ damage a round. Elites and Bosses rated for them already account for that, but anything rated in the previous stage dies before it acts. Use the stage rule above.
 - **Heavies want room; Packs want company.** Put a Heavy in an open hall with the party bunched at a chokepoint and it lives up to its BR. Put four Rats on one freelancer and they live up to their MR.
 - **Final Form** (level 10) turns one fight per Lockdown into a rout. The ratings assume it's off. Save the finale's real threat for the Boss's Shift.
+- **On a battle map,** Areas catch more freelancers than the ratings assume unless the party spreads out (the ratings model a party that neither clumps nor spreads on purpose). The [arcade](../arcade/index.html), which plays every fight on a grid, needed about 20% less enemy strength than off-map to hit the same win rates. If your table uses a grid, start Heavies one step lower or remind players to spread out. See [Playing on a Grid](06_Combat.md#optional-playing-on-a-grid).
 - Terrain, objectives ("hold the pump for 3 rounds"), and fleeing enemies matter more than numbers. Use them.
 
 ## Writing a Stat Block
@@ -424,14 +425,14 @@ Kinds: **Pack** (MR well above BR), **Heavy** (BR close to MR), **Generalist**, 
 
 #### Warden Krell
 **Warden Krell** — T5 Boss · **BR 5 · MR 10+** · Boss · Guard 16 · TN 17 · HP 234 · Speed 30  
-**Actions** (one per Enemy Phase + one Interrupt): *Purge Carbine* (Dodge, Single, 120 ft) — **14**, loses one Primed Surge · *Riot Slam* (Endure, Area, 15-ft cone) — **11**, Prone. Recharge 5–6 · *Call the Line:* 2 Riot Line Trooper join the fight (max 4), Recharge 6–6 — each: Guard 15 · TN 18 · HP 15 · Shock Lance (Dodge) 7, Dazed.  
+**Actions** (one per Enemy Phase + one Interrupt): *Purge Carbine* (Dodge, Single, 120 ft) — **14**, loses one Primed Surge · *Riot Slam* (Endure, Area, 15-ft cone) — **11**, Prone. Recharge 5–6 · *Call the Line:* 2 Riot Line Troopers join the fight (max 4), Recharge 6 — each: Guard 15 · TN 18 · HP 15 · Shock Lance (Dodge) 7, Dazed.  
 **Traits:** **Armored 2** · **Leader** (other enemies deal +6 damage).  
 **Shift (half HP):** +1 Armor; ends every condition on itself; *Riot Slam* (Endure, Area, 20 ft around him) — **11**, Prone. Recharge 5–6.  
 *The Ostrander officer who ran the Lockdown camps.* **Tactics:** Opens from cover, Purges whoever has the most Primed Surges, and calls the Line the moment the party bunches up.
 
 #### Patient Zero
 **Patient Zero** — T10 Boss · **BR 10 · MR 10+** · Boss · Guard 21 · TN 23 · HP 282 · Speed 40 (fly after Shift)  
-**Actions** (one per Enemy Phase + one Interrupt): *Unmaking Touch* (Endure, Single, reach 15 ft) — **25**, +2 Flux · *The First Song* (Resist, Area, 60 ft around it) — **15**, Shaken (psychic: ignores Armor). Recharge 5–6 · *Bloom:* 2 Husk join the fight (max 4), Recharge 5–6 — each: Guard 17 · TN 21 · HP 16 · Root Grip (Endure) 11, Held.  
+**Actions** (one per Enemy Phase + one Interrupt): *Unmaking Touch* (Endure, Single, reach 15 ft) — **25**, +2 Flux · *The First Song* (Resist, Area, 60 ft around it) — **15**, Shaken (psychic: ignores Armor). Recharge 5–6 · *Bloom:* 2 Husks join the fight (max 4), Recharge 5–6 — each: Guard 17 · TN 21 · HP 16 · Root Grip (Endure) 11, Held.  
 **Traits:** **Huge** · **Regenerating 8**.  
 **Shift (half HP):** +1 Guard; +1 Interrupt; *Unmaking Touch* (Endure, Single, reach 15 ft) — **20** to each of 3 targets, +2 Flux.  
 *The first person ever to take the Mutagen, still alive in the reactor core.* **Tactics:** Talks before it fights. Its Shift should land after the party has spent their Final Forms.

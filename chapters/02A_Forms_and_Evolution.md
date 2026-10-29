@@ -51,7 +51,7 @@ A Signature Surge is the power your new body was built around. It's always there
 - **It is always ready.** It's Primed at the start of every combat. After you Unleash it, it's Primed again at the start of your next turn, so you can use each Signature **once per round**.
 - **It costs its normal Flux** (1 + 1 per Twist). It can't be Amped by doubles; only Emergence and Final Form Amp it.
 - **Missed?** A missed Strike or Bolt Signature is still ready next turn, like any Signature.
-- **Changing it:** when you level up, you may rebuild one Signature Surge.
+- **Changing it:** when you level up (from level 5), you may rebuild one Signature Surge.
 - **Flux is the limit.** You can now Surge every turn, but every Surge pushes you toward Overload. Pace yourself, or plan your Overloads.
 
 ### Emergence: the moment it happens

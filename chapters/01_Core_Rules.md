@@ -81,7 +81,7 @@ To help someone, describe how and use your Action (in combat) or just do it (out
 - **Lockdown** (8 hours in a safe place): regain all HP, Flux to 0, end temporary Overload effects, reset Breathers and "once per Lockdown" abilities.
 
 ## Time and Distance
-Combat runs in **rounds** (about 6 seconds). Distances are in feet; on a grid, 1 square = 5 ft. Without a grid use: **Close** (5 ft, touching), **Near** (up to 30 ft, one move), **Far** (up to 120 ft), **Distant** (beyond).
+Combat runs in **rounds** (about 6 seconds). Distances are in feet; on a grid, 1 square = 5 ft (see [Playing on a Grid](06_Combat.md#optional-playing-on-a-grid)). Without a grid use: **Close** (5 ft, touching), **Near** (up to 30 ft, one move), **Far** (up to 120 ft), **Distant** (beyond).
 
 ## Golden Rules
 1. **Specific beats general.** An Augment or Surge that says otherwise wins.
