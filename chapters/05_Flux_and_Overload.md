@@ -11,14 +11,15 @@ Every Surge, every Push, every Churn floods your cells (or circuits) with Mutage
   - **Churn:** 1.
   - **Push** an Augment: 1.
   - Are hit by a **Mutagenic** threat: as its stat block says.
-- Your **Flux Limit** = **4 + Rank + Nerve** (minimum 4; Splice −1).
+- Your **Flux Limit** = **4 + Rank + Nerve** (minimum 4; Splice −1). Nerve rises at each Evolution, so your Limit does too: from 6–8 at level 1 to roughly 11–16 at level 7, highest for Oracles.
+- **Signature Surges** cost Flux like any Surge. Unleashing one every round is the fastest way to Overload; that's the price of always being ready.
 - Flux **drops to 0** when you take a Breather or a Lockdown, and when you Overload.
 - Flux never stops you from acting. You can always choose to go over.
 
 ## Overload
 The moment your Flux goes **above** your Limit, you **Overload**:
 1. Take **Rank d6** damage (ignores Armor). Overload damage (including Glitch *Short*) can't drop you below 1 HP; if you're already Down, skip it.
-2. Roll **d12** on your Form's table: **Bloom** if all your trees are Bio, **Glitch** if all are Chrome. Splices roll both and pick one.
+2. Roll **d12** on your Material's table: **Bloom** if all your trees are Bio, **Glitch** if all are Chrome. Splices roll both and pick one.
 3. Set your Flux to **0**.
 
 Results last **until the end of your next turn** unless they say otherwise. **Scars** and **Faults** are permanent.
@@ -40,7 +41,7 @@ Results last **until the end of your next turn** unless they say otherwise. **Sc
 | 9 | **Adrenal Flood.** Gain 2 × Rank temporary HP. You are Shaken. |
 | 10 | **Cocoon.** You are Held (encased) until the end of your next turn, but take no damage until then. |
 | 11 | **Blossom.** A beautiful permanent change: gain one new Knack describing it (*Bioluminescent*, *Smells Like Rain*...). |
-| 12 | **Evolution.** One Primed Surge becomes Amped, and gain 1 Juice. |
+| 12 | **Flowering.** One Primed Surge becomes Amped, and gain 1 Juice. |
 
 ### Glitch Table (Chrome)
 

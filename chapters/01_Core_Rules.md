@@ -5,7 +5,7 @@ Mutagen uses one roll for everything.
 ## The Roll
 > **Roll d20 + Stat (+ Rank, if it applies). Meet or beat the target number to succeed.**
 
-- **Stat** is one of your five stats (−1 to +5). See [Chapter 2](02_Character_Creation.md).
+- **Stat** is one of your five stats: −1 to +3 at level 1, rising to as high as **+8** as your Base Form Evolves ([Chapter 2A](02A_Forms_and_Evolution.md)), +10 in Final Form.
 - **Rank** is your level-based bonus: **Rank = half your level, rounded up** (1 at level 1–2, up to 5 at level 9–10).
 - You **always** add Rank to **attack rolls** and **defense rolls**.
 - You add Rank to a **check** only if one of your **Knacks** applies.
@@ -31,8 +31,12 @@ The GM almost never rolls. Enemies don't roll to hit you; **you roll to avoid th
 | 16 | Hard | Hotwire an Ostrander security door |
 | 19 | Extreme | Leap between two moving maglev cars |
 | 22 | Mutant | Hold a collapsing ceiling up with your bare (augmented) back |
+| 25 | Monstrous | Outrun a maglev; shout down a riot; read a stranger's mind from across a plaza |
+| 28 | Mythic | Only an Evolved freelancer's primary stat even has a chance |
 
 Only roll when failure is interesting. On a failure, the GM picks a consequence: you fail, you succeed at a cost, or the situation gets worse.
+
+**DCs don't scale with level.** A locked door is DC 16 whether you're level 1 or 9. Evolved freelancers simply *are* better at things their Form is good at: by level 7, a primary stat of +8 passes a Hard check on an 8+. Raise the stakes instead of the DC: higher-level missions put Extreme and Mutant obstacles in your path, and ask for checks with your weak stats. See [Running the Game](09_Running_the_Game.md#difficulty-across-the-campaign).
 
 ## Knacks
 A **Knack** is a short, specific phrase describing something you're trained in: *Street Medicine*, *Lying to Cops*, *Old Ostrander Tech*, *Parkour*, *Sewer Navigation*. When a Knack fits a check, add your Rank. If it's arguable, the GM decides; lean toward yes for narrow Knacks. You start with 3 Knacks and gain more as you level.

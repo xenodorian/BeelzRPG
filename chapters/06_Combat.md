@@ -20,7 +20,7 @@ Then the next round starts. If enemies went first, the round is Enemy Phase then
 **Durations.** "Until the end of its next turn" means the end of that creature's next turn. For enemies, their turn is the Enemy Phase. So a condition you put on an enemy during the Player Phase lasts through the coming Enemy Phase. **"Until the end of next round"** means through the whole round after the current one.
 
 ## Your Turn
-On your turn you get a **Move**, an **Action**, and a **Quick action**, in any order. You also get **one Reaction** per round (it refreshes at the start of your turn).
+On your turn you get a **Move**, an **Action**, and a **Quick action**, in any order. You also get **one Reaction** per round (it refreshes at the start of your turn; the Skitter's Mantis Reflex gives two).
 
 **Move.** Up to your speed (30 ft). Climbing, swimming, crawling, and difficult terrain cost double. Standing from Prone costs half your speed.
 
@@ -29,7 +29,7 @@ On your turn you get a **Move**, an **Action**, and a **Quick action**, in any o
 | Action | What it does |
 |---|---|
 | **Attack** | Weapon or natural attack: d20 + stat + Rank vs Guard. Damage = **Rank × weapon die + stat**. |
-| **Unleash** | Use a Primed Surge ([Chapter 4](04_Surges.md)). |
+| **Unleash** | Use a Primed Surge or a Signature Surge ([Chapter 4](04_Surges.md)). |
 | **Dash** | Move again. |
 | **Brace** | Advantage on all defense rolls until your next turn. |
 | **Help** | An ally gets advantage on their next roll before your next turn. Describe how. |
@@ -45,7 +45,7 @@ Draw or stow an item, open a door, drink a stim, speak a few sentences, **Churn*
 
 ### Reactions
 - **Opportunity Strike:** when an enemy leaves your melee reach, make one weapon attack against it.
-- Reactions from Augments (Bulwark, Reflex Spike, Threat Sense, Precog).
+- Reactions from Augments (Bulwark, Reflex Spike, Threat Sense, Precog, Fortress).
 
 ## Attacking
 Roll **d20 + stat + Rank** against the target's **Guard**.

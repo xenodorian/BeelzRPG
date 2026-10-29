@@ -9,6 +9,7 @@ Mutagen doesn't take orders well. In a fight, your body offers you a few of its 
 2. At the start of each fight you **Prime**: roll your **Sequence die** a few times. The Surges you roll are ready.
 3. On your turn you may **Unleash** a Primed Surge as your Action. It costs **Flux**.
 4. Want more options? **Churn** as a Quick action to roll again.
+5. From your first **Evolution** (level 4) you also have **Signature Surges** that are always ready ([below](#signature-surges)).
 
 ---
 
@@ -30,7 +31,13 @@ You can use any **base** part, plus parts **unlocked** by trees you have the Roo
 
 **Area Shapes** (Burst, Wave, Pulse): roll one attack and compare it to each target's Guard. **Hit:** full damage + Effect. **Miss:** half damage, no Effect. Allies in a Burst or Wave are hit too (they roll Dodge against your attack total; success = half damage, no rider).
 
-**Dread** Surges may use **Chutzpah** in place of the listed attack stat.
+**Attack stat.** A Surge uses its Shape's attack stat, **or** the stat of the tree that unlocked its Effect, whichever you prefer:
+
+| Effect's tree | Hide | Limbs | Senses | Glands | Wiring | Mind |
+|---|---|---|---|---|---|---|
+| Stat it allows | Grit | Grit or Moxie | Nerve | Gumption | Moxie | Chutzpah |
+
+*Bolt + Shock* can use Nerve (Bolt) or Moxie (Wiring); *Burst + Toxin* can use Nerve or Gumption (Glands); *Wave + Dread* can use Grit, Nerve or Chutzpah (Mind). Base Effects (Kinetic) use the Shape's stat only.
 
 ### Effects (what it does)
 **Damage Effects** go with Strike, Bolt, Burst, Wave, or Pulse. The rider applies on a hit (conditions are in [Combat](06_Combat.md#conditions)).
@@ -70,20 +77,22 @@ A Surge can carry **one Twist** (two **different** Twists from Rank 3). Each Twi
 | **Reach** | Any | Double range or area size. Strike reaches 15 ft. |
 | **Hush** | Any | Silent and invisible in origin; using it doesn't reveal you or break stealth. |
 
-> **Budget check.** A plain weapon hit at level 1 averages ~7 damage. A Bolt Surge averages ~12 *and* applies a condition. That's the trade: Surges are stronger, but you don't choose which ones you get, and each one pushes you toward Overload.
+> **Budget check.** A plain weapon hit at level 1 averages ~7.5 damage (1d8 + 3). A Bolt Surge averages ~12 *and* applies a condition. At level 7 (Rank 4, primary +8) a weapon hit is ~26 and a Bolt Surge ~30.5 plus a rider. That's the trade: Surges are stronger, but you don't choose which ones you get (except your Signatures), and each one pushes you toward Overload.
 
 ---
 
 ## The Sequence
-Your **Sequence** is a numbered list of your Surges. Its size is your **Sequence die**:
+Your **Sequence** is a numbered list of your Surges. Its size is your **Sequence die**. The die only grows twice after level 2, when you **Evolve**:
 
-| Level | 1 | 2–3 | 4–5 | 6–7 | 8–10 |
-|---|---|---|---|---|---|
-| **Sequence die** | d4 | d6 | d8 | d10 | d12 |
-| **Surges known** | level + 2 (3 at level 1, 12 at level 10) |||||
-| **Prime** | 2 at levels 1–4, **3** at levels 5+ |||||
+| Level | 1 | 2–3 | 4–6 (Evolution I) | 7–10 (Evolution II) |
+|---|---|---|---|---|
+| **Sequence die** | d4 | d6 | **d8** | **d12** |
+| **Surges known** | level + 2 (3 at level 1, 12 at level 10) ||||
+| **Prime** | 2 | 2 | **3** | **4** |
+| **Signature Surges** | — | — | **1** | **2** |
+| **Wild slots** | 1 | 2, then 1 | 2, 1, 0 | 3, 2, 1, 0 |
 
-Write your Surges in slots 1, 2, 3... Any slot without a Surge is **Wild** (see below). Because the die grows a step before you learn enough to fill it, you'll usually have one or two Wild slots, until level 10, when your Sequence is full.
+Write your Surges in slots 1, 2, 3... Any slot without a Surge is **Wild** (see below). Right after each Evolution your new body offers powers you don't understand yet (extra Wild slots). Then you fill them in, one per level, until your Sequence is full at levels 6 and 10.
 
 You can leave a slot Wild on purpose. When you gain a level, you may **rewrite** one known Surge into a different build.
 
@@ -103,7 +112,17 @@ Unused Primed Surges fade when combat ends.
 **Missed?** If a Strike or Bolt Surge misses, the Flux is still paid but the Surge **stays Primed** (still Amped, if it was). Your body tried; it'll try again.
 
 ## Churning
-**Churn** is a Quick action: gain **1 Flux** and roll your Sequence die once; that Surge is Primed (doubles with an already Primed Surge make it Amped). You **can't Churn on a turn you Unleash** (before or after); a Misfire's free Churn is the only exception. You can't hold more Primed Surges than **Prime + 1**; if you would, choose which to drop.
+**Churn** is a Quick action: gain **1 Flux** and roll your Sequence die once; that Surge is Primed (doubles with an already Primed Surge make it Amped). You **can't Churn on a turn you Unleash** (before or after); a Misfire's free Churn is the only exception. You can't hold more Primed Surges than **Prime + 1** (Signature Surges don't count); if you would, choose which to drop.
+
+## Signature Surges
+At **Evolution I** (level 4) you gain one **Signature Surge**, and at **Evolution II** (level 7) a second. These are the powers your evolved body was built around.
+- **Build** each from your parts like any Surge, with the Twists your Rank allows, and write it in a **Signature box**, not on the Sequence. It doesn't count toward Surges known, Prime, or the Primed maximum.
+- **Always ready:** it's Primed at the start of every combat. When you Unleash it, it is Primed again at the start of your next turn, so you can Unleash each Signature **once per round**.
+- **Cost:** its normal Flux (1 + 1 per Twist). Doubles can't Amp it. Only [Emergence](02A_Forms_and_Evolution.md#emergence-the-moment-it-happens) (its first use) and Final Form make it free. Firmware can't swap it.
+- **Missed** Strike or Bolt Signatures are simply ready again next turn.
+- When you level up, you may **rebuild** one Signature Surge.
+
+> **Why it's fair:** you still get one Action a turn, and every Unleash costs Flux. A freelancer who Unleashes a Signature every round Overloads about once every two fights, unless they have a high Flux Limit (Oracles) or take a turn off to swing a weapon.
 
 ## Surges Outside Combat
 In any tense scene where the GM calls for initiative-style timing (a chase, a heist gone loud), Surges work the same way. In calm scenes you can't Prime; the Mutagen only answers when you're afraid.
@@ -141,7 +160,7 @@ Steal these, rename them, or build your own.
 | Firebloom | Burst + Blaze + Linger | 2 | A burning zone that controls space |
 | Pin | Strike + Snare | 1 | Stops a runner cold |
 | Stomp | Pulse + Quake | 1 | Everything around you falls down |
-| Nightmare | Bolt + Dread (Chutzpah) | 1 | Talk-face's attack |
+| Nightmare | Bolt + Dread (Chutzpah via Mind) | 1 | Talk-face's attack |
 | Flashbulb | Burst + Glare | 1 | Blinds the firing squad |
 | Field Dressing | Infuse + Mend | 1 | Your medic's best friend |
 | Carapace Flex | Infuse + Shell | 1 | Brace for impact |

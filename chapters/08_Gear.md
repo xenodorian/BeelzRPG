@@ -7,7 +7,7 @@ Gear in Mutagen is **modular**: every weapon is a **Frame** plus up to **one Mod
 **Money** is **Scrip** (GRAFT company credit, accepted almost everywhere in Halcyon).
 
 ## Weapons
-**Damage = Rank × die + attack stat.** A level 5 freelancer (Rank 3) with a Heavy weapon and Grit +3 deals 3d10+3.
+**Damage = Rank × die + attack stat.** A level 5 Juggernaut (Rank 3, Grit +5 after Evolution I) with a Heavy weapon deals 3d10+5.
 
 ### Frames
 
