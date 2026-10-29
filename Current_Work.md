@@ -356,3 +356,8 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 10. **Glands unlocks 4 Surge parts** (incl. the only Mend and the only ranged area Shape) vs 2 for Limbs/Senses/Mind. Move Burst elsewhere, or keep Glands as the "toolkit" tree?
 11. **Mind** has the lowest personal damage (Mind Spike ignoring Armor is its edge). Is a support tree with high utility enough, or should Mind Spike scale better?
 12. **No base Infuse Effect.** A Limbs-only freelancer can't build an Infuse Surge. Fine (Limbs is the melee tree), or add a base Infuse Effect (e.g. a weak *Steady*: +Rank to the target's next roll)?
+
+## Hosting (GitHub Pages)
+
+- Every push to `main` deploys the whole repo to https://xenodorian.github.io/BeelzRPG/ via `.github/workflows/pages.yml` (Jekyll build, so Markdown chapters render as HTML; `.html` files are served as-is).
+- Builder: `/builder/`. Printable sheet: `/sheets/Character_Sheet.html`. Check the Actions tab if a deploy fails.
