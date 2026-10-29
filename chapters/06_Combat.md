@@ -47,6 +47,15 @@ Draw or stow an item, open a door, drink a stim, speak a few sentences, **Churn*
 - **Opportunity Strike:** when an enemy leaves your melee reach, make one weapon attack against it.
 - Reactions from Augments (Bulwark, Reflex Spike, Threat Sense, Precog, Fortress).
 
+### Optional: Playing on a Grid
+The rules work theatre-of-the-mind. If your table uses a battle map (the [arcade](../arcade/index.html) always does):
+- **1 square = 5 ft.** Speed 30 ft = 6 squares. Diagonals count as one square (5 ft), so distance is "the larger of the two gaps".
+- **Every creature fills one square**, Huge ones included; the GM may use 2×2 for Huge if the map allows. You can't end your move in an occupied square or pass through an enemy.
+- **Walls and big obstacles** block movement and line of sight (trace a line from centre to centre). Fliers ignore obstacles when moving.
+- **Templates:** a *burst* or "N ft around" is a square of radius N÷5 squares (a 10-ft burst = 5×5 squares). A *cone* of N ft spreads from your square N÷5 squares deep, widening one square each side per step. A *line* is one square wide.
+- **Reach:** melee reach is 1 square (adjacent, diagonals too) unless a feature extends it.
+- **Moving carefully** (optional): move at half speed (each square costs 2) and provoke no Opportunity Strikes.
+
 ## Attacking
 Roll **d20 + stat + Rank** against the target's **Guard**.
 - **Melee:** the stat listed for the weapon in [Gear](08_Gear.md) (Grit for heavy hitting, Moxie for finesse; many weapons allow either).

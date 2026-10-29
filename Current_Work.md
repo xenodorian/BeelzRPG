@@ -3,6 +3,8 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-29)
+**Arcade v2 done (2026-10-29, owner request): battle map + RPG menus.** Fights are now played on a virtual-tabletop grid with movement, real ranges, area templates, JRPG-style command menus that auto-switch between freelancers, a turn-order bar and HUDs for the active freelancer and targeted enemy. See *Arcade v2: battle map* below.
+
 **Arcade mode done (2026-10-29, owner request):** `arcade/` is a playable battle simulator, *Gauntlet mode*. You build a party (5/4/3 freelancers for Easy/Medium/Hard), then each level runs minion fight → boss fight → level-up from 1 to 10, ending with Patient Zero. Parties and characters can be saved. See *Arcade: Gauntlet mode* below.
 
 **Enemy calibration done (2026-10-28, owner request):** every enemy now has a **Boss Rating** and a **Minion Rating** from simulated fights with real builder characters (party sizes 2–6), the threat table was recalibrated (v0.3), the roster is 30 creatures + 3 Bosses with Heavies (AoE) and Packs, and the encounter budget, party-size and difficulty rules come from the sims. See *Enemy Calibration* below; the v0.2 table in D6 is superseded.
@@ -282,7 +284,7 @@ Live at https://xenodorian.github.io/BeelzRPG/arcade/ and offline at `arcade/ind
 ### Design decisions
 1. **Difficulty = party size + threat.**
    - Encounters follow ch 10 for the actual party size: the Hard unit budget for minions, and the Boss's HP and damage × party ÷ 4.
-   - At book budgets the auto-player won about 99% of fights at every size, so each difficulty adds a threat factor: Easy ×1.25, Medium ×1.6, Hard ×1.75.
+   - At book budgets the auto-player won about 99% of fights at every size, so each difficulty adds a threat factor. v1 (no map): Easy ×1.25, Medium ×1.6, Hard ×1.75. **v2 (grid): Easy ×1.0, Medium ×1.22, Hard ×1.38** — positioning made fights harder, so the factors came down.
    - The factor multiplies the minion budget and the boss's HP. Boss damage gets half of it.
    - The extra threat ramps in: half at level 1, three-quarters at level 2.
 2. **Each level** is: minion fight → **Breather** (half Max HP + Knit, Flux 0, death marks cleared, per-Breather abilities back, a Ravenous freelancer eats a ration) → boss fight → **level-up** → **Lockdown** (full HP, injuries cleared, Juice at least 1, kit restocked, per-Lockdown abilities back).
@@ -295,7 +297,7 @@ Live at https://xenodorian.github.io/BeelzRPG/arcade/ and offline at `arcade/ind
      - Each retry of the same fight takes 6% off the enemies' HP and 4% off their damage (**Mercy**, up to 10 retries).
      - A freelancer who dies is recovered by GRAFT at the next Lockdown with a permanent Scar (Bio) or Fault (Chrome).
    - In **permadeath** mode there are no retries, the dead stay dead, and a lost fight ends the run.
-   - Quitting mid-fight saves the run. Resuming restarts that fight.
+   - Quitting mid-fight saves the run. v2: the fight itself is saved too (positions, HP, conditions, whose turn), so resuming continues exactly where you left off.
 5. **Level-up.**
    - The primary node is chosen automatically (the request asked for that); the player picks the secondary and tertiary nodes, new Surges and Signatures, and Knacks.
    - Every pick is checked with the builder's `derive()`, so a sheet can't be confirmed while it's illegal.
@@ -310,11 +312,7 @@ Live at https://xenodorian.github.io/BeelzRPG/arcade/ and offline at `arcade/ind
    - Final Form at the level 10 Boss.
 
 ### Rules simplifications (things the tabletop does that the arcade abstracts)
-- **No battle map.**
-  - Positioning uses the encounter sim's catch odds. Each enemy Area catches each other freelancer with probability Q (small 30%, medium 45%, large 65%), scaled by party size. A freelancer Area catches each other enemy 45% (Burst), 35% (Wave) or 40% (Pulse) of the time, and an ally 12% of the time.
-  - Party order is the line for "adjacent" (Living Wall, Bulwark, Fortress, Hardening, Spore Bloom, Heat Vent).
-  - Movement effects (Overgrowth, Joint Lock, Spring Legs, Grapnel, push distances) are logged only.
-- **Enemies waste 10% of their actions** (the sim's friction for terrain and line of sight). Freelancers don't.
+- ~~No battle map~~ **(removed in v2):** the party-order "adjacency" line, the encounter-sim catch odds (Q) for Areas and the 10% enemy friction are gone. Positions, reach, range, line of sight and templates now decide everything (see *Arcade v2* below). Push distances, Grapnel, Overgrowth, Joint Lock and Spring Legs now act on the grid.
 - **Reactions resolve automatically** when they help: Bulwark, Threat Sense, Precog, Unbreakable, Reflex Spike, Fortress, Omen and Deadeye. Last Gasp fires automatically on the first drop to 0 in each Lockdown. Hair Trigger fires automatically.
 - **Juice** can set Prime dice (Prime screen) and Shrug a condition. There's no Juice reroll of a d20, because rolls resolve at once.
 - **Splice** Overloads roll both tables and keep the better result, and Bloom Lore rerolls bad results automatically. Hive Mind's extra Prime goes to the ally with the fewest Primed Surges. Puppet picks its own target. Perfect Expression picks your two best Surges.
@@ -347,7 +345,66 @@ Live at https://xenodorian.github.io/BeelzRPG/arcade/ and offline at `arcade/ind
 ### Known issues / ideas
 - Levels 2–4, 6–9 use centrepieces because there are only three Bosses. Mother of Rust can come up twice (levels 8 and 9).
 - A few random Hard parties hit a wall against one matchup (all-Siren parties against psychic areas). Mercy softens this, but a human may still need a different party.
-- No battle map, shops or Scrip between levels (see the backlog).
+- No shops or Scrip between levels (see the backlog). Every creature takes one square (Huge too). No difficult terrain, cover bonus or elevation on the map yet.
+
+## Arcade v2: battle map (2026-10-29)
+Owner request: "make the battle simulator a little bit more RPG like. Have a virtual tabletop style backdrop and grid, where the player can move individual player characters in and out of range of their attacks. Also include turn-based RPG menu screens that automatically swap from character to character, and show a HUD for the current player character and the enemy character."
+
+### What changed
+- **`arcade/grid.js` (new):** maps, distances, line of sight, movement, templates, deployment and map save/restore. `engine.js` is v2.0.0 and grid-aware throughout; `app.js` draws the map and menus.
+- **Map:** 14×9 squares (16×10 with more than 8 combatants, wider still for a Boss), 4–6 obstacle blobs themed to the location (pipes, valves, crates, containers, cars, barrels, rubble, barricades, towers, vats, consoles, gurneys, growths, pods) over a blurred art backdrop. Six themes: Pump Station, Streets, Camp, Clinic, Rust Yard, Bloom. Freelancers deploy on the left, enemies on the right.
+- **Tokens:** portrait, HP ring, condition badges, floating damage/heal numbers; states for active, selected, targetable, out of range, allies caught, Down and dead.
+- **Menu:** Move / Attack / Surges / Churn / Items & Kit / Defend & Other / Wait / End Turn. Submenus list every option with its cost (Action/Quick/Move), dice and range; options that can't be used are disabled with a reason ("out of reach (20 ft, reach 5 ft) — move first", "no ally within 30 ft"…). Back with Esc or the Back button. Keys: arrows move the map cursor, Enter/Space confirm, 1–9 pick, Up/Down in lists, C toggles careful movement, T cycles targets, Space skips enemy animation. Touch: tap squares and tokens.
+- **Auto-switch:** when a freelancer's turn is spent (or they End Turn), the menu jumps to the next freelancer in initiative order (can be turned off). **Wait** moves a freelancer to the end of the order, keeping what they have left.
+- **HUDs:** the active freelancer (portrait, HP/temp, Flux/Limit, Sequence die, defences, armor, speed, Juice, reaction, Action/Quick/Move left, Primed Surges) and the targeted/hovered enemy (HP, Guard, TN, armor, speed, traits, attacks, BR/MR, distance). Turn-order bar on top; dice log collapsible.
+- **Enemy turns** animate token by token (normal / fast / instant, saved in settings; Space or the Skip button skips).
+- **Mid-battle save:** `Fight.toJSON/restore` keep positions and the whole fight state; tested to give the same result as an unsaved fight with the same seed.
+- **Auto-play** (Auto this turn / rest of round / Auto-battle) moves too: it scores every reachable square by the best attack or heal it allows, minus the danger there (enemy reach, clustering inside known area attacks), acts, then backs off with any movement left.
+
+### Grid and range mapping
+| Rule | On the grid |
+|---|---|
+| Distance | 1 square = 5 ft; diagonals = 1 square (Chebyshev). Line of sight: centre-to-centre line, blocked by obstacles (not creatures). |
+| Speed | Speed ÷ 5 squares (30 ft = 6). Torn leg −10 ft; Overgrowth halves; Held / Joint Lock / Cocoon = 0. Standing from Prone costs half. Fliers ignore obstacles. |
+| Dash | Adds your speed again this turn (Afterimage also Veiled). Pounce needs 3+ squares moved. |
+| Careful move | Each square costs 2; no Opportunity Strikes. |
+| Opportunity Strike | Enemy: once per round per enemy, when a freelancer leaves its reach. Freelancer: uses the Reaction when an enemy leaves reach (Lash Tail also on entering, and knocks Prone). Slipstream: no OS, can pass through enemies. |
+| Weapons | Melee reach 1 (Reach weapons/Grapnel 2). Ranged: listed range, up to 2× at disadvantage; disadvantage when an enemy is adjacent. A ranged enemy attacking from adjacency gives the defender advantage. |
+| Actions | Help 6 sq (30 ft); Patch, Stim Gland, Antibodies 1 (touch); Analyze, Taunt, Menace, Crown, Puppet, Intrude 12 (60 ft); Target Lock 24; Rally 12. |
+| Surge shapes | Strike reach 1 (Grapnel 2, Reach twist 3). Bolt 12 (×2 with Reach, ×2 with Long Sight). Burst: range 12, radius 2 (Reach: radius 4). Wave: cone 3 or line 6 (Reach: 6 / 12). Pulse: radius 2 around you (Reach: 4). Infuse: ally within 6 (Reach: 12). |
+| Wild Surges | Wild 2: radius-2 burst on yourself (not you). Wild 3: range 12. Wild 8: teleport. Wild 10: pulse radius 4. |
+| Nodes | Siren Song 6; Scream radius 6; Panacea 6; Living Pharmacy 3; Spotter 12; Spore Cloud 3; Bulwark / Fortress (half) 2; Fortress intercept 6; Living Wall 1; Threat Sense / Precog 6; Omen 12; Hardening / Heat Vent / explode 2; Chain jumps 3 from the first target; Phase Step teleports up to 12. |
+| Items | Grenades etc.: radius-2 burst within 6. Launcher: radius-2 burst within 12. |
+| Enemy areas | "N ft around" = radius N÷5 around the creature; "N-ft burst" = radius N÷10 at its range; "N-ft cone" = cone N÷5; unlabelled small/medium/large = radius 2/4/6. |
+| Who an area hits | Freelancer Burst/Wave: every enemy in the footprint; allies inside roll Dodge (success = half). Pulse and Scream: enemies only. Enemy areas with friendly fire hit their allies too; Bulky enemies won't fire if a non-mook ally would be caught. |
+
+### Enemy AI on the grid
+Areas pick the square catching the most freelancers; single attacks score expected damage plus the stat block's preferred target; melee closes in and flanks, ranged enemies keep out of reach; anything with nothing in reach Dashes closer. Summons appear next to the summoner.
+
+### Simplifications added
+- Every creature fills one square (Huge too).
+- Enemy Opportunity Strikes: at most one per enemy per round.
+- No difficult terrain, cover bonus or elevation; obstacles just block.
+
+### Win rates (auto-play, 40 seeded runs each, `node tools/arcade_test.js 40`)
+| Difficulty | Before (v1, no map) permadeath | After (v2 grid) permadeath | Before standard / retries per run | After standard / retries per run |
+|---|---|---|---|---|
+| Easy (5), ×1.0 | 35/40 (88%) | **36/40 (90%)** | 40/40 / 0.23 | 40/40 / 0.13 |
+| Medium (4), ×1.22 | 28/40 (70%) | **30/40 (75%)** | 40/40 / 0.63 | 40/40 / 0.47 |
+| Hard (3), ×1.38 | 18/40 (45%) | **17/40 (43%)** | 38/40 / 2.92 | 40/40 / 2.55 |
+
+First-try fights won (v2): 99.5% / 98.6% / 96.0%. Tuning sweeps of 100–200 runs (seeds 1000·i+1): Easy ×1.0 → 86.5%; Medium ×1.22 → 68.5%; Hard ×1.38 → 43%. The first grid build was far too hard (areas caught 2.6 freelancers on average; the L2 Drain Beast's 20-ft Tail Thrash hit everyone), fixed by larger maps and by teaching the auto-player to spread out.
+
+### Tests (v2)
+- `node tools/arcade_test.js 40`: **17,478 checks, all pass**. New grid section: footprints, line of sight, movement legality, Opportunity Strike vs careful move, ranges / long range / LOS, bursts catch only creatures inside, save/resume keeps positions, melee enemies close in, Wait order. The jsdom page section covers map and tokens, auto-switch, HUDs, order bar, move by click, Esc, arrow cursor, attack submenu with disabled reasons, target and AoE, next-freelancer switch, mid-battle save + resume.
+- Real Chrome (`tools/arcade_shots.js`): full click-through with no page errors; screenshots `arcade_grid_move.png`, `arcade_grid_menu.png`, `arcade_grid_attack.png`, `arcade_grid_aoe.png`, `arcade_grid_enemy.png`, `arcade_grid_mobile.png`.
+- `check_builder_data.js` (493/0), `builder_test.js` (255), `builder_flows.js` (all pass, no console errors), `check_links.py` (177/0), `sync_arcade.js --check` (in sync).
+
+### Issues fixed along the way
+- `weaponOf` had a duplicate `range` key (text vs number); the text is now `rangeTxt`.
+- Weapon ranges like "30/90/120 ft" were parsed wrongly.
+- On phones the map's width forced the whole page to zoom out; grid columns now use `minmax(0,1fr)` and the map scrolls inside its frame.
+- Numbered enemies of the same kind now get distinct tokens (S1, S2…).
 
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
