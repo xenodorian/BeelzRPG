@@ -48,6 +48,11 @@ aside h3{margin:0;color:var(--acid)}
 .th{border-bottom:1px solid var(--line);padding-bottom:6px;margin-bottom:4px}.th>b{font-size:17px;color:var(--acid)}
 .formsel{display:flex;gap:10px;margin-top:4px}.formsel label{margin:0;display:inline-flex;gap:4px;align-items:center}.formsel .bio{color:var(--bio)}.formsel .chrome{color:var(--chrome)}.look{font-style:italic}
 .node{display:block;margin:4px 0;padding:5px 6px;border-radius:6px;color:var(--ink);cursor:pointer}.node:hover{background:rgba(255,255,255,.03)}.node.on{background:rgba(76,195,0,.14)}.node.dis{opacity:.5;cursor:not-allowed}
+.tierh{font-size:10.5px;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin:8px 0 2px;border-bottom:1px solid rgba(255,255,255,.08)}
+.node.evo{border:1px dashed var(--acid2);cursor:default}.node.evo.on{background:rgba(76,195,0,.2)}
+.tag.role{background:var(--acid2);color:#000;border-color:var(--acid2)}
+.slot.sig{border-left:3px solid var(--acid)}
+.formbox.mig{border-color:#d90;color:#fc6}
 .tag{font-size:10.5px;border:1px solid var(--acid2);color:var(--acid);border-radius:4px;padding:0 4px}.tag.no{border-color:var(--dim);color:var(--dim)}
 .slot{border:1px solid var(--line);background:var(--pan2);border-radius:8px;padding:8px;margin:6px 0}.slot.wild{border-style:dashed;color:var(--dim)}.slot.bads{border-color:var(--bad)}
 .slot .row input{flex:1 1 150px;width:auto}.slot select{flex:0 1 auto}.num{font-size:18px;color:var(--acid);width:24px}.flux{font-weight:700;color:var(--splice);white-space:nowrap}
@@ -79,11 +84,11 @@ aside h3,.card,.node,.slot .line,.msgs button,.sheet td,.sheet p,.formbox{overfl
 </head>
 <body>
 <div id="app">
-<header><h1>MUTAGEN<small>Character Builder · v0.1.1</small></h1>
+<header><h1>MUTAGEN<small>Character Builder · v0.2</small></h1>
 <div class="tools">
 <select id="lvlTop" aria-label="Character level"></select>
 <button id="btnRandom" title="Random legal character at this level">⚄ Random</button>
-<select id="exSel" aria-label="Load example"><option value="">Example…</option><option value="dree1">Dree, level 1 (guide)</option><option value="dree5">Dree, level 5 (guide)</option></select>
+<select id="exSel" aria-label="Load example"><option value="">Example…</option></select>
 <button id="btnNew">New</button><button id="btnSave">Save</button><select id="loadSel" aria-label="Load saved"></select>
 <button id="btnExport" title="Download this character as a .json file">Export</button><button id="btnImport" title="Load a character from an exported .json file">Import</button><input type="file" id="importFile" accept=".json,application/json" hidden aria-label="Import character file"><span id="saveNote" role="status"></span>
 </div></header>
@@ -94,16 +99,22 @@ aside h3,.card,.node,.slot .line,.msgs button,.sheet td,.sheet p,.formbox{overfl
 <script>
 /* =====================================================================
    MUTAGEN GAME DATA  (edit here when the rules change)
-   Source of truth: chapters/02-08. Keep ids stable (saved characters use them).
+   Source of truth: chapters/02-08 (+02A, 03_Trees/*). Keep ids stable (saved characters use them).
    Text tokens in node text: {R}=Rank, {2R}=2xRank, {R1}=Rank+1,
-   {GUM}=Gumption, {GRIT}=Grit. fx keys are read by derive() in the app code:
-     armor, armorRank3 (Plating), hpPerLevel, speed, primeBonus, mendFree,
-     rangedDouble, critRanged, meleeDie (bonus die note), attack:{...}
+   {GUM}=Gumption, {GRIT}=Grit, {ADR}=2xRank+Grit. fx keys are read by derive() in the app code:
+     armor, armorRank3 (Plating), armorMax, hpPerLevel, speed, reach, mendFree, burstDie,
+     rangedDouble, critRanged, critWiden, meleeDie / anyDie (bonus die note), rend, reactions, attack:{...}
+   Node tiers: 0 Root, 1 Tier I, 2 Tier II, 3 Apex. Evolution nodes: evo: 4|7, form: <form id>.
    ===================================================================== */
 const MUTAGEN = {
-  version: "0.1.1",
-  statArray: [3, 2, 1, 0, -1],
-  statMax: 5,
+  version: "0.2.0",
+  // Stat values by stage, in order: primary, secondary, tertiary, dump (+0), dump (-1)
+  stages: [
+    { id: "base", name: "Base", from: 1, vals: [3, 2, 1, 0, -1] },
+    { id: "evo1", name: "Evolution I", from: 4, vals: [5, 3, 2, 1, 0] },
+    { id: "evo2", name: "Evolution II", from: 7, vals: [8, 4, 3, 2, 1] }
+  ],
+  finalFormBonus: 2,
   stats: [
     { id: "grit", name: "Grit", tag: "I'm still standing.", does: "Power melee, lifting, Endure, Max HP" },
     { id: "moxie", name: "Moxie", tag: "Watch this.", does: "Finesse melee, sneaking, Dodge, initiative" },
@@ -111,39 +122,79 @@ const MUTAGEN = {
     { id: "gumption", name: "Gumption", tag: "Hand me that wrench.", does: "Tech, medicine, hacking, Patch, Analyze, Spit" },
     { id: "chutzpah", name: "Chutzpah", tag: "You and what army?", does: "Talk, lie, Taunt, Rally, Mind Spike, Dread" }
   ],
-  // Per level (index 0 = level 1). Wild slots = die - surges known.
+  // Per level (index 0 = level 1). Wild slots = die - surges known. sigs = Signature Surges.
   levels: [
-    { lv: 1, rank: 1, nodes: 2, surges: 3, die: 4, prime: 2, extra: "3 Knacks" },
-    { lv: 2, rank: 1, nodes: 3, surges: 4, die: 6, prime: 2, extra: "" },
-    { lv: 3, rank: 2, nodes: 4, surges: 5, die: 6, prime: 2, extra: "Stat boost" },
-    { lv: 4, rank: 2, nodes: 5, surges: 6, die: 8, prime: 2, extra: "+1 Knack" },
-    { lv: 5, rank: 3, nodes: 6, surges: 7, die: 8, prime: 3, extra: "2 Twists per Surge; Plating +2" },
-    { lv: 6, rank: 3, nodes: 7, surges: 8, die: 10, prime: 3, extra: "Stat boost" },
-    { lv: 7, rank: 4, nodes: 8, surges: 9, die: 10, prime: 3, extra: "Apex nodes available" },
-    { lv: 8, rank: 4, nodes: 9, surges: 10, die: 12, prime: 3, extra: "+1 Knack" },
-    { lv: 9, rank: 5, nodes: 10, surges: 11, die: 12, prime: 3, extra: "Stat boost" },
-    { lv: 10, rank: 5, nodes: 11, surges: 12, die: 12, prime: 3, extra: "Final Form" }
+    { lv: 1, rank: 1, surges: 3, die: 4, prime: 2, sigs: 0, extra: "3 Knacks" },
+    { lv: 2, rank: 1, surges: 4, die: 6, prime: 2, sigs: 0, extra: "" },
+    { lv: 3, rank: 2, surges: 5, die: 6, prime: 2, sigs: 0, extra: "+1 Knack" },
+    { lv: 4, rank: 2, surges: 6, die: 8, prime: 3, sigs: 1, extra: "EVOLUTION I; Tier II opens" },
+    { lv: 5, rank: 3, surges: 7, die: 8, prime: 3, sigs: 1, extra: "2 Twists per Surge; Plating +2" },
+    { lv: 6, rank: 3, surges: 8, die: 8, prime: 3, sigs: 1, extra: "+1 Knack" },
+    { lv: 7, rank: 4, surges: 9, die: 12, prime: 4, sigs: 2, extra: "EVOLUTION II; Apex opens" },
+    { lv: 8, rank: 4, surges: 10, die: 12, prime: 4, sigs: 2, extra: "Primary tree full" },
+    { lv: 9, rank: 5, surges: 11, die: 12, prime: 4, sigs: 2, extra: "+1 Knack; primary pick overflows" },
+    { lv: 10, rank: 5, surges: 12, die: 12, prime: 4, sigs: 2, extra: "FINAL FORM" }
   ],
-  statBoostLevels: [3, 6, 9],     // +1 to two different stats
-  knackLevels: { 1: 3, 4: 1, 8: 1 }, // Knacks gained at that level
-  apexLevel: 7, apexNeeds: 3,
+  knackLevels: { 1: 3, 3: 1, 6: 1, 9: 1 }, // Knacks gained at that level
+  tier2Level: 4, tier2Needs: 3, apexLevel: 7, apexNeeds: 6, treeSize: 10,
   baseHP: 12, hpPerGrit: 2, hpPerLevel: 5,
   baseSpeed: 30, armorMax: 4, fluxBase: 4, fluxMin: 4, spliceFlux: -1,
   startScrip: 50, upkeepPerChrome: 25, juiceStart: 1, juiceMax: 3,
   missionPay: lv => 200 + 100 * lv,
-  finalForm: "Once per Lockdown, at the start of a combat: every Surge you Unleash this combat is Amped, and you Prime two extra Surges.",
+  finalForm: "Once per Lockdown, at the start of a combat (after Priming): until it ends, primary stat +2, Prime two extra Surges, and every Surge you Unleash is Amped (Signatures too).",
+  emergence: "In the first combat after Evolving, at the start of your first turn: describe the change, gain temporary HP = 2 x level, every enemy within 30 ft that sees you is Shaken (not Bosses), and your new Signature Surge is Amped the first time you Unleash it.",
+  signatureRule: "Always Primed at the start of combat; Primed again at the start of your next turn after you Unleash it (once per round). Normal Flux. Not on the Sequence; doesn't count toward Surges known, Prime, or the Primed maximum.",
+  // A Surge may use its Shape's stat or the stat of the tree that unlocked its Effect.
+  treeStats: { hide: ["grit"], limbs: ["grit", "moxie"], senses: ["nerve"], glands: ["gumption"], wiring: ["moxie"], mind: ["chutzpah"] },
 
+  forms: [
+    { id: "juggernaut", name: "Juggernaut", quote: "I don't move. You do.", primary: "grit", secondary: "nerve", tertiary: "chutzpah", dumps: ["moxie", "gumption"], trees: ["hide", "limbs", "glands"], evo: { 4: "siegehide", 7: "fortress" },
+      blurb: "Unkillable. Holds doorways, Taunts, intercepts, and takes the hit meant for a friend.",
+      stages: [
+        { name: "Juggernaut", bio: "Thick neck, heavy brow, knuckles armoured with horn. Your skin has the give of a car tyre.", chrome: "Subdermal plates you can feel through your shirt; a spine brace that whines when you stand." },
+        { name: "Rampart", bio: "You grow a foot in a night. Your back splits into overlapping bone slabs; your forearms swell into shields.", chrome: "Bulkhead plates bolt over shoulders and chest; your joints are hydraulic now, and they hiss." },
+        { name: "Colossus", bio: "Nine feet of keratin and scar tissue. Horns, a domed skull, a heartbeat people feel through the floor.", chrome: "A walking bunker: riveted armour, a face behind a visor slit, treads of steel on your soles." },
+        { name: "Citadel", bio: "Stone-hard ridges, moss in the cracks, small things nesting in you. You are a place.", chrome: "Siren lights, warning stencils, a hatch in your chest. Ostrander would classify you as infrastructure." } ] },
+    { id: "skitter", name: "Skitter", quote: "You blinked. I was already there.", primary: "moxie", secondary: "gumption", tertiary: "grit", dumps: ["nerve", "chutzpah"], trees: ["wiring", "limbs", "senses"], evo: { 4: "mantisreflex", 7: "lightningstep" },
+      blurb: "The fastest thing in any room: darts in, Dazes, darts out, and acts more often than anyone.",
+      stages: [
+        { name: "Skitter", bio: "Long limbs, twitchy hands, pupils that never settle; you're warm to the touch.", chrome: "Reflex jacks at the base of the skull; fingertips with steel contacts that spark when you're nervous." },
+        { name: "Mantis", bio: "Your forearms fold into barbed hooks; your knees bend backwards; you smell like ozone.", chrome: "Synthetic muscle cables under translucent skin, and a capacitor hump between your shoulders." },
+        { name: "Wraith", bio: "Glassy wing-cases that hum, faceted eyes, lightning crawling along your veins.", chrome: "You blur when you move; a plasma coil glows through your ribs; you leave scorch-prints." },
+        { name: "Livewire", bio: "Barely solid: a figure of arcs and chitin that's always slightly somewhere else.", chrome: "A human-shaped storm in a chrome cage, held together by a magnetic field." } ] },
+    { id: "oracle", name: "Oracle", quote: "I saw you coming. Three days ago.", primary: "nerve", secondary: "chutzpah", tertiary: "moxie", dumps: ["grit", "gumption"], trees: ["senses", "mind", "wiring"], evo: { 4: "foresight", 7: "thousandeyes" },
+      blurb: "Sees everything, steadies everyone, holds the most Flux. Fragile body, deadly aim.",
+      stages: [
+        { name: "Oracle", bio: "Pale, still, unsettling eyes with too much iris; you hear heartbeats through walls.", chrome: "A monocle lens grafted to the socket; tiny antennae behind the ears." },
+        { name: "Argus", bio: "A third eye opens on your brow; small eyes bead along your collarbones and blink out of time.", chrome: "A ring of lenses around your head like a crown; your voice comes with a faint radio hiss." },
+        { name: "Seraph", bio: "Wing-like membranes covered in eyes unfold from your back; you float a hand's width off the floor.", chrome: "Six optic arms fan out from your spine; holographic targeting halos hang around you." },
+        { name: "Panopticon", bio: "A tall white shape of lids and lashes; when you look at someone, they feel seen.", chrome: "A tower of lenses and dishes; every camera in the district turns toward you." } ] },
+    { id: "alembic", name: "Alembic", quote: "Hold still. This will either cure you or kill it.", primary: "gumption", secondary: "grit", tertiary: "nerve", dumps: ["moxie", "chutzpah"], trees: ["glands", "hide", "mind"], evo: { 4: "transmute", 7: "panacea" },
+      blurb: "A walking laboratory: heals, poisons, survives toxic air, and keeps the crew alive.",
+      stages: [
+        { name: "Alembic", bio: "Glands swelling at the throat and wrists; you sweat something sweet-smelling and faintly green.", chrome: "Injector ports along your forearms, and a hip-mounted reservoir with a gauge." },
+        { name: "Still", bio: "Translucent sacs bloom across your back, glowing with what you're brewing; your breath fogs.", chrome: "Coiled tubing and glass vials under a ribcage of chrome; you gurgle when you walk." },
+        { name: "Bloomheart", bio: "Spore-fronds and flower-like vents open along your spine; insects follow you.", chrome: "A walking refinery: pressurised tanks, nozzle arrays, a warning placard that reads FLAMMABLE." },
+        { name: "Wellspring", bio: "A living garden: roots in the floor where you stand, fruit that heals, pollen that kills.", chrome: "A mobile clinic: hissing pipes, a dozen spigots, steam that smells like hospitals." } ] },
+    { id: "siren", name: "Siren", quote: "Everybody look at me.", primary: "chutzpah", secondary: "moxie", tertiary: "gumption", dumps: ["grit", "nerve"], trees: ["mind", "wiring", "limbs"], evo: { 4: "sirensong", 7: "crownofwill" },
+      blurb: "Impossible to ignore: talks past guards, Taunts whole rooms, bends minds. Reckless; first to Overload.",
+      stages: [
+        { name: "Siren", bio: "Striking face, a voice with a second note under it, a scent people remember.", chrome: "Voice modulator at the throat; LED tattoos that pulse when you talk." },
+        { name: "Diva", bio: "Iridescent skin, a frill of feathers or fins at the neck; your voice harmonises with itself.", chrome: "Speaker grilles bloom along your collarbones; your face projects a light-show halo." },
+        { name: "Choir", bio: "A crown of soft horns; a dozen mouths open along your arms and sing in chorus.", chrome: "An antenna crown and a cape of fibre-optic cable; you broadcast on every frequency." },
+        { name: "Crowned", bio: "Too beautiful to look at directly; people weep, kneel or flee.", chrome: "A living billboard and a broadcast tower; your face is on every screen, saying your name." } ] }
+  ],
   origins: [
     { id: "spillborn", name: "Spill-Born", blurb: "Raised in the flooded Wards.", knack: "Scavenging", perk: "Advantage on Endure against poison, disease, and anything that adds Flux to you." },
     { id: "washout", name: "Corporate Washout", blurb: "Ex-Ostrander staff, fired or fled.", knack: "Corporate Protocol", perk: "Start with +100 Scrip. Once per mission, name an old contact who can open one door.", scrip: 100 },
-    { id: "escapee", name: "Lab Escapee", blurb: "You were the experiment.", knack: "Lab Science", perk: "You know one extra Surge at every level (it fills a Wild slot).", extraSurge: 1 },
+    { id: "escapee", name: "Lab Escapee", blurb: "You were the experiment.", knack: "Lab Science", perk: "You know one extra Surge at every level (it fills a Wild slot; never adds a Signature).", extraSurge: 1 },
     { id: "clinicrat", name: "Clinic Rat", blurb: "A street surgeon raised you, or still owns you.", knack: "Street Medicine", perk: "Your Patch action heals +Rank extra HP; removing Scars or Faults costs you half.", patchBonus: true },
     { id: "militia", name: "Ward Militia", blurb: "You held the barricades.", knack: "Squad Tactics", perk: "+2 to your roll in group initiative checks. Once per combat, take Brace as a Quick action." },
     { id: "convert", name: "Bloom Convert", blurb: "The Children took you in.", knack: "Bloom Lore", perk: "Once per Lockdown, reroll an Overload result and choose either result." }
   ],
   knackExamples: ["Parkour", "Knife Fighting", "Ostrander Security", "Drone Piloting", "Sewer Routes", "Fast Talk", "Interrogation", "Chemistry", "Mutant Biology", "Salvage Appraisal", "Street Medicine", "Black-Market Contacts", "Crowd Work", "Lockpicking", "Swimming", "Gambling", "Old Halcyon History", "Cooking Anything", "Bloom Scripture", "Explosives", "Gang Turf", "Electrical Repair", "Rooftop Routes", "Demolition", "Intimidation"],
 
-  forms: {
+  materials: {
     bio: { name: "Bio", look: "Chitin, scales, extra eyes, glands, tentacles, glowing veins", perk: "Knit: at the end of each combat and when you take a Breather, regain HP equal to Rank x your number of Bio trees.", cost: "Overloads roll on the Bloom table." },
     chrome: { name: "Chrome", look: "Plates, pistons, optics, ports, wiring, servo-arms", perk: "Firmware: once per combat, right after you Prime, swap one Primed Surge for any Surge you know that uses a part unlocked by one of your Chrome trees (base parts alone don't count).", cost: "Overloads roll on the Glitch table. Disadvantage on defense against Shock. Upkeep 25 Scrip per Chrome tree each mission (GRAFT prepays your first)." },
     splice: { name: "Splice", look: "Meat and metal fighting for the same body", perk: "Overload: roll on both Bloom and Glitch, choose one. Keeps Knit (Bio trees) and Firmware (Chrome trees).", cost: "Flux Limit -1. Chrome trees still cost Upkeep and give disadvantage vs Shock." }
@@ -153,62 +204,96 @@ const MUTAGEN = {
     { id: "hide", name: "Hide", stats: "Grit", role: "Tank, protector", unlocks: ["pulse", "quake", "shell"],
       bio: "chitin plates, scales, rubbery blubber, bark-skin", chrome: "dermal plating, kinetic mesh, ablative shell",
       nodes: [
-        { id: "plating", name: "Plating", root: true, text: "+1 Armor (+2 from Rank 3). Armor from all sources maxes at 4.", fx: { armor: 1, armorRank3: 2 } },
-        { id: "thick", name: "Thick", text: "+2 Max HP per level (count past levels too).", fx: { hpPerLevel: 2 } },
-        { id: "barbs", name: "Barbs", text: "When an enemy's melee attack damages you, it takes {2R} damage." },
-        { id: "adaptive", name: "Adaptive", text: "When you take Blaze, Shock, Toxin, Corrode, or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old." },
-        { id: "bulwark", name: "Bulwark", push: true, text: "Reaction: when an ally within 10 ft is targeted by a Single attack, you become the target and roll your own defense. Push: roll it with advantage." },
-        { id: "unbreakable", name: "Unbreakable", apex: true, push: true, text: "Once per round, when you fail a defense roll, Push to take half damage and ignore its rider. You can't be knocked Prone or moved against your will." }
+        {"id": "plating", "name": "Plating", "tier": 0, "root": true, "text": "+1 Armor (+2 from Rank 3). Armor from all sources maxes at 4, unless a node says otherwise.", "fx": {"armor": 1, "armorRank3": 2}},
+        {"id": "thick", "name": "Thick", "tier": 1, "text": "+2 Max HP per level (count past levels too).", "fx": {"hpPerLevel": 2}},
+        {"id": "barbs", "name": "Barbs", "tier": 1, "text": "When an enemy's melee attack damages you, it takes {2R} damage."},
+        {"id": "anchor", "name": "Anchor", "tier": 1, "text": "You can't be knocked Prone, pushed or pulled against your will. You roll defense with advantage against attacks whose rider is Held."},
+        {"id": "shouldercheck", "name": "Shoulder Check", "tier": 1, "text": "Once per turn, you can Grapple or Shove as a Quick action."},
+        {"id": "adaptive", "name": "Adaptive", "tier": 2, "text": "When you take Blaze, Shock, Toxin, Corrode or Psychic damage, you resist that type (half damage) until combat ends. One type at a time; a new type replaces the old."},
+        {"id": "bulwark", "name": "Bulwark", "tier": 2, "push": true, "text": "Reaction: when an ally within 10 ft is targeted by a Single attack, you become the target instead and roll your own defense. Push: roll it with advantage."},
+        {"id": "livingwall", "name": "Living Wall", "tier": 2, "text": "Allies adjacent to you get +1 to defense rolls (+2 from Rank 4). It doesn't stack with another Living Wall."},
+        {"id": "menace", "name": "Menace", "tier": 2, "text": "You can Taunt as a Quick action, using Grit in place of Chutzpah. You get +2 to defense rolls against creatures you have Taunted."},
+        {"id": "unbreakable", "name": "Unbreakable", "tier": 3, "apex": true, "push": true, "text": "Once per round, when you fail a defense roll, Push to take half damage and ignore its rider. Your Armor maximum is 5.", "fx": {"armorMax": 5}},
+        {"id": "siegehide", "name": "Siege Hide", "tier": 4, "evo": 4, "form": "juggernaut", "text": "Your hide thickens into overlapping slabs. +1 Armor, and your Armor maximum is 6. Your melee reach is 10 ft, and you count as Huge (non-Huge creatures can't knock you Prone or push you).", "fx": {"armor": 1, "armorMax": 6, "reach": 10}},
+        {"id": "fortress", "name": "Fortress", "tier": 4, "evo": 7, "form": "juggernaut", "text": "You are terrain now. Allies within 10 ft of you take half damage from Area attacks (after their own defense roll). Reaction: once per round, when an ally within 30 ft would drop to 0 HP, you take that damage instead (your Armor applies)."}
       ] },
     { id: "limbs", name: "Limbs", stats: "Grit / Moxie", role: "Melee, grappler, mover", unlocks: ["wave", "snare"],
       bio: "claws, mantis blades, tentacles, extra arms, digitigrade legs", chrome: "piston arms, mono-blades, grapple lines, servo-arms, hydraulic legs",
       nodes: [
-        { id: "naturalweapons", name: "Natural Weapons", root: true, text: "A melee weapon (d8, Grit or Moxie) that can't be disarmed and doesn't need a free hand.", fx: { weapon: "natural" } },
-        { id: "extraarm", name: "Extra Arm", push: true, text: "Hold one more item; draw, stow, or interact without your Quick action. Once per turn, on a melee hit, +1 damage die. Push: also knock the target Prone (not Huge).", fx: { meleeDie: "Extra Arm" } },
-        { id: "grapnel", name: "Grapnel", text: "Melee reach 10 ft. As your Move, pull yourself up to 30 ft to a surface you can see, or yank an unheld object to your hand.", fx: { reach: 10 } },
-        { id: "crushergrip", name: "Crusher Grip", push: true, text: "Once per turn when you hit with a natural weapon, the target is Held. Huge creatures and Bosses require a Push." },
-        { id: "springlegs", name: "Spring Legs", text: "+10 ft speed. Jump 20 ft long or 10 ft high as part of your move, climb at full speed, half falling damage.", fx: { speed: 10 } },
-        { id: "flurry", name: "Flurry", apex: true, text: "When you take the Attack action with natural weapons, make a second attack with half the damage dice (round up)." }
+        {"id": "naturalweapons", "name": "Natural Weapons", "tier": 0, "root": true, "text": "Claws, blades or pistons: a melee weapon (d8, Grit or Moxie) that can't be disarmed and doesn't need a free hand.", "fx": {"weapon": "natural"}},
+        {"id": "extraarm", "name": "Extra Arm", "tier": 1, "push": true, "text": "A third limb. Hold one more item, and draw, stow or interact without using your Quick action. Once per turn, when you hit with a melee attack, deal +1 damage die (one more of that attack's dice). Push: also knock the target Prone (not Huge).", "fx": {"meleeDie": "Extra Arm"}},
+        {"id": "grapnel", "name": "Grapnel", "tier": 1, "text": "Your melee reach is 10 ft. As your Move, you can pull yourself up to 30 ft to any surface you can see, or yank an unheld object to your hand.", "fx": {"reach": 10}},
+        {"id": "springlegs", "name": "Spring Legs", "tier": 1, "text": "+10 ft speed. Jump 20 ft long or 10 ft high as part of your move, climb at full speed, and take half falling damage.", "fx": {"speed": 10}},
+        {"id": "lashtail", "name": "Lash Tail", "tier": 1, "text": "You can make an Opportunity Strike when an enemy enters your melee reach, as well as when it leaves. A hit from an Opportunity Strike knocks a non-Huge target Prone."},
+        {"id": "crushergrip", "name": "Crusher Grip", "tier": 2, "push": true, "text": "Once per turn when you hit with a natural weapon, the target is Held. Huge creatures and Bosses require a Push."},
+        {"id": "rend", "name": "Rend", "tier": 2, "text": "Your natural weapons' die becomes d10 (d12 from Rank 4).", "fx": {"rend": true}},
+        {"id": "pounce", "name": "Pounce", "tier": 2, "text": "Once per turn, if you move at least 15 ft toward a creature and then hit it with a melee attack, it's knocked Prone (not Huge), and you can Grapple it as a Quick action."},
+        {"id": "manyhands", "name": "Many Hands", "tier": 2, "text": "Help is a Quick action for you. You can hold a second creature Held while you already hold one."},
+        {"id": "flurry", "name": "Flurry", "tier": 3, "apex": true, "text": "When you take the Attack action with natural weapons, make a second attack with half the damage dice (round up)."}
       ] },
     { id: "senses", name: "Senses", stats: "Nerve", role: "Sniper, scout, spotter", unlocks: ["glare", "veil"],
       bio: "compound eyes, pit organs, bat ears, whiskers, a third eye", chrome: "optic suites, targeting HUD, radar, audio filters",
       nodes: [
-        { id: "keen", name: "Keen", root: true, text: "See in darkness out to 60 ft. Advantage on checks to notice hidden things. Bright light can't Blind you." },
-        { id: "targetlock", name: "Target Lock", text: "Quick: mark a creature you can see. Once per turn, your attack against it deals +1 damage die. Lasts until combat ends or you mark another.", fx: { anyDie: "Target Lock (marked target)" } },
-        { id: "threatsense", name: "Threat Sense", text: "You and your group can't be surprised. Reaction: when an ally within 30 ft makes a defense roll, add your Nerve to it (declare before rolling)." },
-        { id: "analyzer", name: "Analyzer", text: "You can Analyze as a Quick action once per turn." },
-        { id: "longsight", name: "Long Sight", text: "Double the range of your ranged attacks and ranged Surges. Ignore partial cover. Read lips at 300 ft.", fx: { rangedDouble: true } },
-        { id: "deadeye", name: "Deadeye", apex: true, push: true, text: "Your ranged attacks (weapons, Spit, Mind Spike, ranged Surges) Crit on 18-20. Once per round, Push to reroll a missed attack.", fx: { critRanged: 18 } }
+        {"id": "keen", "name": "Keen", "tier": 0, "root": true, "text": "See in darkness out to 60 ft. Advantage on checks to notice hidden things. Bright light can't Blind you."},
+        {"id": "targetlock", "name": "Target Lock", "tier": 1, "text": "Quick: mark a creature you can see. Once per turn, your attack against it deals +1 damage die (one more of that attack's dice). The mark lasts until combat ends or you mark another.", "fx": {"anyDie": "Target Lock (marked target)"}},
+        {"id": "threatsense", "name": "Threat Sense", "tier": 1, "text": "You and your group can't be surprised. Reaction: when an ally within 30 ft makes a defense roll, add your Nerve to it (declare before rolling)."},
+        {"id": "analyzer", "name": "Analyzer", "tier": 1, "text": "You can Analyze as a Quick action once per turn."},
+        {"id": "echolocation", "name": "Echolocation", "tier": 1, "text": "You sense creatures within 30 ft without sight. You can't be Blinded against anything within that range, and hidden or invisible creatures there are revealed to you."},
+        {"id": "longsight", "name": "Long Sight", "tier": 2, "text": "Double the range of your ranged attacks and ranged Surges. Ignore partial cover. Read lips at 300 ft.", "fx": {"rangedDouble": true}},
+        {"id": "weakspot", "name": "Weak Spot", "tier": 2, "text": "When you Analyze a creature, its Armor and Resistances don't apply to anyone's damage until the end of its next turn."},
+        {"id": "spotter", "name": "Spotter", "tier": 2, "text": "Quick, once per round: an ally within 60 ft who can hear you gets advantage on its next attack against a creature you can see."},
+        {"id": "hairtrigger", "name": "Hair Trigger", "tier": 2, "text": "When a combat starts, after Priming and before anyone else acts, you may make one ranged weapon attack."},
+        {"id": "deadeye", "name": "Deadeye", "tier": 3, "apex": true, "push": true, "text": "Your ranged attacks (weapons, Spit, Mind Spike, ranged Surges) Crit on 18–20. Once per round, Push to reroll a missed attack.", "fx": {"critRanged": 18}},
+        {"id": "foresight", "name": "Foresight", "tier": 4, "evo": 4, "form": "oracle", "text": "A lidless third eye opens. At the start of each round, roll a d20 and set it aside: your Omen. Once before the round ends, after any d20 is rolled by you or an ally within 60 ft, you may replace that roll with the Omen. An unused Omen fades at the end of the round."},
+        {"id": "thousandeyes", "name": "Thousand Eyes", "tier": 4, "evo": 7, "form": "oracle", "text": "Eyes open all over you. Target Lock can mark up to three creatures at once. You and allies within 60 ft can't be surprised or Blinded. Your ranged attacks ignore partial cover, and their Crit range is one wider than it would otherwise be: 20 → 19–20, 19–20 → 18–20, 18–20 → 17–20. This is an exception to the rule that Crit ranges don't stack.", "fx": {"critWiden": 1}}
       ] },
-    { id: "glands", name: "Glands", stats: "Gumption / Grit", role: "Chemist, healer, attrition", unlocks: ["burst", "toxin", "corrode", "mend"],
+    { id: "glands", name: "Glands", stats: "Gumption", role: "Chemist, healer, attrition", unlocks: ["burst", "toxin", "corrode", "mend"],
       bio: "venom sacs, acid glands, healing bile, spore pods", chrome: "chem injectors, nanite reservoirs, drug pumps, nozzle ports",
       nodes: [
-        { id: "spit", name: "Spit", root: true, text: "A ranged natural attack (d8, 30 ft, Nerve or Gumption), Toxin or Corrode damage (choose each time). Advantage on Endure against poison.", fx: { attack: { name: "Spit", die: 8, stats: ["nerve", "gumption"], range: 30, ranged: true, note: "Toxin or Corrode" } } },
-        { id: "regenerate", name: "Regenerate", text: "At the start of your turn, if you're at half HP or less (and not Down), regain {R1} HP." },
-        { id: "stimgland", name: "Stim Gland", push: true, text: "Action (or Quick with Push): you or a creature you touch regains {R}d6 + Gumption ({R}d6+{GUM}) HP and ends Burning or Poisoned. Twice per Breather." },
-        { id: "adrenaldump", name: "Adrenal Dump", text: "The first time each combat you drop to half HP or less, gain 2 x Rank + Grit ({ADR}) temporary HP and advantage on your next attack." },
-        { id: "purge", name: "Purge", text: "Once per combat, Quick: lose {R1} Flux and take {R1} damage (ignores Armor)." },
-        { id: "livingpharmacy", name: "Living Pharmacy", apex: true, text: "Stim Gland affects you and every ally within 15 ft at once. Your Mend Surges cost no Flux.", fx: { mendFree: true } }
+        {"id": "spit", "name": "Spit", "tier": 0, "root": true, "text": "A ranged natural attack (d8, 30 ft, Nerve or Gumption) dealing Toxin or Corrode damage (choose each time). Advantage on Endure against poison.", "fx": {"attack": {"name": "Spit", "die": 8, "stats": ["nerve", "gumption"], "range": 30, "ranged": true, "note": "Toxin or Corrode"}}},
+        {"id": "regenerate", "name": "Regenerate", "tier": 1, "text": "At the start of your turn, if you're at half HP or less (and not Down), regain Rank + 1 HP."},
+        {"id": "stimgland", "name": "Stim Gland", "tier": 1, "push": true, "text": "Action (or Quick with Push): you or a creature you touch regains Rank d6 + Gumption HP and ends Burning or Poisoned. Twice per Breather."},
+        {"id": "adrenaldump", "name": "Adrenal Dump", "tier": 1, "text": "The first time each combat you drop to half HP or less, gain {ADR} temporary HP and advantage on your next attack."},
+        {"id": "antibodies", "name": "Antibodies", "tier": 1, "text": "You can't be Poisoned. Quick, once per Breather: end one condition on a creature you touch."},
+        {"id": "purge", "name": "Purge", "tier": 2, "text": "Once per combat, Quick: lose Flux equal to Rank + 1 and take that much damage (ignores Armor)."},
+        {"id": "catalyst", "name": "Catalyst", "tier": 2, "text": "Your Burst Surges roll d8 damage dice instead of d6.", "fx": {"burstDie": 8}},
+        {"id": "sporecloud", "name": "Spore Cloud", "tier": 2, "push": true, "text": "Action, once per combat, Push: exhale a 15-ft-radius cloud centred on you that lasts until the end of next round. Creatures outside it can't see into it. You and your allies inside are Veiled against attacks made from outside the cloud."},
+        {"id": "mutagentap", "name": "Mutagen Tap", "tier": 2, "text": "Once per round, when you would gain Flux, you may take Rank + 1 damage per point instead (ignores Armor; it can't drop you below 1 HP)."},
+        {"id": "livingpharmacy", "name": "Living Pharmacy", "tier": 3, "apex": true, "text": "Stim Gland affects you and every ally within 15 ft at once. Your Mend Surges cost no Flux.", "fx": {"mendFree": true}},
+        {"id": "transmute", "name": "Transmute", "tier": 4, "evo": 4, "form": "alembic", "text": "Your glands learn to brew anything. When your Toxin or Corrode damage applies its rider, the target is both Poisoned and Exposed. Your healing (Stim Gland, Mend Surges, Patch) restores +Gumption HP."},
+        {"id": "panacea", "name": "Panacea", "tier": 4, "evo": 7, "form": "alembic", "text": "Your blood is medicine. Once per combat, Action: you and every ally within 30 ft regain (Rank + 1)d8 + Gumption HP, end all conditions, and lose 2 Flux. A Down ally stands up."}
       ] },
     { id: "wiring", name: "Wiring", stats: "Moxie", role: "Speed, reflexes, shock", unlocks: ["shock", "blaze", "haste"],
       bio: "hyper-fast nerves, eel-organs, adrenal crystals", chrome: "reflex boosters, synthetic muscle, capacitor banks, plasma coils",
       nodes: [
-        { id: "quickened", name: "Quickened", root: true, text: "+10 ft speed. You can Dash as a Quick action. Your group has advantage on initiative checks.", fx: { speed: 10 } },
-        { id: "reflexspike", name: "Reflex Spike", push: true, text: "Reaction, Push: when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker with half the damage dice (round up)." },
-        { id: "capacitor", name: "Capacitor", push: true, text: "Once per turn when you hit with a melee attack, +1 damage die as Shock. Push: the target is also Dazed.", fx: { meleeDie: "Capacitor (Shock)" } },
-        { id: "slipstream", name: "Slipstream", text: "You never provoke Opportunity Strikes, can move through enemies' spaces, and take no damage when you succeed on a Dodge against an area attack." },
-        { id: "overclock", name: "Overclock", text: "Once per Breather, take one extra Action on your turn, then gain 1 Flux." },
-        { id: "blur", name: "Blur", apex: true, text: "Two Moves each turn. If you've moved 20+ ft this turn, roll your first Dodge each round with advantage until your next turn." }
+        {"id": "quickened", "name": "Quickened", "tier": 0, "root": true, "text": "+10 ft speed. You can Dash as a Quick action. Your group has advantage on initiative checks.", "fx": {"speed": 10}},
+        {"id": "reflexspike", "name": "Reflex Spike", "tier": 1, "push": true, "text": "Reaction, Push: when you succeed on a Dodge against a melee attack, make one weapon attack against the attacker with half the damage dice (round up)."},
+        {"id": "capacitor", "name": "Capacitor", "tier": 1, "push": true, "text": "Once per turn when you hit with a melee attack, deal +1 damage die (one more of that attack's dice) as Shock. Push: the target is also Dazed.", "fx": {"meleeDie": "Capacitor (Shock)"}},
+        {"id": "slipstream", "name": "Slipstream", "tier": 1, "text": "You never provoke Opportunity Strikes, can move through enemies' spaces, and take no damage when you succeed on a Dodge against an Area attack."},
+        {"id": "wallrun", "name": "Wall Run", "tier": 1, "text": "As part of your Move you can run along walls and across liquids, as long as you end the Move on something that holds you (otherwise you fall)."},
+        {"id": "overclock", "name": "Overclock", "tier": 2, "text": "Once per Breather, take one extra Action on your turn, then gain 1 Flux."},
+        {"id": "arcjump", "name": "Arc Jump", "tier": 2, "push": true, "text": "Once per turn, as part of your Move, flash up to 20 ft in a straight line, passing through creatures' spaces. Push: each creature you pass through takes {2R} Shock damage."},
+        {"id": "kineticbattery", "name": "Kinetic Battery", "tier": 2, "text": "Each time you succeed on a Dodge, store a charge (max 3). When you hit with an attack, you may spend all your charges: +1 damage die per charge, as Shock. Charges fade when combat ends."},
+        {"id": "afterimage", "name": "Afterimage", "tier": 2, "text": "When you Dash, you are Veiled until the start of your next turn."},
+        {"id": "blur", "name": "Blur", "tier": 3, "apex": true, "text": "You get two Moves each turn. If you've moved 20+ ft this turn, roll your first Dodge each round with advantage until your next turn."},
+        {"id": "mantisreflex", "name": "Mantis Reflex", "tier": 4, "evo": 4, "form": "skitter", "text": "Your nerves fire before you think. You get two Reactions per round (both refresh at the start of your turn). Your Reflex Spike and Opportunity Strikes use your full damage dice.", "fx": {"reactions": 2}},
+        {"id": "lightningstep", "name": "Lightning Step", "tier": 4, "evo": 7, "form": "skitter", "text": "You move between moments. Once per turn, after you Unleash a Surge, you may make one weapon attack as a Quick action, with half its damage dice (round up)."}
       ] },
-    { id: "mind", name: "Mind", stats: "Nerve / Chutzpah", role: "Psionics, hacking, control", unlocks: ["dread", "link"],
+    { id: "mind", name: "Mind", stats: "Chutzpah", role: "Psionics, hacking, control", unlocks: ["dread", "link"],
       bio: "swollen cortex, psionic nodules, pheromone glands", chrome: "neural coprocessor, wetware deck, voice modulator, antenna crown",
       nodes: [
-        { id: "uplink", name: "Uplink", root: true, text: "Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. Mind Spike: a ranged attack (d8, 60 ft, Nerve or Chutzpah), Psychic damage.", fx: { attack: { name: "Mind Spike", die: 8, stats: ["nerve", "chutzpah"], range: 60, ranged: true, note: "Psychic (ignores Armor)" } } },
-        { id: "intrude", name: "Intrude", text: "Action: Gumption or Chutzpah + Rank vs a creature's TN (or a device's DC): read surface thoughts, or seize an unattended device for 1 minute. In combat, a Mook machine obeys you until the end of next round; any other machine is Dazed." },
-        { id: "puppet", name: "Puppet", push: true, text: "Action, Push: Chutzpah + Rank vs the TN of a non-Boss creature. On success it moves up to its speed where you choose, or makes one attack against a target you choose (an enemy target simply takes the attack's Damage, no roll, no rider; a player target defends normally)." },
-        { id: "ironwill", name: "Iron Will", text: "Advantage on Resist, and you can't be Shaken. Allies within 30 ft get +1 to Resist." },
-        { id: "precog", name: "Precog", push: true, text: "Reaction, Push: when you or an ally within 30 ft is about to make a d20 roll (declare before rolling), they roll it with advantage." },
-        { id: "hivemind", name: "Hive Mind", apex: true, text: "Prime one extra Surge at the start of each combat. Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll.", fx: { primeBonus: 1 } }
+        {"id": "uplink", "name": "Uplink", "tier": 0, "root": true, "text": "Speak mind-to-mind (Bio) or by encrypted radio (Chrome) with willing creatures within 300 ft. Mind Spike: a ranged attack (d8, 60 ft, Nerve or Chutzpah) dealing Psychic damage.", "fx": {"attack": {"name": "Mind Spike", "die": 8, "stats": ["nerve", "chutzpah"], "range": 60, "ranged": true, "note": "Psychic (ignores Armor)"}}},
+        {"id": "intrude", "name": "Intrude", "tier": 1, "text": "Action: Gumption or Chutzpah + Rank vs a creature's TN (or a device's DC). Read its surface thoughts, or seize an unattended device for 1 minute. In combat, a Mook machine obeys you until the end of next round; any other machine is Dazed."},
+        {"id": "ironwill", "name": "Iron Will", "tier": 1, "text": "Advantage on Resist, and you can't be Shaken. Allies within 30 ft get +1 to Resist."},
+        {"id": "commandingvoice", "name": "Commanding Voice", "tier": 1, "text": "You can Rally as a Quick action."},
+        {"id": "readtheroom", "name": "Read the Room", "tier": 1, "text": "Advantage on checks to spot a lie. Once per scene, ask the GM what a creature you can see wants or fears most right now; the answer is true."},
+        {"id": "puppet", "name": "Puppet", "tier": 2, "push": true, "text": "Action, Push: Chutzpah + Rank vs the TN of a non-Boss creature. On a success, it immediately does one of these, your choice: moves up to its speed where you choose, or makes one attack against a target you choose. An enemy target simply takes the attack's Damage (no roll, no rider); a player target defends normally."},
+        {"id": "precog", "name": "Precog", "tier": 2, "push": true, "text": "Reaction, Push: when you or an ally within 30 ft is about to make a d20 roll (declare before rolling), they roll it with advantage."},
+        {"id": "psychicscream", "name": "Psychic Scream", "tier": 2, "text": "Action, once per combat: make one Chutzpah attack (an Area attack) against every enemy within 30 ft that you choose. Hit: (Rank + 1)d6 Psychic and Shaken. Miss: half damage."},
+        {"id": "glamour", "name": "Glamour", "tier": 2, "push": true, "text": "Quick, Push: you are Veiled until the end of next round."},
+        {"id": "hivemind", "name": "Hive Mind", "tier": 3, "apex": true, "text": "Once per round, an ally within 300 ft can use your Nerve or Chutzpah in place of theirs for one roll. At the start of each combat, choose one ally: they Prime one extra Surge."},
+        {"id": "sirensong", "name": "Siren Song", "tier": 4, "evo": 4, "form": "siren", "text": "Your voice splits into harmonies. Once per round you can Taunt as a Quick action, and your Taunt can target every enemy within 30 ft you choose (compare one roll to each creature's TN). Each enemy you Taunt this way must target you or one ally you name within 30 ft of you (same ally for all of them) if it can, and has -2 TN against that creature's defense rolls until the Taunt ends."},
+        {"id": "crownofwill", "name": "Crown of Will", "tier": 4, "evo": 7, "form": "siren", "push": true, "text": "Once per combat, Action, Push: Chutzpah + Rank vs the TN of a creature within 60 ft. A non-Boss obeys you until the end of combat. In each Enemy Phase it acts as you choose (it won't harm itself), and it breaks free if you or an ally damages it. A Boss instead loses its next Interrupt and is Dazed until the end of its next turn."}
       ] }
   ],
 
@@ -230,7 +315,7 @@ const MUTAGEN = {
     { id: "snare", name: "Snare", unlock: "limbs", kind: "damage", type: "Kinetic", rider: "Held" },
     { id: "quake", name: "Quake", unlock: "hide", kind: "damage", type: "Kinetic", rider: "Prone (not Huge)" },
     { id: "glare", name: "Glare", unlock: "senses", kind: "damage", type: "Blaze", rider: "Blinded" },
-    { id: "dread", name: "Dread", unlock: "mind", kind: "damage", type: "Psychic", rider: "Shaken", altStat: "chutzpah" },
+    { id: "dread", name: "Dread", unlock: "mind", kind: "damage", type: "Psychic", rider: "Shaken" },
     { id: "mend", name: "Mend", unlock: "glands", kind: "infuse", text: "Target regains {R1}d8 + Gumption ({R1}d8+{GUM}) HP and ends Burning and Poisoned. A Down target stands up." },
     { id: "shell", name: "Shell", unlock: "hide", kind: "infuse", text: "Target gains {R1}d6 + Grit ({R1}d6+{GRIT}) temporary HP and +1 Armor until the end of next round." },
     { id: "haste", name: "Haste", unlock: "wiring", kind: "infuse", allyOnly: true, text: "An ally (not you) immediately takes a Move and one Action (not Unleash), with advantage on any roll that Action needs." },
@@ -341,25 +426,62 @@ const MUTAGEN = {
   names: { first: ["Dree", "Vex", "Juno", "Ozzie", "Rook", "Tamsin", "Cass", "Ivo", "Marrow", "Pike", "Sable", "Wren", "Kit", "Bram", "Nyx", "Lio", "Odette", "Sol"], last: ["Ocampo", "Hale", "Varga", "Okafor", "Lund", "Reyes", "Petrov", "Quill", "Achterberg", "Moss", "Kade", "Ferro"], nick: ["Brownout", "Ratking", "Static", "Pinch", "Sparks", "Lockjaw", "Mothball", "Gristle", "Halfmoon", "Hush"] },
   surgeWords: { strike: ["Lunge", "Slam", "Rend", "Jab"], bolt: ["Spit", "Lance", "Shot", "Dart"], burst: ["Bloom", "Cloud", "Flare", "Pop"], wave: ["Lash", "Sweep", "Gout", "Torrent"], pulse: ["Stomp", "Throb", "Nova", "Shrug"], infuse: ["Gift", "Graft", "Boost", "Kiss"] },
 
-  // Guide worked example (ch 13) — used by "Load example" and the test suite.
+  // Worked example (ch 13: Dree at levels 1, 4, 7) and the five pregens (ch 11). Used by "Load example" and the tests.
   examples: {
-    dree1: { name: "Dree \"Brownout\" Ocampo", concept: "Ex-Ward electrician who rewired her nerves and grew a gut that brews napalm.", level: 1,
-      stats: { moxie: 3, nerve: 2, gumption: 1, grit: 0, chutzpah: -1 }, boosts: {}, origin: "militia",
-      knacks: ["Electrical Repair", "Rooftop Routes"], trees: { wiring: "chrome", glands: "bio" }, nodes: ["quickened", "spit"],
-      surges: [["Sizzle Spit", "bolt", "blaze", []], ["Brownout", "burst", "shock", []], ["Second Wind", "infuse", "mend", []]],
-      kit: "gunhand", kitChoice: "rifle", buy: { medkit: 1 },
+    dree1: { label: "Dree, Siren (ch 13) \u2014 level 1", name: "Dree \"Brownout\" Ocampo", concept: "Ex-Ward electrician whose voice now carries on every frequency.", level: 1, form: "siren", dumpZero: "nerve",
+      origin: "militia", knacks: ["Electrical Repair", "Rooftop Routes"], trees: { mind: "bio", wiring: "chrome", limbs: "bio" },
+      nodes: ["uplink", "intrude", "commandingvoice", "quickened", "slipstream", "naturalweapons"],
+      surges: [["Sizzle Line", "wave", "blaze", []], ["Brownout", "bolt", "shock", []], ["Dead Air", "bolt", "dread", []]], signatures: [],
+      kit: "face", kitChoice: "rifle", buy: { medkit: 1 },
       drive: { why: "To survive a substation fire.", goal: "Get the Ward's grid back on.", owe: "Owes Scrapjack boss Tallow a new spine." },
-      expect: { hp: 12, armor: 1, speed: 40, dodge: 4, endure: 1, resist: 3, limit: 6, scrip: 25, die: 4, prime: 2, wild: 1 } },
-    dree5: { name: "Dree \"Brownout\" Ocampo", concept: "Ex-Ward electrician who rewired her nerves and grew a gut that brews napalm.", level: 5,
-      stats: { moxie: 3, nerve: 2, gumption: 1, grit: 0, chutzpah: -1 }, boosts: { 3: ["nerve", "grit"] }, origin: "militia",
-      knacks: ["Electrical Repair", "Rooftop Routes", "Chemistry"], trees: { wiring: "chrome", glands: "bio" },
-      nodes: ["quickened", "spit", "overclock", "slipstream", "purge", "stimgland"],
-      surges: [["Sizzle Spit", "bolt", "blaze", []], ["Brownout", "burst", "shock", []], ["Second Wind", "infuse", "mend", []],
-        ["Firebloom", "burst", "blaze", ["linger"]], ["Jolt", "bolt", "shock", ["overcharge"]], ["Wire Up", "infuse", "haste", []],
-        ["Toxic Cloud", "burst", "toxin", ["linger", "reach"]]],
-      kit: "gunhand", kitChoice: "rifle", buy: { medkit: 1 }, kitMods: { 0: "keen" }, scripAdj: 1700,
+      expect: { hp: 10, armor: 1, speed: 40, dodge: 3, endure: 0, resist: 1, limit: 4, scrip: 75, die: 4, prime: 2, wild: 1, sigs: 0 } },
+    dree4: { label: "Dree as a Diva \u2014 level 4 (Evolution I)", name: "Dree \"Brownout\" Ocampo", concept: "Ex-Ward electrician whose voice now carries on every frequency.", level: 4, form: "siren", dumpZero: "nerve",
+      origin: "militia", knacks: ["Electrical Repair", "Rooftop Routes", "Pirate Radio"], trees: { mind: "bio", wiring: "chrome", limbs: "bio" },
+      nodes: ["uplink", "intrude", "commandingvoice", "ironwill", "readtheroom", "psychicscream", "quickened", "slipstream", "wallrun", "overclock", "naturalweapons", "springlegs"],
+      surges: [["Sizzle Line", "wave", "blaze", []], ["Brownout", "bolt", "shock", []], ["Dead Air", "bolt", "dread", []], ["Wire Up", "infuse", "haste", []], ["Static Snare", "wave", "snare", []], ["Overvolt", "bolt", "shock", ["overcharge"]]],
+      signatures: [["The Broadcast", "wave", "dread", []]],
+      kit: "face", kitChoice: "rifle", buy: { medkit: 1 }, scripAdj: 1125,
       drive: { why: "To survive a substation fire.", goal: "Get the Ward's grid back on.", owe: "Owes Scrapjack boss Tallow a new spine." },
-      expect: { hp: 34, armor: 1, speed: 40, dodge: 6, endure: 4, resist: 6, limit: 9, die: 8, prime: 3, wild: 1 } }
+      expect: { hp: 27, armor: 1, speed: 50, dodge: 5, endure: 2, resist: 3, limit: 6, die: 8, prime: 3, wild: 2, sigs: 1 } },
+    dree7: { label: "Dree as a Choir \u2014 level 7 (Evolution II)", name: "Dree \"Brownout\" Ocampo", concept: "Ex-Ward electrician whose voice now carries on every frequency.", level: 7, form: "siren", dumpZero: "nerve",
+      origin: "militia", knacks: ["Electrical Repair", "Rooftop Routes", "Pirate Radio", "Crowd Work"], trees: { mind: "bio", wiring: "chrome", limbs: "bio" },
+      nodes: ["uplink", "intrude", "commandingvoice", "ironwill", "readtheroom", "psychicscream", "puppet", "glamour", "hivemind", "quickened", "slipstream", "wallrun", "overclock", "afterimage", "arcjump", "naturalweapons", "springlegs", "grapnel"],
+      surges: [["Sizzle Line", "wave", "blaze", []], ["Brownout", "bolt", "shock", []], ["Dead Air", "bolt", "dread", []], ["Wire Up", "infuse", "haste", []], ["Static Snare", "wave", "snare", []], ["Overvolt", "bolt", "shock", ["overcharge"]],
+        ["Crowd Surge", "infuse", "link", ["sure"]], ["Arc Halo", "wave", "shock", ["reach"]], ["Blackout", "bolt", "dread", ["chain", "overcharge"]]],
+      signatures: [["The Broadcast", "wave", "dread", []], ["Live Feed", "infuse", "haste", []]],
+      kit: "face", kitChoice: "rifle", buy: { medkit: 1 }, scripAdj: 3000,
+      drive: { why: "To survive a substation fire.", goal: "Get the Ward's grid back on.", owe: "Owes Scrapjack boss Tallow a new spine." },
+      expect: { hp: 44, armor: 1, speed: 50, dodge: 8, endure: 5, resist: 6, limit: 9, die: 12, prime: 4, wild: 3, sigs: 2 } },
+    vex: { label: "Pregen: Vex, Skitter (ch 11)", name: "Vex", concept: "Spill-Born courier with mantis claws, wired nerves and the reflexes of a cockroach.", level: 1, form: "skitter", dumpZero: "nerve",
+      origin: "spillborn", knacks: ["Parkour", "Gang Turf"], trees: { wiring: "bio", limbs: "bio", senses: "bio" },
+      nodes: ["quickened", "capacitor", "slipstream", "naturalweapons", "springlegs", "keen"],
+      surges: [["Mantis Lunge", "strike", "kinetic", []], ["Live Wire", "bolt", "shock", []], ["Slip Veil", "infuse", "veil", []]], signatures: [],
+      kit: "sneak", kitChoice: "rifle", buy: {}, drive: { why: "", goal: "", owe: "" },
+      expect: { hp: 14, armor: 1, speed: 50, dodge: 4, endure: 2, resist: 1, limit: 5, die: 4, prime: 2, wild: 1, sigs: 0 } },
+    juno: { label: "Pregen: Juno, Oracle (ch 11)", name: "Juno", concept: "Corporate washout with a sniper's optic and an encrypted voice in everyone's ear.", level: 1, form: "oracle", dumpZero: "gumption",
+      origin: "washout", knacks: ["Ostrander Security", "Fast Talk"], trees: { senses: "chrome", mind: "chrome", wiring: "chrome" },
+      nodes: ["keen", "targetlock", "threatsense", "uplink", "ironwill", "quickened"],
+      surges: [["Neural Spike", "bolt", "dread", []], ["Dazzle", "bolt", "glare", []], ["Hive Whisper", "infuse", "link", []]], signatures: [],
+      kit: "gunhand", kitChoice: "rifle", buy: {}, drive: { why: "", goal: "", owe: "" },
+      expect: { hp: 10, armor: 1, speed: 40, dodge: 2, endure: 0, resist: 4, limit: 8, die: 4, prime: 2, wild: 1, sigs: 0 } },
+    ozzie: { label: "Pregen: Ozzie, Alembic (ch 11)", name: "Ozzie", concept: "A clinic rat with acid glands in his throat and a plated chest his surgeon is still paying off.", level: 1, form: "alembic", dumpZero: "moxie",
+      origin: "clinicrat", knacks: ["Chemistry", "Black-Market Contacts"], trees: { glands: "bio", hide: "chrome", mind: "bio" },
+      nodes: ["spit", "stimgland", "antibodies", "plating", "thick", "uplink"],
+      surges: [["Field Dressing", "infuse", "mend", []], ["Acid Bloom", "burst", "corrode", []], ["Stomp", "pulse", "quake", []]], signatures: [],
+      kit: "medic", kitChoice: "rifle", buy: {}, drive: { why: "", goal: "", owe: "" },
+      expect: { hp: 18, armor: 2, speed: 30, dodge: 1, endure: 3, resist: 2, limit: 5, die: 4, prime: 2, wild: 1, sigs: 0 } },
+    rook: { label: "Pregen: Rook, Juggernaut (ch 11)", name: "Rook", concept: "Ward militia veteran with piston fists, a riveted hide and a voice like a closing door.", level: 1, form: "juggernaut", dumpZero: "moxie",
+      origin: "militia", knacks: ["Intimidation", "Demolition"], trees: { hide: "chrome", limbs: "chrome", glands: "chrome" },
+      nodes: ["plating", "thick", "barbs", "naturalweapons", "extraarm", "spit"],
+      surges: [["Piston Slam", "strike", "kinetic", []], ["Floor Breaker", "pulse", "quake", []], ["Bulkhead", "infuse", "shell", []]], signatures: [],
+      kit: "bruiser", kitChoice: "rifle", buy: {}, drive: { why: "", goal: "", owe: "" },
+      expect: { hp: 20, armor: 2, speed: 30, dodge: 1, endure: 4, resist: 3, limit: 7, die: 4, prime: 2, wild: 1, sigs: 0 } },
+    mags: { label: "Pregen: Mags, Siren (ch 11)", name: "Mags", concept: "A Bloom street-preacher with a voice that harmonises with itself and a crowd that follows her home.", level: 1, form: "siren", dumpZero: "grit",
+      origin: "convert", knacks: ["Street Preaching", "Gambling"], trees: { mind: "bio", wiring: "bio", limbs: "bio" },
+      nodes: ["uplink", "ironwill", "commandingvoice", "quickened", "slipstream", "naturalweapons"],
+      surges: [["Nightmare", "bolt", "dread", []], ["Hold Them", "wave", "snare", []], ["Go, Go!", "infuse", "haste", []]], signatures: [],
+      kit: "face", kitChoice: "rifle", buy: {}, drive: { why: "", goal: "", owe: "" },
+      expect: { hp: 12, armor: 1, speed: 40, dodge: 3, endure: 1, resist: 0, limit: 4, die: 4, prime: 2, wild: 1, sigs: 0 } }
   }
 };
 /* ======================= END OF GAME DATA ======================= */
@@ -376,7 +498,9 @@ const STAT_IDS = D.stats.map(s => s.id);
 const STAT_NAME = Object.fromEntries(D.stats.map(s => [s.id, s.name]));
 const NODE = {}, NODE_TREE = {};
 D.trees.forEach(t => t.nodes.forEach(n => { NODE[n.id] = n; NODE_TREE[n.id] = t.id; }));
+const isEvo = id => NODE[id] && NODE[id].tier === 4;
 const TREE = Object.fromEntries(D.trees.map(t => [t.id, t]));
+const FORM = Object.fromEntries(D.forms.map(f => [f.id, f]));
 const SHAPE = Object.fromEntries(D.shapes.map(x => [x.id, x]));
 const EFFECT = Object.fromEntries(D.effects.map(x => [x.id, x]));
 const TWIST = Object.fromEntries(D.twists.map(x => [x.id, x]));
@@ -387,35 +511,50 @@ const ORIGIN = Object.fromEntries(D.origins.map(x => [x.id, x]));
 const KIT = Object.fromEntries(D.kits.map(x => [x.id, x]));
 const SCAR = Object.fromEntries(D.scars.concat(D.faults).map(x => [x.id, x]));
 const INJ = Object.fromEntries((D.injuries || []).map(x => [x.id, x]));
+const ROLES = ["primary", "secondary", "tertiary"];
+const ROLE_NAME = { primary: "Primary", secondary: "Secondary", tertiary: "Tertiary" };
+const TIER_NAME = ["Root", "Tier I", "Tier II", "Apex", "Evolution"];
 const lvl = L => D.levels[Math.min(10, Math.max(1, L)) - 1];
+const stageIdx = L => (L >= 7 ? 2 : L >= 4 ? 1 : 0);
 const sgn = n => (n >= 0 ? "+" + n : "\u2212" + Math.abs(n));
 const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const rnd = n => Math.floor(Math.random() * n);
 const pick = a => a[rnd(a.length)];
 const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+// Picks per level: primary = L+2 (max 10, the overflow goes to secondary/tertiary); secondary + tertiary = L+2 (+ overflow).
+function picks(L) { const want = L + 2, prim = Math.min(D.treeSize, want), over = want - prim; return { prim, secTert: want + over, total: 2 * L + 4 }; }
+// Role of a tree for a Form: "primary" | "secondary" | "tertiary" | null
+const roleOf = (form, t) => (form ? ROLES[form.trees.indexOf(t)] || null : null);
+// Evolution nodes a Form has at a level (granted automatically, never stored in s.nodes).
+const evoNodes = (form, L) => (form ? Object.keys(form.evo).filter(l => +l <= L).map(l => form.evo[l]) : []);
 
 function blank() {
-  return { v: 1, name: "", player: "", concept: "", level: 1,
-    stats: { grit: null, moxie: null, nerve: null, gumption: null, chutzpah: null }, boosts: {},
-    origin: "", knacks: [], trees: {}, nodes: [], surges: [],
+  return { v: 2, name: "", player: "", concept: "", level: 1, form: "", dumpZero: "",
+    origin: "", knacks: [], trees: {}, nodes: [], surges: [], signatures: [],
     kit: "", kitChoice: "rifle", kitMods: {}, naturalMod: "", armor: "light", shield: false, buyWeapons: [], buy: {}, scripAdj: 0,
-    scars: [], injuries: [], patchApplied: false, drive: { why: "", goal: "", owe: "" }, notes: "" };
+    scars: [], injuries: [], patchApplied: false, drive: { why: "", goal: "", owe: "" }, notes: "", migrated: false };
 }
 // Coerce any loaded/imported object into a safe, well-typed character (unknown ids dropped).
+// A v0.1 save (no Form; free stat array and boosts) is migrated: identity, Origin, Knacks, gear, Surges, Drive
+// and notes are kept; stats, nodes and Materials are reset and `migrated` asks the player to choose a Form.
 function normalize(s) {
   if (!s || typeof s !== "object" || Array.isArray(s)) throw new Error("not a character object");
   const b = blank(), str = (v, n) => (typeof v === "string" ? v : v == null ? "" : String(v)).slice(0, n || 300);
   const arr = v => (Array.isArray(v) ? v : []), obj = v => (v && typeof v === "object" && !Array.isArray(v) ? v : {});
+  const legacy = s.v !== 2 && !("form" in s && FORM[s.form]) && ("stats" in s || "boosts" in s || s.v === 1);
   const o = {};
-  o.v = 1; o.name = str(s.name, 120); o.player = str(s.player, 120); o.concept = str(s.concept, 300); o.notes = str(s.notes, 3000);
+  o.v = 2; o.name = str(s.name, 120); o.player = str(s.player, 120); o.concept = str(s.concept, 300); o.notes = str(s.notes, 3000);
   o.level = Math.min(10, Math.max(1, parseInt(s.level, 10) || 1));
-  o.stats = {}; STAT_IDS.forEach(id => { const v = obj(s.stats)[id]; o.stats[id] = v === null || v === "" || v === undefined || !D.statArray.includes(Number(v)) ? null : Number(v); });
-  o.boosts = {}; D.statBoostLevels.forEach(bl => { const v = arr(obj(s.boosts)[bl]).slice(0, 2).map(x => (STAT_IDS.includes(x) ? x : "")); if (v.length) o.boosts[bl] = v; });
+  o.form = !legacy && FORM[s.form] ? s.form : "";
+  const f = FORM[o.form];
+  o.dumpZero = f && f.dumps.includes(s.dumpZero) ? s.dumpZero : "";
   o.origin = ORIGIN[s.origin] ? s.origin : "";
   o.knacks = arr(s.knacks).map(k => str(k, 80)).slice(0, 12);
-  o.trees = {}; for (const t in obj(s.trees)) if (TREE[t] && (s.trees[t] === "bio" || s.trees[t] === "chrome")) o.trees[t] = s.trees[t];
-  o.nodes = [...new Set(arr(s.nodes).filter(id => NODE[id]))];
-  o.surges = arr(s.surges).filter(x => x && typeof x === "object").slice(0, 12).map(x => ({ name: str(x.name, 80), shape: SHAPE[x.shape] ? x.shape : "", effect: EFFECT[x.effect] ? x.effect : "", twists: [...new Set(arr(x.twists).filter(t => TWIST[t]))].slice(0, 3), sample: !!x.sample }));
+  o.trees = {}; if (!legacy) for (const t in obj(s.trees)) if (TREE[t] && (!f || f.trees.includes(t)) && (s.trees[t] === "bio" || s.trees[t] === "chrome")) o.trees[t] = s.trees[t];
+  o.nodes = legacy ? [] : [...new Set(arr(s.nodes).filter(id => NODE[id] && !isEvo(id) && (!f || f.trees.includes(NODE_TREE[id]))))];
+  const surge = x => ({ name: str(x.name, 80), shape: SHAPE[x.shape] ? x.shape : "", effect: EFFECT[x.effect] ? x.effect : "", twists: [...new Set(arr(x.twists).filter(t => TWIST[t]))].slice(0, 3), sample: !!x.sample });
+  o.surges = arr(s.surges).filter(x => x && typeof x === "object").slice(0, 12).map(surge);
+  o.signatures = arr(s.signatures).filter(x => x && typeof x === "object").slice(0, 2).map(x => { const y = surge(x); delete y.sample; return y; });
   o.kit = KIT[s.kit] ? s.kit : ""; o.kitChoice = FRAME[s.kitChoice] ? s.kitChoice : "rifle";
   o.kitMods = {}; for (const i in obj(s.kitMods)) if (/^\d$/.test(i) && (s.kitMods[i] === "" || MOD[s.kitMods[i]])) o.kitMods[i] = s.kitMods[i];
   o.naturalMod = MOD[s.naturalMod] ? s.naturalMod : "";
@@ -426,33 +565,57 @@ function normalize(s) {
   o.scars = [...new Set(arr(s.scars).filter(id => SCAR[id]))]; o.injuries = [...new Set(arr(s.injuries).filter(id => INJ[id]))];
   o.patchApplied = !!s.patchApplied;
   const dr = obj(s.drive); o.drive = { why: str(dr.why), goal: str(dr.goal), owe: str(dr.owe) };
+  o.migrated = legacy || (!!s.migrated && !o.form);
   for (const k in b) if (o[k] === undefined) o[k] = b[k];
   return o;
 }
-const looksLikeCharacter = o => o && typeof o === "object" && !Array.isArray(o) && ["stats", "nodes", "surges", "origin", "level", "name"].some(k => k in o);
+const looksLikeCharacter = o => o && typeof o === "object" && !Array.isArray(o) && ["form", "stats", "nodes", "surges", "origin", "level", "name"].some(k => k in o);
 function tok(text, c) {
   return text.replace(/\{2R\}/g, 2 * c.R).replace(/\{R1\}/g, c.R + 1).replace(/\{R\}/g, c.R)
     .replace(/\{GUM\}/g, c.st.gumption).replace(/\{GRIT\}/g, c.st.grit).replace(/\{ADR\}/g, 2 * c.R + c.st.grit);
 }
+// Stats of a Form at a level (dumpZero = the dump stat that gets +0 at Base).
+function formStats(form, dumpZero, level) {
+  const st = {}; STAT_IDS.forEach(id => st[id] = 0);
+  if (!form) return st;
+  const v = D.stages[stageIdx(level)].vals, z = form.dumps.includes(dumpZero) ? dumpZero : form.dumps[0];
+  st[form.primary] = v[0]; st[form.secondary] = v[1]; st[form.tertiary] = v[2];
+  st[z] = v[3]; st[form.dumps.find(x => x !== z)] = v[4];
+  return st;
+}
+// Why a standard node can't be taken (null = it can), given the other nodes.
+function gate(id, nodes, form, level) {
+  const n = NODE[id], t = NODE_TREE[id], role = roleOf(form, t);
+  if (!form) return "Choose a Base Form first";
+  if (!role) return `${TREE[t].name} isn't one of your Form's trees`;
+  if (n.tier === 4) return "Evolution nodes are automatic";
+  const inTree = nodes.filter(x => NODE_TREE[x] === t && x !== id);
+  if (n.tier > 0 && !inTree.includes(TREE[t].nodes[0].id)) return `needs the ${TREE[t].name} Root (${TREE[t].nodes[0].name}) first`;
+  if (n.tier === 2) {
+    if (level < D.tier2Level) return `Tier II: level ${D.tier2Level}+`;
+    if (inTree.length < D.tier2Needs) return `Tier II: needs ${D.tier2Needs} nodes in ${TREE[t].name} (you have ${inTree.length})`;
+  }
+  if (n.tier === 3) {
+    if (role === "tertiary") return "Apex: only in your primary or secondary tree";
+    if (level < D.apexLevel) return `Apex: level ${D.apexLevel}+`;
+    if (inTree.length < D.apexNeeds) return `Apex: needs ${D.apexNeeds} other ${TREE[t].name} nodes (you have ${inTree.length})`;
+  }
+  return null;
+}
+function countRoles(nodes, form) { const c = { primary: 0, secondary: 0, tertiary: 0 }; nodes.forEach(id => { const r = roleOf(form, NODE_TREE[id]); if (r) c[r]++; }); return c; }
 
 /* ---------- derive: every number and every legality check ---------- */
 function derive(s) {
   s = normalize(s);
   const L = lvl(s.level), R = L.rank, E = [], W = [];
   const err = (step, m) => E.push({ step, m }), warn = (step, m) => W.push({ step, m });
-  // Stats
-  const vals = STAT_IDS.map(id => s.stats[id]);
-  if (vals.some(v => v === null || v === "" || v === undefined)) err(1, "Assign all five stats (+3, +2, +1, +0, \u22121).");
-  else if (vals.map(Number).sort((a, b) => a - b).join() !== D.statArray.slice().sort((a, b) => a - b).join()) err(1, "Each of +3, +2, +1, +0, \u22121 must be used exactly once.");
-  const st = {}; STAT_IDS.forEach(id => st[id] = Number(s.stats[id]) || 0);
-  D.statBoostLevels.forEach(bl => {
-    if (bl > s.level) return;
-    const b = s.boosts[bl] || [];
-    if (!b[0] || !b[1]) err(1, `Level ${bl} stat boost: choose two stats.`);
-    else if (b[0] === b[1]) err(1, `Level ${bl} stat boost: the two stats must be different.`);
-    b.forEach(x => { if (st[x] !== undefined) st[x] += 1; });
-  });
-  STAT_IDS.forEach(id => { if (st[id] > D.statMax) err(1, `${STAT_NAME[id]} is ${sgn(st[id])}; the maximum is +${D.statMax}.`); });
+  // Form & stats
+  const form = FORM[s.form], si = stageIdx(s.level), stage = D.stages[si];
+  if (s.migrated) warn(1, "Imported from v0.1: choose a Base Form. Stats and Augment nodes were reset; Surges were kept, so re-check them.");
+  if (!form) err(1, "Choose a Base Form.");
+  else if (!s.dumpZero) err(1, `Choose which dump stat gets +0 (${STAT_NAME[form.dumps[0]]} or ${STAT_NAME[form.dumps[1]]}).`);
+  const st = formStats(form, s.dumpZero, s.level);
+  const look = form ? form.stages[si] : null, final = form && s.level >= 10 ? form.stages[3] : null;
   // Origin & Knacks
   const origin = ORIGIN[s.origin];
   if (!origin) err(2, "Choose an Origin.");
@@ -461,23 +624,25 @@ function derive(s) {
   if (knacks.length < knReq) warn(2, `Write ${knReq - knacks.length} more Knack(s) (${knReq} at level ${s.level}).`);
   if (knacks.length > knReq) warn(2, `${knacks.length - knReq} Knack(s) over the ${knReq} allowed; extra Knacks only come from a Bloom *Blossom*.`);
   // Nodes
-  const nodes = [...new Set(s.nodes.filter(id => NODE[id]))];
-  const owned = D.trees.filter(t => nodes.includes(t.nodes[0].id)).map(t => t.id);
-  nodes.forEach(id => {
-    const n = NODE[id], t = NODE_TREE[id];
-    if (!n.root && !owned.includes(t)) err(3, `${n.name} needs the ${TREE[t].name} Root (${TREE[t].nodes[0].name}) first.`);
-    if (n.apex) {
-      if (s.level < D.apexLevel) err(3, `${n.name} is an Apex: level ${D.apexLevel}+ only.`);
-      const others = nodes.filter(x => NODE_TREE[x] === t && x !== id).length;
-      if (others < D.apexNeeds) err(3, `${n.name} needs ${D.apexNeeds} other ${TREE[t].name} nodes (you have ${others}).`);
-    }
-  });
-  if (nodes.length < L.nodes) err(3, `Pick ${L.nodes - nodes.length} more Augment node(s) (${L.nodes} at level ${s.level}).`);
-  if (nodes.length > L.nodes) err(3, `Too many nodes: ${nodes.length} of ${L.nodes}.`);
+  const std = s.nodes.filter(id => NODE[id] && !isEvo(id));
+  const P = picks(s.level), cnt = countRoles(std, form);
+  if (form) {
+    std.forEach(id => { const g = gate(id, std, form, s.level); if (g) err(3, `${NODE[id].name}: ${g}.`); });
+    if (cnt.primary < P.prim) err(3, `Pick ${P.prim - cnt.primary} more ${TREE[form.trees[0]].name} (primary) node(s): ${P.prim} at level ${s.level}.`);
+    if (cnt.primary > P.prim) err(3, `Too many primary nodes: ${cnt.primary} of ${P.prim} in ${TREE[form.trees[0]].name}.`);
+    const st2 = cnt.secondary + cnt.tertiary;
+    if (st2 < P.secTert) err(3, `Pick ${P.secTert - st2} more secondary/tertiary node(s) (${TREE[form.trees[1]].name} + ${TREE[form.trees[2]].name}: ${P.secTert} at level ${s.level}).`);
+    if (st2 > P.secTert) err(3, `Too many secondary/tertiary nodes: ${st2} of ${P.secTert}.`);
+    if (st2 >= 3 && cnt.secondary < 2) err(3, `Your secondary tree (${TREE[form.trees[1]].name}) needs at least 2 nodes.`);
+    if (st2 >= 3 && cnt.tertiary < 1) err(3, `Your tertiary tree (${TREE[form.trees[2]].name}) needs at least 1 node (its Root).`);
+  }
+  const evo = evoNodes(form, s.level);
+  const nodes = std.concat(evo);
   const has = id => nodes.includes(id);
+  const owned = form ? form.trees.filter(t => std.includes(TREE[t].nodes[0].id)) : [];
   owned.forEach(t => { if (s.trees[t] !== "bio" && s.trees[t] !== "chrome") err(3, `Choose Bio or Chrome for ${TREE[t].name}.`); });
   const bioN = owned.filter(t => s.trees[t] === "bio").length, chromeN = owned.filter(t => s.trees[t] === "chrome").length;
-  const form = bioN && chromeN ? "splice" : bioN ? "bio" : chromeN ? "chrome" : "none";
+  const material = bioN && chromeN ? "splice" : bioN ? "bio" : chromeN ? "chrome" : "none";
   const fx = {}; nodes.forEach(id => { const f = NODE[id].fx || {}; for (const k in f) (fx[k] = fx[k] || []).push(f[k]); });
   const scars = s.scars.filter(id => SCAR[id]);
   scars.forEach(id => {
@@ -494,20 +659,23 @@ function derive(s) {
   armorSrc.push([suit.name, suit.armor]);
   if (s.shield) armorSrc.push(["Shield", D.shield.armor]);
   if (has("plating")) armorSrc.push(["Plating", R >= 3 ? 2 : 1]);
+  if (has("siegehide")) armorSrc.push(["Siege Hide", 1]);
   if (sfx("armor")) armorSrc.push(["Scars/Faults", sfx("armor")]);
+  const armorMax = Math.max(D.armorMax, ...(fx.armorMax || []));
   const armorRaw = armorSrc.reduce((a, x) => a + x[1], 0);
-  if (armorRaw > D.armorMax) warn(5, `Armor ${armorRaw} is capped at ${D.armorMax}.`);
-  const armor = Math.max(0, Math.min(D.armorMax, armorRaw));
+  if (armorRaw > armorMax) warn(5, `Armor ${armorRaw} is capped at ${armorMax}.`);
+  const armor = Math.max(0, Math.min(armorMax, armorRaw));
   const speed = D.baseSpeed + (fx.speed || []).reduce((a, b) => a + b, 0) + (suit.speed || 0) + sfx("speed");
-  const limit = Math.max(D.fluxMin, D.fluxBase + R + st.nerve) + (form === "splice" ? D.spliceFlux : 0) + sfx("flux") + (s.patchApplied ? 1 : 0);
+  const limit = Math.max(D.fluxMin, D.fluxBase + R + st.nerve) + (material === "splice" ? D.spliceFlux : 0) + sfx("flux") + (s.patchApplied ? 1 : 0);
   const def = { dodge: st.moxie + R, endure: st.grit + R, resist: st.nerve + R };
-  const prime = L.prime + (has("hivemind") ? 1 : 0);
+  const prime = L.prime;
   const slots = L.die - (sticky ? 1 : 0);
   const known = Math.min(slots, L.surges + (origin && origin.extraSurge ? origin.extraSurge : 0));
   // Unlocked parts
   const unlocked = new Set(); owned.forEach(t => TREE[t].unlocks.forEach(u => unlocked.add(u)));
   const partOk = p => !p.unlock || owned.includes(p.unlock);
-  const c = { R, st, s, owned, fx, has, unlocked };
+  const critR = Math.max(1, (fx.critRanged ? 18 : 20) - (fx.critWiden ? 1 : 0));
+  const c = { R, st, s, owned, fx, has, unlocked, critR };
   // Surges
   const surges = s.surges.map((sg, i) => surgeCalc(sg, i, c));
   surges.forEach(x => x.errs.forEach(m => err(4, `Slot ${x.slot} (${x.name || "unnamed"}): ${m}`)));
@@ -516,12 +684,17 @@ function derive(s) {
   if (s.surges.length > slots) err(4, `Your Sequence has ${slots} slots; you have ${s.surges.length} Surges.`);
   if (nonSample < known) warn(4, `${known - nonSample} Surge(s) not built yet; those slots stay Wild.`);
   const wild = Math.max(0, L.die - s.surges.length);
+  // Signature Surges (Evolution I and II)
+  const sigs = s.signatures.map((sg, i) => { const x = surgeCalc(Object.assign({}, sg, { sig: true }), i, c); x.sig = true; return x; });
+  sigs.forEach(x => x.errs.forEach(m => err(4, `Signature ${x.slot} (${x.name || "unnamed"}): ${m}`)));
+  if (s.signatures.length > L.sigs) err(4, `You have ${L.sigs} Signature Surge(s) at level ${s.level}; remove ${s.signatures.length - L.sigs}.`);
+  if (s.signatures.length < L.sigs) warn(4, `Build ${L.sigs - s.signatures.length} Signature Surge(s): you Evolved (${L.sigs} at level ${s.level}).`);
   // Gear
   const gear = gearCalc(s, c, E, W, err);
   const upkeep = D.upkeepPerChrome * chromeN + gear.smartlinks * 25;
-  return { s, L, R, st, origin, knacks, knReq, nodes, owned, form, bioN, chromeN, hp, armor, armorRaw, armorSrc, speed, limit, def,
-    prime, maxPrimed: prime + 1, die: L.die, slots, known, wild, sticky, surges, unlocked, gear, upkeep, scars, injuries, suit,
-    knit: R * bioN, errors: E, warnings: W, legal: E.length === 0, partOk };
+  return { s, L, R, st, form, stage, si, look, final, P, cnt, evo, origin, knacks, knReq, nodes, std, owned, material, bioN, chromeN, hp, armor, armorRaw, armorMax, armorSrc, speed, limit, def,
+    prime, maxPrimed: prime + 1, die: L.die, slots, known, wild, sticky, surges, sigs, sigMax: L.sigs, unlocked, gear, upkeep, scars, injuries, suit,
+    knit: R * bioN, errors: E, warnings: W, legal: E.length === 0, partOk, critR };
 }
 
 function surgeCalc(sg, i, c) {
@@ -547,20 +720,22 @@ function surgeCalc(sg, i, c) {
   });
   out.flux = 1 + tw.length;
   if (ef.id === "mend" && c.has("livingpharmacy")) out.flux = 0;
-  out.fw = [sh.unlock, ef.unlock].some(u => u && c.s.trees[u] === "chrome" && c.owned.includes(u));
+  out.fw = !sg.sig && [sh.unlock, ef.unlock].some(u => u && c.s.trees[u] === "chrome" && c.owned.includes(u));
   const R = c.R, tws = tw.map(t => TWIST[t].name);
   if (sh.kind === "damage" && ef.kind === "damage") {
-    let opts = sh.stats.slice(); if (ef.altStat) opts.push(ef.altStat);
+    // The Shape's stat, or the stat of the tree that unlocked the Effect (Kinetic: the Shape's only).
+    let opts = sh.stats.slice(); if (ef.unlock && D.treeStats[ef.unlock]) D.treeStats[ef.unlock].forEach(x => { if (!opts.includes(x)) opts.push(x); });
     const stat = opts.reduce((a, b) => (c.st[b] > c.st[a] ? b : a), opts[0]);
     const dice = R + 1 + (ef.extraDice || 0) + tw.reduce((a, t) => a + (TWIST[t].extraDice || 0), 0);
     out.atk = c.st[stat] + R; out.stat = stat;
-    out.dmg = `${dice}d${sh.die}` + (sh.addStat ? (c.st[stat] ? sgn(c.st[stat]) : "") : "");
-    let rng = sh.id === "strike" ? (tw.includes("reach") ? "reach 15 ft" : c.has("grapnel") ? "reach 10 ft" : "melee") : sh.target;
+    const die = sh.id === "burst" && c.has("catalyst") ? 8 : sh.die;
+    out.dmg = `${dice}d${die}` + (sh.addStat ? (c.st[stat] ? sgn(c.st[stat]) : "") : "");
+    let rng = sh.id === "strike" ? (tw.includes("reach") ? "reach 15 ft" : c.fx.reach ? "reach 10 ft" : "melee") : sh.target;
     if (sh.id === "bolt") { let r = 60 * (c.fx.rangedDouble ? 2 : 1) * (tw.includes("reach") ? 2 : 1); rng = `${r} ft`; }
     if (sh.id === "burst") { rng = `10-ft radius within ${60 * (c.fx.rangedDouble ? 2 : 1)} ft` + (tw.includes("reach") ? " (Reach: double range or radius)" : ""); }
     if ((sh.id === "wave" || sh.id === "pulse") && tw.includes("reach")) rng += " (Reach: doubled)";
     out.range = rng;
-    if (sh.ranged && c.fx.critRanged) rng += " \u00b7 Crit 18\u201320";
+    if (sh.ranged && c.critR < 20) rng += ` \u00b7 Crit ${c.critR}\u201320`;
     out.line = `${sgn(out.atk)} (${STAT_NAME[stat]}) \u00b7 ${out.dmg} ${ef.type} \u00b7 ${tok(ef.rider, c)} \u00b7 ${rng}` + (sh.area ? " \u00b7 Area: miss = half, no rider" : "") + (sh.hitsAllies ? "; allies in it Dodge" : "");
   } else if (sh.kind === "infuse" && ef.kind === "infuse") {
     out.line = tok(ef.text, c) + (tws.includes("Sure") ? " (Sure: +1 ally)" : "");
@@ -624,9 +799,11 @@ function attackLine(name, die, stats, range, ranged, melee, mod, c, natural, not
   const stat = stats.reduce((a, b) => (c.st[b] > c.st[a] ? b : a), stats[0]);
   const atk = c.st[stat] + c.R + (mod && mod.attack || 0);
   let crit = 20; if (mod && mod.crit) crit = Math.min(crit, mod.crit); if (ranged && c.fx.critRanged) crit = Math.min(crit, 18);
+  if (ranged && c.fx.critWiden) crit -= 1; // Thousand Eyes: one wider (an explicit exception to non-stacking)
+  if (natural && c.fx.rend) die = c.R >= 4 ? 12 : 10; // Rend
   let rng = range;
   if (ranged && typeof range === "number") rng = range * (c.fx.rangedDouble ? 2 : 1) * (mod && mod.rangeDouble ? 2 : 1) + " ft";
-  if (melee && (c.has("grapnel") || (mod && mod.id === "polehaft"))) rng = "Melee, reach 10 ft";
+  if (melee && (c.fx.reach || (mod && mod.id === "polehaft"))) rng = "Melee, reach 10 ft";
   const n = [];
   if (notes) n.push(notes);
   if (mod && !mod.crit && !mod.attack) n.push(mod.text);
@@ -639,45 +816,43 @@ function attackLine(name, die, stats, range, ranged, melee, mod, c, natural, not
 }
 
 /* ---------- random legal character ---------- */
-function randomChar(level) {
+// Grow nodes the way the rules do: Roots, then one pick at a time from trees whose gates are met at this level.
+function growNodes(s, form) {
+  const P = picks(s.level), [pt, ss, tt] = form.trees;
+  s.nodes = [pt, ss, tt].map(t => TREE[t].nodes[0].id);
+  const elig = t => TREE[t].nodes.filter(n => n.tier !== 4 && !s.nodes.includes(n.id) && !gate(n.id, s.nodes, form, s.level)).map(n => n.id);
+  const cnt = () => countRoles(s.nodes, form);
+  let guard = 0;
+  while (cnt().primary < P.prim && guard++ < 50) { const e = elig(pt); if (!e.length) break; s.nodes.push(pick(e)); }
+  // secondary must reach 2, tertiary 1 (both Roots already count once)
+  while (cnt().secondary < 2 && guard++ < 100) s.nodes.push(pick(elig(ss)));
+  while (cnt().secondary + cnt().tertiary < P.secTert && guard++ < 200) {
+    const opts = [ss, tt].filter(t => elig(t).length); if (!opts.length) break;
+    s.nodes.push(pick(elig(pick(opts))));
+  }
+}
+function randomSurge(owned, maxT) {
+  const okPart = p => !p.unlock || owned.includes(p.unlock);
+  const sh = pick(D.shapes.filter(p => okPart(p) && D.effects.some(e => okPart(e) && e.kind === p.kind)));
+  const ef = pick(D.effects.filter(e => okPart(e) && e.kind === sh.kind));
+  const compat = D.twists.filter(t => twistFits(t, sh));
+  const nt = Math.random() < 0.55 ? 0 : 1 + rnd(maxT);
+  return { name: ef.name + " " + pick(D.surgeWords[sh.id]), shape: sh.id, effect: ef.id, twists: shuffle(compat).slice(0, nt).map(t => t.id) };
+}
+function randomChar(level, formId) {
   const s = blank(); s.level = level || 1 + rnd(10);
-  // apex check below: Apex needs level 7+ and 3 other nodes in its tree
-  const L = lvl(s.level);
-  const arr = shuffle(D.statArray); STAT_IDS.forEach((id, i) => s.stats[id] = arr[i]);
-  const cur = Object.assign({}, s.stats);
-  D.statBoostLevels.forEach(bl => { if (bl > s.level) return; const ok = shuffle(STAT_IDS.filter(x => cur[x] < D.statMax)); s.boosts[bl] = [ok[0], ok[1]]; cur[ok[0]]++; cur[ok[1]]++; });
+  const L = lvl(s.level), form = FORM[formId] || pick(D.forms);
+  s.form = form.id; s.dumpZero = pick(form.dumps);
   s.origin = pick(D.origins).id;
   let knReq = 0; for (const k in D.knackLevels) if (+k <= s.level) knReq += D.knackLevels[k];
   s.knacks = shuffle(D.knackExamples.filter(k => k !== ORIGIN[s.origin].knack)).slice(0, knReq - 1);
-  const nTrees = Math.min(L.nodes, pick([1, 2, 2, 2, 3, 3]));
-  const trees = shuffle(D.trees.map(t => t.id)).slice(0, nTrees);
-  trees.forEach(t => { s.trees[t] = Math.random() < 0.5 ? "bio" : "chrome"; s.nodes.push(TREE[t].nodes[0].id); });
-  let guard = 0;
-  while (s.nodes.length < L.nodes && guard++ < 200) {
-    const owned = Object.keys(s.trees);
-    const elig = [];
-    owned.forEach(t => TREE[t].nodes.forEach(n => {
-      if (n.root || s.nodes.includes(n.id)) return;
-      if (n.apex && (s.level < D.apexLevel || s.nodes.filter(x => NODE_TREE[x] === t).length < D.apexNeeds)) return;
-      elig.push(n.id);
-    }));
-    if (!elig.length || (owned.length < 6 && Math.random() < 0.08)) {
-      const t = pick(D.trees.filter(t => !owned.includes(t.id))); s.trees[t.id] = Math.random() < 0.5 ? "bio" : "chrome"; s.nodes.push(t.nodes[0].id); continue;
-    }
-    s.nodes.push(pick(elig));
-  }
-  const owned = Object.keys(s.trees);
-  const okPart = p => !p.unlock || owned.includes(p.unlock);
+  const mat = Math.random() < 0.4 ? null : pick(["bio", "chrome"]); // 40%: Splice-style mix
+  form.trees.forEach(t => s.trees[t] = mat || pick(["bio", "chrome"]));
+  growNodes(s, form);
+  const owned = form.trees, maxT = D.twistsByRank(L.rank);
   const known = Math.min(L.die, L.surges + (ORIGIN[s.origin].extraSurge || 0));
-  const maxT = D.twistsByRank(L.rank);
-  for (let i = 0; i < known; i++) {
-    const sh = pick(D.shapes.filter(p => okPart(p) && D.effects.some(e => okPart(e) && e.kind === p.kind)));
-    const ef = pick(D.effects.filter(e => okPart(e) && e.kind === sh.kind));
-    const compat = D.twists.filter(t => t.works === "any" || (t.works === "strikebolt" && (sh.id === "strike" || sh.id === "bolt")) || (t.works === "area" && sh.area) || (t.works === "damage" && sh.kind === "damage"));
-    const nt = Math.random() < 0.55 ? 0 : 1 + rnd(maxT);
-    const tw = shuffle(compat).slice(0, nt).map(t => t.id);
-    s.surges.push({ name: ef.name + " " + pick(D.surgeWords[sh.id]), shape: sh.id, effect: ef.id, twists: tw });
-  }
+  for (let i = 0; i < known; i++) s.surges.push(randomSurge(owned, maxT));
+  for (let i = 0; i < L.sigs; i++) { const x = randomSurge(owned, maxT); x.name = pick(["Signature", "Hallmark", "Trademark", "Calling Card"]) + " " + x.name.split(" ").pop(); s.signatures.push(x); }
   const k = pick(D.kits); s.kit = k.id; s.kitChoice = pick(["rifle", "shotgun"]);
   s.scripAdj = estimateScrip(s);
   const f = D.names; s.name = `${pick(f.first)} "${pick(f.nick)}" ${pick(f.last)}`;
@@ -692,14 +867,15 @@ function estimateScrip(s) {
 }
 function fromExample(key) {
   const x = D.examples[key]; const s = blank();
-  Object.assign(s, { name: x.name, concept: x.concept, level: x.level, stats: Object.assign({}, x.stats), boosts: JSON.parse(JSON.stringify(x.boosts)), origin: x.origin, knacks: x.knacks.slice(), trees: Object.assign({}, x.trees), nodes: x.nodes.slice(),
-    surges: x.surges.map(a => ({ name: a[0], shape: a[1], effect: a[2], twists: a[3].slice() })), kit: x.kit, kitChoice: x.kitChoice, buy: Object.assign({}, x.buy), kitMods: Object.assign({}, x.kitMods || {}), scripAdj: x.scripAdj || 0, drive: Object.assign({}, x.drive) });
+  const sg = a => ({ name: a[0], shape: a[1], effect: a[2], twists: a[3].slice() });
+  Object.assign(s, { name: x.name, concept: x.concept, level: x.level, form: x.form, dumpZero: x.dumpZero, origin: x.origin, knacks: x.knacks.slice(), trees: Object.assign({}, x.trees), nodes: x.nodes.slice(),
+    surges: x.surges.map(sg), signatures: (x.signatures || []).map(sg), kit: x.kit, kitChoice: x.kitChoice, buy: Object.assign({}, x.buy), kitMods: Object.assign({}, x.kitMods || {}), scripAdj: x.scripAdj || 0, drive: Object.assign({}, x.drive) });
   return s;
 }
 
 /* ---------- UI ---------- */
 let S = blank(), step = 0;
-const STEPS = ["Start", "Stats", "Origin & Knacks", "Augments", "Surges", "Gear", "Extras & Drive", "Sheet"];
+const STEPS = ["Start", "Form & Stats", "Origin & Knacks", "Augments", "Surges", "Gear", "Extras & Drive", "Sheet"];
 const LS = "mutagen.builder.";
 function store(k, v) { try { localStorage.setItem(LS + k, JSON.stringify(v)); return true; } catch (e) { return false; } }
 function load(k) { try { return JSON.parse(localStorage.getItem(LS + k)); } catch (e) { return null; } }
@@ -727,7 +903,7 @@ function render() {
     const bad = d.errors.some(e => e.step === i), w = d.warnings.some(e => e.step === i);
     return `<button class="stp${i === step ? " on" : ""}${bad ? " bad" : w ? " warn" : ""}" data-step="${i}"><b>${i + 1}</b> ${n}</button>`;
   }).join("");
-  document.getElementById("panel").innerHTML = [pStart, pStats, pOrigin, pAug, pSurges, pGear, pExtras, pSheet][step](d);
+  document.getElementById("panel").innerHTML = [pStart, pForm, pOrigin, pAug, pSurges, pGear, pExtras, pSheet][step](d);
   document.getElementById("summary").innerHTML = summary(d);
   document.getElementById("printArea").innerHTML = sheet(d);
   storageOk = store("autosave", S);
@@ -737,107 +913,128 @@ function render() {
 }
 function summary(d) {
   const msgs = d.errors.map(e => `<li class="e"><button data-step="${e.step}" title="Go to step ${e.step + 1}">\u2716 ${esc(e.m)}</button></li>`).concat(d.warnings.map(e => `<li class="w"><button data-step="${e.step}" title="Go to step ${e.step + 1}">\u26a0 ${esc(e.m)}</button></li>`)).join("");
-  const overLevel = d.errors.concat(d.warnings).some(e => /Too many nodes|max \d Twist|You know \d+ Surges|Sequence has|is an Apex|over the \d+ allowed|needs \d other/.test(e.m));
+  const overLevel = d.errors.concat(d.warnings).some(e => /Too many|max \d Twist|You know \d+ Surges|Sequence has|Tier II: level|Apex: level|over the \d+ allowed|Signature Surge\(s\) at level/.test(e.m));
   const N = (label, val, tip) => `<div title="${esc(tip)}"><span>${label}</span><b>${val}</b></div>`;
+  const nodesTip = `Primary ${d.cnt.primary}/${d.P.prim}, secondary + tertiary ${d.cnt.secondary + d.cnt.tertiary}/${d.P.secTert}, plus ${d.evo.length} Evolution node(s)`;
   return `<h3>${esc(S.name || "Unnamed freelancer")}</h3>
-  <div class="mini">Level ${S.level} \u00b7 Rank ${d.R} \u00b7 <span class="form ${d.form}">${d.form === "none" ? "No trees" : D.forms[d.form].name}</span></div>
+  <div class="mini">Level ${S.level} \u00b7 Rank ${d.R} \u00b7 ${d.form ? `<b>${esc(d.look.name)}</b> <span class="small">(${d.form.name}, ${d.stage.name})</span>` : "No Form"} \u00b7 <span class="form ${d.material}">${d.material === "none" ? "No trees" : D.materials[d.material].name}</span></div>
   <div class="nums">
-   ${N("HP", d.hp, "Max HP = 12 + 2 \u00d7 Grit + 5 per level after 1st (+2/level with Thick)")}${N("Armor", d.armor, "Armor (max 4): " + d.armorSrc.map(a => a[0] + " " + sgn(a[1])).join(", "))}${N("Speed", d.speed, "30 ft, +10 Quickened, +10 Spring Legs, \u22125 Heavy armor")}${N("Flux Limit", d.limit, "4 + Rank + Nerve (min 4), \u22121 if Splice. Go over it and you Overload.")}
+   ${N("HP", d.hp, "Max HP = 12 + 2 \u00d7 Grit + 5 per level after 1st (+2/level with Thick)")}${N("Armor", d.armor, `Armor (max ${d.armorMax}): ` + d.armorSrc.map(a => a[0] + " " + sgn(a[1])).join(", "))}${N("Speed", d.speed, "30 ft, +10 Quickened, +10 Spring Legs, \u22125 Heavy armor")}${N("Flux Limit", d.limit, "4 + Rank + Nerve (min 4), \u22121 if Splice. Go over it and you Overload.")}
    ${N("Dodge", sgn(d.def.dodge), "Moxie + Rank: claws, bullets, things you see coming")}${N("Endure", sgn(d.def.endure), "Grit + Rank: gas, blasts, disease, grabs")}${N("Resist", sgn(d.def.resist), "Nerve + Rank: fear, psychic, hacking your wetware")}${N("Sequence", "d" + d.die, "Your Sequence die: roll it Prime times at the start of each fight")}
-   ${N("Prime", d.prime, "Surges you roll ready at the start of each fight")}${N("Surges", S.surges.length + "/" + d.known, "Surges built / Surges known at this level; empty slots are Wild (" + d.wild + " Wild)")}${N("Nodes", d.nodes.length + "/" + d.L.nodes, "Augment nodes taken / allowed (level + 1)")}${N("Scrip", d.gear.scrip, "Money left after purchases")}
+   ${N("Prime", d.prime, "Surges you roll ready at the start of each fight (+1 per Evolution)")}${N("Surges", S.surges.length + "/" + d.known, "Surges built / Surges known at this level; empty slots are Wild (" + d.wild + " Wild)")}${N("Signature", S.signatures.length + "/" + d.sigMax, "Signature Surges: always ready, once per round (1 at Evolution I, 2 at Evolution II)")}${N("Nodes", d.nodes.length + "/" + (d.P.total + d.evo.length), nodesTip)}
   </div>
-  <div class="mini">${STAT_IDS.map(id => `${STAT_NAME[id]} ${sgn(d.st[id])}`).join(" \u00b7 ")}</div>
+  <div class="mini">${STAT_IDS.map(id => `${STAT_NAME[id]} ${sgn(d.st[id])}`).join(" \u00b7 ")} \u00b7 Scrip ${d.gear.scrip}</div>
   <div class="status ${d.legal ? "ok" : "no"}">${d.legal ? "\u2714 Legal character" : `\u2716 ${d.errors.length} problem(s)`}</div>
-  ${overLevel ? `<button class="btn trim" data-act="trim" title="Drop the picks this level doesn't allow: extra nodes (newest first), early Apexes, extra Surges (from the end), extra Twists and Knacks, and later stat boosts">\u2702 Fit picks to level ${S.level}</button>` : ""}
+  ${overLevel ? `<button class="btn trim" data-act="trim" title="Drop the picks this level doesn't allow: extra nodes (newest first), gated Tier II and Apex nodes, extra Surges and Signatures (from the end), extra Twists and Knacks">\u2702 Fit picks to level ${S.level}</button>` : ""}
   <ul class="msgs">${msgs}</ul>`;
 }
 function pStart(d) {
   return `<h2>1. Concept & Level</h2>
-  <p class="intro">New to Mutagen? You'll pick five <b>Stats</b>, an <b>Origin</b>, <b>Augments</b> from six body-part skill trees (each grown <b>Bio</b> or installed <b>Chrome</b>), and build <b>Surges</b>, the random combat powers your body offers each fight. The panel on the right updates live and lists anything that isn't legal yet; click a message to jump to its step.</p>
-  <p class="hint">One sentence: a job, a body change, and a flaw. Then pick a level; everything that scales follows it. <a href="${DOC}13_Character_Building_Guide.md">Guide</a> \u00b7 <a href="${DOC}02_Character_Creation.md">Ch 2</a></p>
+  <p class="intro">New to Mutagen? You'll pick one of five <b>Base Forms</b> (it sets your stats and your three skill trees), an <b>Origin</b>, <b>Augment</b> nodes from those trees (each tree grown <b>Bio</b> or installed <b>Chrome</b>), and build <b>Surges</b>, the random combat powers your body offers each fight. At levels 4 and 7 you <b>Evolve</b>. The panel on the right updates live and lists anything that isn't legal yet; click a message to jump to its step.</p>
+  <p class="hint">One sentence: a job, a body change, and a flaw. Then pick a level; everything that scales follows it. <a href="${DOC}13_Character_Building_Guide.md">Guide</a> \u00b7 <a href="${DOC}02_Character_Creation.md">Ch 2</a> \u00b7 <a href="${DOC}02A_Forms_and_Evolution.md">Ch 2A</a></p>
   <div class="row"><label>Name<input data-k="name" value="${esc(S.name)}" placeholder="Dree \u201cBrownout\u201d Ocampo"></label><label>Player<input data-k="player" value="${esc(S.player)}"></label></div>
   <label>Concept<input data-k="concept" value="${esc(S.concept)}" placeholder="Ex-cop with a shotgun arm who can't stop apologising"></label>
   <label>Level ${sel("level", levelOpts, S.level, 'data-num="1"')}</label>
-  <table class="t"><tr><th>Lv</th><th>Rank</th><th>Nodes</th><th>Surges</th><th>Die</th><th>Prime</th><th>Extra</th></tr>
-  ${D.levels.map(l => `<tr class="${l.lv === S.level ? "cur" : ""}"><td>${l.lv}</td><td>${l.rank}</td><td>${l.nodes}</td><td>${l.surges}</td><td>d${l.die}</td><td>${l.prime}</td><td>${l.extra}</td></tr>`).join("")}</table>
-  <p class="hint">Stuck? Hit <b>Random</b>, or load the guide's worked example from the <b>Example</b> menu.</p>`;
+  <table class="t"><tr><th>Lv</th><th>Rank</th><th>Stage</th><th>Nodes</th><th>Surges</th><th>Die</th><th>Prime</th><th>Sig.</th><th>Extra</th></tr>
+  ${D.levels.map(l => { const p = picks(l.lv), e = l.lv >= 7 ? 2 : l.lv >= 4 ? 1 : 0; return `<tr class="${l.lv === S.level ? "cur" : ""}"><td>${l.lv}</td><td>${l.rank}</td><td>${D.stages[stageIdx(l.lv)].name}</td><td>${p.total}${e ? ` (+${e})` : ""}</td><td>${l.surges}</td><td>d${l.die}</td><td>${l.prime}</td><td>${l.sigs}</td><td>${l.extra}</td></tr>`; }).join("")}</table>
+  <p class="hint">Stuck? Hit <b>Random</b>, or load the guide's worked example or a pregen from the <b>Example</b> menu.</p>`;
 }
-function pStats(d) {
-  const opts = [["", "\u2014"]].concat(D.statArray.map(v => [v, sgn(v)]));
-  const used = STAT_IDS.map(id => S.stats[id]).filter(v => v !== null && v !== "");
-  let h = `<h2>2. Stats</h2><p class="hint">Assign +3, +2, +1, +0, \u22121, one each. Put +3 in the stat you'll attack with.</p><div class="cards">`;
-  D.stats.forEach(x => {
-    const v = S.stats[x.id]; const dup = v !== null && v !== "" && used.filter(u => String(u) === String(v)).length > 1;
-    h += `<div class="card${dup ? " badc" : ""}"><b>${x.name}</b> <i>\u201c${x.tag}\u201d</i><div class="small">${x.does}</div>${sel("stats." + x.id, opts, v == null ? "" : v, 'data-num="1"', x.name + " value")} <span class="tot">= ${sgn(d.st[x.id])}</span></div>`;
+function pForm(d) {
+  let h = `<h2>2. Base Form & Stats</h2>`;
+  if (S.migrated) h += `<div class="formbox mig">\u26a0 <b>Imported from v0.1.</b> Mutagen 0.2 replaced free stat placement with Base Forms. Your name, Origin, Knacks, gear, Surges and Drive were kept; choose a Form, then retake your Augment nodes and re-check your Surges.</div>`;
+  h += `<p class="hint">Your Form sets your primary (+3), secondary (+2) and tertiary (+1) stats and your three trees. You choose which of the two dump stats gets +0 (the other gets \u22121). Each Evolution raises every stat. <a href="${DOC}02A_Forms_and_Evolution.md">Ch 2A</a></p><div class="cards">`;
+  D.forms.forEach(f => {
+    h += `<label class="card pickc${S.form === f.id ? " on" : ""}"><input type="radio" name="form" data-k="form" value="${f.id}"${S.form === f.id ? " checked" : ""}> <b>${f.name}</b> <i>\u201c${esc(f.quote)}\u201d</i><div class="small">${esc(f.blurb)}<br>+3 ${STAT_NAME[f.primary]} \u00b7 +2 ${STAT_NAME[f.secondary]} \u00b7 +1 ${STAT_NAME[f.tertiary]} \u00b7 dumps ${STAT_NAME[f.dumps[0]]}, ${STAT_NAME[f.dumps[1]]}<br>Trees: <b>${TREE[f.trees[0]].name}</b> (primary), ${TREE[f.trees[1]].name}, ${TREE[f.trees[2]].name}<br>Evolves into ${f.stages[1].name} \u2192 ${f.stages[2].name} \u2192 ${f.stages[3].name}</div></label>`;
   });
-  h += `</div><button class="btn" data-act="autostats">Fill in order (+3 Grit \u2192 \u22121 Chutzpah)</button>`;
-  const bl = D.statBoostLevels.filter(b => b <= S.level);
-  if (bl.length) {
-    h += `<h3>Stat boosts</h3><p class="hint">+1 to two <b>different</b> stats at levels 3, 6, 9 (max +5).</p>`;
-    const so = [["", "\u2014"]].concat(D.stats.map(x => [x.id, x.name]));
-    bl.forEach(b => { const v = S.boosts[b] || []; h += `<div class="row"><b class="lbl">Level ${b}</b>${sel(`boosts.${b}.0`, so, v[0] || "", "", `Level ${b} boost, first stat`)}${sel(`boosts.${b}.1`, so, v[1] || "", "", `Level ${b} boost, second stat`)}</div>`; });
-  }
+  h += `</div>`;
+  const f = d.form; if (!f) return h;
+  h += `<h3>Dump stats</h3><div class="row">${f.dumps.map(x => `<label class="inl"><input type="radio" name="dump" data-k="dumpZero" value="${x}"${S.dumpZero === x ? " checked" : ""}> ${STAT_NAME[x]} gets +0 (${STAT_NAME[f.dumps.find(y => y !== x)]} gets \u22121)</label>`).join("")}</div>`;
+  const roleOfStat = id => id === f.primary ? "Primary" : id === f.secondary ? "Secondary" : id === f.tertiary ? "Tertiary" : "Dump";
+  h += `<table class="t"><tr><th>Stat</th><th>Role</th>${D.stages.map((g, i) => `<th class="${i === d.si ? "cur" : ""}">${g.name} <span class="small">(L${g.from}+)</span></th>`).join("")}<th>Does</th></tr>
+  ${D.stats.map(x => `<tr><td><b>${x.name}</b></td><td>${roleOfStat(x.id)}</td>${D.stages.map((g, i) => `<td class="${i === d.si ? "cur" : ""}">${sgn(formStats(f, S.dumpZero, g.from)[x.id])}</td>`).join("")}<td class="small">${x.does}</td></tr>`).join("")}</table>
+  ${S.level >= 10 ? `<p class="small"><b>Final Form</b> (once per Lockdown): ${STAT_NAME[f.primary]} ${sgn(d.st[f.primary] + D.finalFormBonus)} while active.</p>` : ""}
+  <h3>Stages</h3><table class="t"><tr><th>Stage</th><th>Name</th><th>Bio</th><th>Chrome</th><th>Exclusive node</th></tr>
+  ${f.stages.map((g, i) => { const lv = [1, 4, 7, 10][i], ex = i === 1 ? f.evo[4] : i === 2 ? f.evo[7] : ""; return `<tr class="${(i === 3 ? S.level >= 10 : i === d.si && S.level < 10) ? "cur" : ""}"><td>${["Base", "Evolution I", "Evolution II", "Final Form"][i]} <span class="small">(L${lv})</span></td><td><b>${g.name}</b></td><td class="small">${esc(g.bio)}</td><td class="small">${esc(g.chrome)}</td><td class="small">${ex ? `<b>${NODE[ex].name}</b>` : i === 3 ? "Final Form" : "\u2014"}</td></tr>`; }).join("")}</table>
+  <p class="small"><b>Each Evolution:</b> stats rise to the next stage, +1 Prime, a bigger Sequence die, an exclusive node, and one Signature Surge. <b>Emergence:</b> ${esc(D.emergence)}</p>`;
   return h;
 }
 function pOrigin(d) {
   let h = `<h2>3. Origin & Knacks</h2><p class="hint">Pick or roll an Origin: it gives one Knack and a Perk. Knacks are narrow specialties that add Rank to checks. <a href="${DOC}01_Core_Rules.md#knacks">Ch 1</a></p>
   <button class="btn" data-act="rollorigin">Roll d6</button><div class="cards">`;
   D.origins.forEach((o, i) => { h += `<label class="card pickc${S.origin === o.id ? " on" : ""}"><input type="radio" name="origin" data-k="origin" value="${o.id}"${S.origin === o.id ? " checked" : ""}> <b>${i + 1}. ${o.name}</b><div class="small"><i>${o.blurb}</i><br>Knack: <b>${o.knack}</b><br>${o.perk}</div></label>`; });
-  h += `</div><h3>Knacks (${d.knacks.length}/${d.knReq})</h3><p class="hint">Origin Knack: <b>${esc(d.origin ? d.origin.knack : "\u2014")}</b>. Write ${d.knReq - 1} more (3 at level 1, +1 at 4 and 8; a Bloom <i>Blossom</i> adds one).</p>`;
+  h += `</div><h3>Knacks (${d.knacks.length}/${d.knReq})</h3><p class="hint">Origin Knack: <b>${esc(d.origin ? d.origin.knack : "\u2014")}</b>. Write ${d.knReq - 1} more (3 at level 1, +1 at levels 3, 6 and 9; a Bloom <i>Blossom</i> adds one).</p>`;
   const n = Math.max(d.knReq - 1, S.knacks.length);
   for (let i = 0; i < n; i++) h += `<input list="knackList" maxlength="80" aria-label="Knack ${i + 2}" data-k="knacks.${i}" value="${esc(S.knacks[i] || "")}" placeholder="e.g. ${esc(D.knackExamples[i % D.knackExamples.length])}">`;
   h += `<button class="btn" data-act="addknack">+ Blossom Knack</button><datalist id="knackList">${D.knackExamples.map(k => `<option value="${esc(k)}">`).join("")}</datalist>`;
   return h;
 }
-function nodeState(n, t, d) {
+function nodeState(n, d) {
   const taken = S.nodes.includes(n.id);
   if (taken) return { taken, ok: true };
-  if (!n.root && !d.owned.includes(t.id)) return { ok: false, why: "Root first" };
-  if (n.apex) {
-    if (S.level < D.apexLevel) return { ok: false, why: "Level 7+" };
-    if (S.nodes.filter(x => NODE_TREE[x] === t.id && !NODE[x].apex).length < D.apexNeeds) return { ok: false, why: "Needs 3 nodes" };
-  }
-  if (S.nodes.length >= d.L.nodes) return { ok: false, why: "No picks left" };
+  const g = gate(n.id, S.nodes, d.form, S.level);
+  if (g) return { ok: false, why: g.replace(/^needs the .*Root.*$/, "Root first").replace(/ \(you have \d+\)/, "") };
+  const role = roleOf(d.form, NODE_TREE[n.id]);
+  if (role === "primary" && d.cnt.primary >= d.P.prim) return { ok: false, why: "Primary picks used" };
+  if (role !== "primary" && d.cnt.secondary + d.cnt.tertiary >= d.P.secTert) return { ok: false, why: "No picks left" };
   return { ok: true };
 }
 function pAug(d) {
   const c = { R: d.R, st: d.st };
-  let h = `<h2>4. Augments</h2><p class="hint">Picks: <b>${d.nodes.length}/${d.L.nodes}</b>. Root first; choose each tree's Form when you take its Root. Apex: level 7+ and 3 other nodes. <a href="${DOC}03_Augment_Trees.md">Ch 3</a></p>
-  <div class="formbox">${d.form === "none" ? "Take a Root to begin." : `<b class="form ${d.form}">${D.forms[d.form].name}</b>: ${D.forms[d.form].perk} <i>${D.forms[d.form].cost}</i>`}${d.bioN ? ` <b>Knit ${d.knit} HP.</b>` : ""}${d.upkeep ? ` <b>Upkeep ${d.upkeep}/mission.</b>` : ""}</div><div class="trees">`;
-  D.trees.forEach(t => {
-    const own = d.owned.includes(t.id), f = S.trees[t.id];
-    h += `<div class="tree${own && D.forms[f] ? " own " + f : own ? " own" : ""}"><div class="th"><b>${t.name}</b> <span class="small">${t.stats} \u00b7 ${t.role}</span>
+  const f = d.form;
+  if (!f) return `<h2>4. Augments</h2><p class="hint">Choose a Base Form in step 2 first: it decides your three trees.</p>`;
+  const P = d.P, st2 = d.cnt.secondary + d.cnt.tertiary;
+  let h = `<h2>4. Augments</h2><p class="hint">Primary (<b>${TREE[f.trees[0]].name}</b>): <b>${d.cnt.primary}/${P.prim}</b> \u00b7 Secondary + tertiary: <b>${st2}/${P.secTert}</b> (secondary 2+, tertiary 1+)${P.secTert > P.prim ? " \u2014 your primary tree is full, so its pick overflows" : ""}. Tier II: level 4+ and 3 nodes in the tree. Apex: level 7+, 6 other nodes, primary or secondary tree only. Evolution nodes are automatic. <a href="${DOC}03_Augment_Trees.md">Ch 3</a></p>
+  <div class="formbox">${d.material === "none" ? "Take a Root to begin." : `<b class="form ${d.material}">${D.materials[d.material].name}</b>: ${D.materials[d.material].perk} <i>${D.materials[d.material].cost}</i>`}${d.bioN ? ` <b>Knit ${d.knit} HP.</b>` : ""}${d.upkeep ? ` <b>Upkeep ${d.upkeep}/mission.</b>` : ""}</div><div class="trees">`;
+  f.trees.forEach((tid, ri) => {
+    const t = TREE[tid], role = ROLES[ri], own = d.owned.includes(tid), m = S.trees[tid];
+    const nIn = d.std.filter(x => NODE_TREE[x] === tid).length;
+    h += `<div class="tree${own && D.materials[m] ? " own " + m : own ? " own" : ""}"><div class="th"><b>${t.name}</b> <span class="tag role">${ROLE_NAME[role]}</span> <span class="small">${nIn}/10 \u00b7 ${t.stats} \u00b7 ${t.role}</span>
     <div class="small">Unlocks: ${t.unlocks.map(u => (SHAPE[u] || EFFECT[u]).name).join(", ")}</div>
-    ${own ? `<div class="formsel">${["bio", "chrome"].map(x => `<label class="${x}"><input type="radio" name="form_${t.id}" data-k="trees.${t.id}" value="${x}"${f === x ? " checked" : ""}> ${D.forms[x].name}</label>`).join("")}</div><div class="small look">${f ? t[f] : "Choose Bio or Chrome"}</div>` : ""}</div>`;
+    ${own ? `<div class="formsel">${["bio", "chrome"].map(x => `<label class="${x}"><input type="radio" name="mat_${tid}" data-k="trees.${tid}" value="${x}"${m === x ? " checked" : ""}> ${D.materials[x].name}</label>`).join("")}</div><div class="small look">${m ? t[m] : "Choose Bio or Chrome"}</div>` : ""}</div>`;
+    let lastTier = -1;
     t.nodes.forEach(n => {
-      const ns = nodeState(n, t, d);
+      if (n.tier === 4 && n.form !== f.id) return;
+      if (n.tier !== lastTier) { h += `<div class="tierh">${TIER_NAME[n.tier]}${n.tier === 2 ? " \u00b7 level 4+, 3 nodes" : n.tier === 3 ? " \u00b7 level 7+, 6 other nodes" : n.tier === 4 ? ` \u00b7 ${f.name} only` : ""}</div>`; lastTier = n.tier; }
+      if (n.tier === 4) {
+        const got = S.level >= n.evo;
+        h += `<div class="node evo${got ? " on" : " dis"}"><b>\u2605 ${n.name}</b> <span class="tag${got ? "" : " no"}">${got ? "Granted" : "Level " + n.evo}</span>${n.push ? ' <span class="tag">Push</span>' : ""}<div class="small">${esc(tok(n.text, c))}</div></div>`;
+        return;
+      }
+      const ns = nodeState(n, d);
       h += `<label class="node${ns.taken ? " on" : ""}${ns.ok ? "" : " dis"}"><input type="checkbox" data-node="${n.id}"${ns.taken ? " checked" : ""}${ns.ok ? "" : " disabled"}>
-      <b>${n.root ? "Root \u2014 " : n.apex ? "Apex \u2014 " : ""}${n.name}</b>${n.push ? ' <span class="tag">Push</span>' : ""}${ns.why ? ` <span class="tag no">${ns.why}</span>` : ""}<div class="small">${esc(tok(n.text, c))}</div></label>`;
+      <b>${n.name}</b>${n.push ? ' <span class="tag">Push</span>' : ""}${ns.why ? ` <span class="tag no">${esc(ns.why)}</span>` : ""}<div class="small">${esc(tok(n.text, c))}</div></label>`;
     });
     h += `</div>`;
   });
   return h + `</div>`;
 }
+function slotHTML(kind, i, sg, x, d) {
+  const maxT = D.twistsByRank(d.R), key = kind === "sig" ? "signatures" : "surges", lab = kind === "sig" ? `Signature ${i + 1}` : `Slot ${i + 1}`;
+  const shOpts = [["", "Shape\u2026"]].concat(D.shapes.filter(p => sg.sample || d.partOk(p)).map(p => [p.id, p.name + (p.unlock ? " (" + TREE[p.unlock].name + ")" : "")]));
+  const sh = SHAPE[sg.shape];
+  const efOpts = [["", "Effect\u2026"]].concat(D.effects.filter(p => (sg.sample || d.partOk(p)) && (!sh || p.kind === sh.kind)).map(p => [p.id, p.name + (p.unlock ? " (" + TREE[p.unlock].name + ")" : "")]));
+  const tk = kind === "sig" ? "s" + i : String(i);
+  return `<div class="slot${kind === "sig" ? " sig" : ""}${x.errs.length ? " bads" : ""}"><div class="row"><b class="num">${kind === "sig" ? "\u2605" + (i + 1) : i + 1}</b><input data-k="${key}.${i}.name" maxlength="80" aria-label="${lab} name" value="${esc(sg.name)}" placeholder="Name it">
+      ${sel(`${key}.${i}.shape`, shOpts, sg.shape || "", "", `${lab} Shape`)}${sel(`${key}.${i}.effect`, efOpts, sg.effect || "", "", `${lab} Effect`)}
+      <span class="flux">${x.flux} Flux${x.fw ? " \u2699" : ""}</span>
+      <span class="ctl">${kind === "sig" ? `<button class="ib" data-act="delsig" data-i="${i}" title="Remove" aria-label="Remove ${lab}">\u2715</button>` : `<button class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move slot ${i + 1} up">\u2191</button><button class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move slot ${i + 1} down">\u2193</button><button class="ib" data-act="del" data-i="${i}" title="Remove" aria-label="Remove slot ${i + 1}">\u2715</button>`}</span></div>
+      <div class="tw">${D.twists.map(t => { const on = (sg.twists || []).includes(t.id); const can = on || (twistFits(t, sh) && (sg.twists || []).length < maxT); return `<label class="${can ? "" : "dis"}" title="${esc(tok(t.text, { R: d.R, st: d.st }))}"><input type="checkbox" data-twist="${tk}" value="${t.id}"${on ? " checked" : ""}${can ? "" : " disabled"}>${t.name}</label>`; }).join("")}
+      ${kind === "sig" ? "" : `<label class="smp" title="Harvested Sample (ch 7): may use parts you haven't unlocked; fills a Wild slot"><input type="checkbox" data-k="surges.${i}.sample" data-bool="1"${sg.sample ? " checked" : ""}>Sample</label>`}</div>
+      <div class="small line">${esc(x.line)}</div>${x.errs.map(m => `<div class="small err">\u2716 ${esc(m)}</div>`).join("")}</div>`;
+}
 function pSurges(d) {
-  const c = { R: d.R };
   const maxT = D.twistsByRank(d.R);
-  let h = `<h2>5. Surges & Sequence</h2><p class="hint">Sequence <b>d${d.die}</b> \u00b7 Prime <b>${d.prime}</b> (hold up to ${d.maxPrimed}) \u00b7 Surges known <b>${d.known}</b> \u00b7 Twists per Surge <b>${maxT}</b>${maxT > 1 ? " (different)" : ""}. Shape + Effect (+ Twist); 1 Flux + 1 per Twist. Empty slots are Wild. \u2699 = Firmware can swap it in. <a href="${DOC}04_Surges.md">Ch 4</a></p>
+  let h = `<h2>5. Surges & Sequence</h2><p class="hint">Sequence <b>d${d.die}</b> \u00b7 Prime <b>${d.prime}</b> (hold up to ${d.maxPrimed}) \u00b7 Surges known <b>${d.known}</b> \u00b7 Twists per Surge <b>${maxT}</b>${maxT > 1 ? " (different)" : ""}. Shape + Effect (+ Twist); 1 Flux + 1 per Twist. Attack with the Shape's stat or the stat of the tree that unlocked the Effect. Empty slots are Wild. \u2699 = Firmware can swap it in. <a href="${DOC}04_Surges.md">Ch 4</a></p>
   <div class="small">Unlocked parts: <b>${["Strike", "Bolt", "Infuse", "Kinetic"].concat([...d.unlocked].map(u => (SHAPE[u] || EFFECT[u]).name)).join(", ")}</b></div>`;
+  h += `<h3>\u2605 Signature Surges (${S.signatures.length}/${d.sigMax})</h3><p class="hint">${d.sigMax ? esc(D.signatureRule) + " Firmware can't swap them; only Emergence (first use) and Final Form Amp them. You may rebuild one each level-up." : "You gain your first Signature Surge when you Evolve at level 4 and a second at level 7."} <a href="${DOC}04_Surges.md#signature-surges">Ch 4</a></p>`;
+  S.signatures.forEach((sg, i) => { h += slotHTML("sig", i, sg, d.sigs[i], d); });
+  if (d.sigMax) h += `<div class="row"><button class="btn" data-act="addsig"${S.signatures.length < d.sigMax ? "" : " disabled"}>+ Signature Surge</button></div>`;
+  h += `<h3>Sequence</h3>`;
   for (let i = 0; i < d.die; i++) {
     const sg = S.surges[i], x = d.surges[i];
     if (d.sticky && i === d.die - 1) { h += `<div class="slot wild"><b>${i + 1}</b> Wild <span class="small">(Sticky Relay: always Wild)</span></div>`; continue; }
     if (!sg) { h += `<div class="slot wild"><b>${i + 1}</b> <i>Wild</i> \u2014 roll on the Wild Surge table when Primed.</div>`; continue; }
-    const shOpts = [["", "Shape\u2026"]].concat(D.shapes.filter(p => sg.sample || d.partOk(p)).map(p => [p.id, p.name + (p.unlock ? " (" + TREE[p.unlock].name + ")" : "")]));
-    const sh = SHAPE[sg.shape];
-    const efOpts = [["", "Effect\u2026"]].concat(D.effects.filter(p => (sg.sample || d.partOk(p)) && (!sh || p.kind === sh.kind)).map(p => [p.id, p.name + (p.unlock ? " (" + TREE[p.unlock].name + ")" : "")]));
-    const twOk = t => sh && (t.works === "any" || (t.works === "strikebolt" && (sh.id === "strike" || sh.id === "bolt")) || (t.works === "area" && sh.area) || (t.works === "damage" && sh.kind === "damage"));
-    h += `<div class="slot${x.errs.length ? " bads" : ""}"><div class="row"><b class="num">${i + 1}</b><input data-k="surges.${i}.name" maxlength="80" aria-label="Slot ${i + 1} Surge name" value="${esc(sg.name)}" placeholder="Name it">
-      ${sel(`surges.${i}.shape`, shOpts, sg.shape || "", "", `Slot ${i + 1} Shape`)}${sel(`surges.${i}.effect`, efOpts, sg.effect || "", "", `Slot ${i + 1} Effect`)}
-      <span class="flux">${x.flux} Flux${x.fw ? " \u2699" : ""}</span>
-      <span class="ctl"><button class="ib" data-act="up" data-i="${i}" title="Move up" aria-label="Move slot ${i + 1} up">\u2191</button><button class="ib" data-act="down" data-i="${i}" title="Move down" aria-label="Move slot ${i + 1} down">\u2193</button><button class="ib" data-act="del" data-i="${i}" title="Remove" aria-label="Remove slot ${i + 1}">\u2715</button></span></div>
-      <div class="tw">${D.twists.map(t => { const on = (sg.twists || []).includes(t.id); const can = on || (twOk(t) && (sg.twists || []).length < maxT); return `<label class="${can ? "" : "dis"}" title="${esc(tok(t.text, { R: d.R, st: d.st }))}"><input type="checkbox" data-twist="${i}" value="${t.id}"${on ? " checked" : ""}${can ? "" : " disabled"}>${t.name}</label>`; }).join("")}
-      <label class="smp" title="Harvested Sample (ch 7): may use parts you haven't unlocked; fills a Wild slot"><input type="checkbox" data-k="surges.${i}.sample" data-bool="1"${sg.sample ? " checked" : ""}>Sample</label></div>
-      <div class="small line">${esc(x.line)}</div>${x.errs.map(m => `<div class="small err">\u2716 ${esc(m)}</div>`).join("")}</div>`;
+    h += slotHTML("surge", i, sg, x, d);
   }
   const nonSample = S.surges.filter(x => !x.sample).length;
   const room = S.surges.length < d.slots;
@@ -850,7 +1047,7 @@ function pSurges(d) {
 function pGear(d) {
   const g = d.gear;
   const modOpts = only => [["", "No mod"]].concat(D.mods.filter(m => !m.only || m.only === only).map(m => [m.id, `${m.name} (100)`]));
-  let h = `<h2>6. Gear & Scrip</h2><p class="hint">One Starting Kit + common items (${D.commonKit.text}, 2 rations, 1 Damper). 50 Scrip to spend. One Mod per weapon. One armor + optional Shield; Armor max 4. <a href="${DOC}08_Gear.md">Ch 8</a></p>
+  let h = `<h2>6. Gear & Scrip</h2><p class="hint">One Starting Kit + common items (${D.commonKit.text}, 2 rations, 1 Damper). 50 Scrip to spend. One Mod per weapon. One armor + optional Shield; Armor max ${d.armorMax}. <a href="${DOC}08_Gear.md">Ch 8</a></p>
   <div class="cards">${D.kits.map(k => `<label class="card pickc${S.kit === k.id ? " on" : ""}"><input type="radio" name="kit" data-k="kit" value="${k.id}"${S.kit === k.id ? " checked" : ""}> <b>${k.name}</b><div class="small">${k.weapons.map(w => typeof w === "string" ? FRAME[w].name : w.choice ? w.choice.map(x => FRAME[x].name).join(" or ") : FRAME[w.frame].name + " + " + MOD[w.mod].name).join(", ")}, ${Object.keys(k.items).map(i => (k.items[i] > 1 ? k.items[i] + " " : "") + ITEM[i].name).join(", ")}${k.scrip ? `, +${k.scrip} Scrip` : ""}</div></label>`).join("")}</div>`;
   const kw = kitWeapons(S);
   {
@@ -865,7 +1062,7 @@ function pGear(d) {
     h += `</table><button class="btn" data-act="addweapon">+ Buy a weapon</button>`;
   }
   h += `<h3>Armor</h3><div class="row">${sel("armor", D.armors.map(a => [a.id, `${a.name} (Armor ${a.armor}${a.id === "light" ? ", in kit" : `, ${a.cost} Scrip, speed \u22125, stealth disadvantage`})`]), S.armor, "", "Armor worn")}<label class="inl"><input type="checkbox" data-k="shield" data-bool="1"${S.shield ? " checked" : ""}> Shield (+1 Armor, 40 Scrip, uses a hand)</label></div>
-  <p class="small">Armor ${d.armor}: ${d.armorSrc.map(a => `${a[0]} ${sgn(a[1])}`).join(", ")}${d.armorRaw > 4 ? " (capped at 4)" : ""}</p>
+  <p class="small">Armor ${d.armor}: ${d.armorSrc.map(a => `${a[0]} ${sgn(a[1])}`).join(", ")}${d.armorRaw > d.armorMax ? ` (capped at ${d.armorMax})` : ""}</p>
   <h3>Buy kit items</h3><div class="items">${D.items.map(it => `<label title="${esc(it.text)}">${it.name} <span class="small">${it.cost}</span><input type="number" min="0" max="20" data-k="buy.${it.id}" data-num="1" value="${S.buy[it.id] || 0}"></label>`).join("")}</div>
   <h3>Scrip</h3><div class="row"><label>Earned / adjustments since creation<input type="number" data-k="scripAdj" data-num="1" value="${Number(S.scripAdj) || 0}"></label><button class="btn" data-act="estimate">Estimate from ${S.level - 1} mission(s)</button></div>
   <table class="t"><tr><td>Start (50${d.origin && d.origin.scrip ? " + " + d.origin.scrip + " Origin" : ""}${KIT[S.kit] && KIT[S.kit].scrip ? " + " + KIT[S.kit].scrip + " kit" : ""})</td><td>${g.start}</td></tr><tr><td>Earned / adjustments</td><td>${sgn(Number(S.scripAdj) || 0)}</td></tr>${g.lines.map(l => `<tr><td>${esc(l[0])}</td><td>\u2212${l[1]}</td></tr>`).join("")}<tr class="cur"><td><b>Scrip left</b></td><td><b>${g.scrip}</b></td></tr><tr><td>Upkeep per mission</td><td>${d.upkeep}${S.level === 1 && d.upkeep ? " (first mission prepaid)" : ""}</td></tr></table>`;
@@ -896,66 +1093,84 @@ function sheet(d) {
     if (!sg || (d.sticky && i === d.die - 1)) { rows.push(`<tr><td>${i + 1}</td><td><i>Wild</i></td><td colspan="2" class="small">Roll d12 on the Wild Surge table</td><td>${boxes(1)}</td></tr>`); continue; }
     rows.push(`<tr><td>${i + 1}</td><td><b>${esc(sg.name)}</b>${sg.sample ? " <i>(Sample)</i>" : ""}${x.fw ? " \u2699" : ""}</td><td class="small">${esc(x.build || "")}<br>${esc(x.line)}</td><td>${x.flux}</td><td>${boxes(1)}</td></tr>`);
   }
-  const trees = d.owned.map(t => `<tr><td>${TREE[t].name}</td><td>${D.forms[S.trees[t]] ? D.forms[S.trees[t]].name : "?"}</td><td>${d.nodes.filter(n => NODE_TREE[n] === t).map(n => NODE[n].name).join(", ")}</td></tr>`).join("") || `<tr><td colspan="3">&nbsp;</td></tr>`;
-  const feats = d.nodes.map(n => `<li><b>${NODE[n].name}${NODE[n].push ? " (Push)" : ""}:</b> ${esc(tok(NODE[n].text, c))}</li>`).join("");
+  const sigRows = [0, 1].map(i => { const sg = S.signatures[i], x = d.sigs[i]; const lab = i ? "Evo II" : "Evo I";
+    return sg ? `<tr><td>${lab}</td><td><b>${esc(sg.name)}</b></td><td class="small">${esc(x.build || "")}<br>${esc(x.line)}</td><td>${x.flux}</td><td>${boxes(1)}</td></tr>` : `<tr class="${i < d.sigMax ? "" : "off"}"><td>${lab}</td><td colspan="3" class="small">${i < d.sigMax ? "" : `Unlocks at level ${i ? 7 : 4}`}</td><td></td></tr>`; }).join("");
+  const f = d.form;
+  const trees = f ? f.trees.map((t, ri) => `<tr><td>${ROLE_NAME[ROLES[ri]]}</td><td>${TREE[t].name}</td><td>${D.materials[S.trees[t]] && d.owned.includes(t) ? D.materials[S.trees[t]].name : ""}</td><td>${d.std.filter(n => NODE_TREE[n] === t).map(n => NODE[n].name).join(", ")}</td></tr>`).join("") : `<tr><td colspan="4">&nbsp;</td></tr>`;
+  const evoRow = f ? `<tr><th>Evolution</th><td colspan="3">L4: ${S.level >= 4 ? "<b>" + NODE[f.evo[4]].name + "</b>" : "<i>" + NODE[f.evo[4]].name + "</i>"} \u00b7 L7: ${S.level >= 7 ? "<b>" + NODE[f.evo[7]].name + "</b>" : "<i>" + NODE[f.evo[7]].name + "</i>"}</td></tr>` : "";
+  const feats = d.nodes.map(n => `<li><b>${isEvo(n) ? "\u2605 " : ""}${NODE[n].name}${NODE[n].push ? " (Push)" : ""}:</b> ${esc(tok(NODE[n].text, c))}</li>`).join("");
   const items = Object.keys(d.gear.items).map(i => (d.gear.items[i] > 1 ? d.gear.items[i] + "\u00d7 " : "") + ITEM[i].name);
+  const stageBox = f ? D.stages.map((g, i) => `${i === d.si ? "\u25a0" : "\u25a1"} ${f.stages[i].name}`).join(" \u00b7 ") + ` \u00b7 ${S.level >= 10 ? "\u25a0" : "\u25a1"} ${f.stages[3].name}` : "";
+  const mat = d.material === "chrome" ? "chrome" : "bio";
   return `<div class="sheet"><h1>MUTAGEN</h1>
   <table><tr><th>Name</th><td colspan="3">${esc(S.name)}</td><th>Level</th><td>${S.level}</td><th>Rank</th><td>${d.R}</td></tr>
-  <tr><th>Origin</th><td colspan="3">${d.origin ? d.origin.name : ""}</td><th>Player</th><td colspan="3">${esc(S.player)}</td></tr><tr><th>Concept</th><td colspan="7">${esc(S.concept)}</td></tr></table>
+  <tr><th>Origin</th><td colspan="3">${d.origin ? d.origin.name : ""}</td><th>Player</th><td colspan="3">${esc(S.player)}</td></tr>
+  <tr><th>Base Form</th><td colspan="3">${f ? f.name : ""}</td><th>Stage</th><td colspan="3" class="small">${stageBox}</td></tr>
+  <tr><th>Look</th><td colspan="7" class="small">${d.look ? `<b>${esc(d.look.name)}:</b> ${esc(d.look[mat])}` : ""}</td></tr>
+  <tr><th>Concept</th><td colspan="7">${esc(S.concept)}</td></tr></table>
   <div class="g2"><div><h2>Stats</h2><table>
   <tr><th>Grit</th><td>${sgn(d.st.grit)}</td><th>Dodge <small>(Moxie+Rank)</small></th><td>${sgn(d.def.dodge)}</td></tr>
   <tr><th>Moxie</th><td>${sgn(d.st.moxie)}</td><th>Endure <small>(Grit+Rank)</small></th><td>${sgn(d.def.endure)}</td></tr>
   <tr><th>Nerve</th><td>${sgn(d.st.nerve)}</td><th>Resist <small>(Nerve+Rank)</small></th><td>${sgn(d.def.resist)}</td></tr>
   <tr><th>Gumption</th><td>${sgn(d.st.gumption)}</td><th>Speed</th><td>${d.speed} ft</td></tr>
-  <tr><th>Chutzpah</th><td>${sgn(d.st.chutzpah)}</td><th>Armor <small>(max 4)</small></th><td>${d.armor}</td></tr></table></div>
+  <tr><th>Chutzpah</th><td>${sgn(d.st.chutzpah)}</td><th>Armor <small>(max ${d.armorMax})</small></th><td>${d.armor}</td></tr></table></div>
   <div><h2>Vitals</h2><table><tr><th>HP</th><td></td><th>Max HP</th><td>${d.hp}</td></tr><tr><th>Temp HP</th><td></td><th>Juice</th><td>\u25cf \u25cb \u25cb</td></tr>
   <tr><th>Flux</th><td colspan="3">${boxes(d.limit)} <small>over = Overload</small></td></tr>
-  <tr><th>Limit</th><td>${d.limit}</td><th>Death</th><td>${boxes(3)}</td></tr><tr><th>Breathers</th><td>${boxes(2)}</td><th>Last Gasp</th><td>${boxes(1)}</td></tr></table></div></div>
-  <h2>Knacks</h2><table><tr>${Array.from({ length: Math.max(5, d.knacks.length) }, (_, i) => `<td>${esc(d.knacks[i] || "")}</td>`).join("")}</tr></table>
-  <h2>Augments \u2014 ${d.form === "none" ? "" : D.forms[d.form].name}${d.knit ? ` \u00b7 Knit ${d.knit}` : ""}${d.upkeep ? ` \u00b7 Upkeep ${d.upkeep}` : ""}</h2><table><tr><th style="width:18%">Tree</th><th style="width:12%">Bio / Chrome</th><th>Nodes</th></tr>${trees}
-  <tr><th>Unlocked parts</th><td colspan="2">Strike, Bolt, Infuse, Kinetic${[...d.unlocked].map(u => ", " + (SHAPE[u] || EFFECT[u]).name).join("")}</td></tr></table>
+  <tr><th>Limit</th><td>${d.limit}</td><th>Death</th><td>${boxes(3)}</td></tr><tr><th>Breathers</th><td>${boxes(2)}</td><th>Last Gasp</th><td>${boxes(1)}</td></tr>${S.level >= 10 ? `<tr><th>Final Form</th><td>${boxes(1)}</td><th colspan="2" class="small">once per Lockdown</th></tr>` : ""}</table></div></div>
+  <h2>Knacks</h2><table><tr>${Array.from({ length: Math.max(6, d.knacks.length) }, (_, i) => `<td>${esc(d.knacks[i] || "")}</td>`).join("")}</tr></table>
+  <h2>Augments \u2014 ${d.material === "none" ? "" : D.materials[d.material].name}${d.knit ? ` \u00b7 Knit ${d.knit}` : ""}${d.upkeep ? ` \u00b7 Upkeep ${d.upkeep}` : ""}</h2><table><tr><th style="width:12%">Role</th><th style="width:12%">Tree</th><th style="width:12%">Bio / Chrome</th><th>Nodes</th></tr>${trees}${evoRow}
+  <tr><th>Unlocked parts</th><td colspan="3">Strike, Bolt, Infuse, Kinetic${[...d.unlocked].map(u => ", " + (SHAPE[u] || EFFECT[u]).name).join("")}</td></tr></table>
+  <h2>\u2605 Signature Surges <small>(always Primed \u00b7 once per round each)</small></h2><table><tr><th>#</th><th>Surge</th><th>Build / numbers</th><th>Flux</th><th>Used</th></tr>${sigRows}</table>
   <h2>Sequence \u2014 die d${d.die} \u00b7 Prime ${d.prime} <small>(empty slots are Wild; \u2699 Firmware)</small></h2><table><tr><th>#</th><th>Surge</th><th>Build / numbers</th><th>Flux</th><th>Primed</th></tr>${rows.join("")}</table>
   <h2>Attacks</h2><table><tr><th>Weapon</th><th>Attack</th><th>Damage</th><th>Crit</th><th>Range / notes</th></tr>${d.gear.attacks.map(a => `<tr><td>${esc(a.name)}</td><td>${sgn(a.atk)}</td><td>${a.dmg}</td><td>${a.crit}</td><td class="small">${esc(a.range)}${a.notes ? " \u00b7 " + esc(a.notes) : ""}</td></tr>`).join("")}</table>
   <div class="g2"><div><h2>Gear & Scrip</h2><p class="small"><b>Scrip:</b> ${d.gear.scrip} \u00b7 <b>Upkeep due:</b> ${d.upkeep}<br>${d.suit.name}${d.suit.notes ? " (" + d.suit.notes.toLowerCase() + ")" : ""}${S.shield ? ", Shield (one hand)" : ""}, GRAFT ID, radio, flashlight, ${items.join(", ")}</p></div>
   <div><h2>Scars, Faults, Injuries</h2><p class="small">${d.scars.map(id => `<b>${SCAR[id].name}:</b> ${SCAR[id].text}`).concat(d.injuries.map(id => `<b>${INJ[id].name}</b> (injury): ${INJ[id].text}`)).join("<br>") || "&nbsp;"}${S.patchApplied ? "<br>Patch Applied (+1 Limit)" : ""}</p></div></div>
-  <h2>Features</h2><ul class="small feats">${d.origin ? `<li><b>${d.origin.name}:</b> ${d.origin.perk}</li>` : ""}${d.bioN ? `<li><b>Knit:</b> regain ${d.knit} HP after each combat and Breather.</li>` : ""}${d.chromeN ? `<li><b>Firmware:</b> once per combat after Priming, swap a Primed Surge for a \u2699 Surge. Disadvantage on defense vs Shock.</li>` : ""}<li><b>Overload:</b> ${d.form === "splice" ? "roll Bloom and Glitch, choose one" : d.form === "chrome" ? "Glitch table" : "Bloom table"}; Rank d6 damage (${d.R}d6), Flux to 0.</li>${feats}${S.level >= 10 ? `<li><b>Final Form:</b> ${D.finalForm}</li>` : ""}</ul>
+  <h2>Features</h2><ul class="small feats">${d.origin ? `<li><b>${d.origin.name}:</b> ${d.origin.perk}</li>` : ""}${d.sigMax ? `<li><b>Signature Surges:</b> ${esc(D.signatureRule)}</li>` : ""}${d.bioN ? `<li><b>Knit:</b> regain ${d.knit} HP after each combat and Breather.</li>` : ""}${d.chromeN ? `<li><b>Firmware:</b> once per combat after Priming, swap a Primed Surge for a \u2699 Surge (not a Signature). Disadvantage on defense vs Shock.</li>` : ""}<li><b>Overload:</b> ${d.material === "splice" ? "roll Bloom and Glitch, choose one" : d.material === "chrome" ? "Glitch table" : "Bloom table"}; Rank d6 damage (${d.R}d6), Flux to 0.</li>${feats}${S.level >= 10 && f ? `<li><b>Final Form (${esc(f.stages[3].name)}):</b> ${D.finalForm} ${STAT_NAME[f.primary]} becomes ${sgn(d.st[f.primary] + D.finalFormBonus)}.</li>` : ""}</ul>
   <h2>Drive</h2><p class="small"><b>Why the Mutagen?</b> ${esc(S.drive.why)} \u00b7 <b>Goal:</b> ${esc(S.drive.goal)} \u00b7 <b>Owe / hate:</b> ${esc(S.drive.owe)}${S.notes ? "<br><b>Notes:</b> " + esc(S.notes) : ""}</p></div>`;
 }
-
 /* ---------- events ---------- */
 function twistFits(t, sh) { return !!sh && (t.works === "any" || (t.works === "strikebolt" && (sh.id === "strike" || sh.id === "bolt")) || (t.works === "area" && !!sh.area) || (t.works === "damage" && sh.kind === "damage")); }
 function onField(e, rerender) {
   const t = e.target; const k = t.dataset.k; if (!k || k === "_sample") return;
   let v = t.type === "checkbox" ? t.checked : t.value;
   if (t.dataset.num && v !== "") v = Number(v);
-  if (t.dataset.num && v === "" && k.startsWith("stats.")) v = null;
   if (t.type === "radio" && !t.checked) return;
+  const prevForm = S.form;
   setPath(S, k, v);
-  if (k.startsWith("surges.") && k.endsWith(".shape")) { const i = +k.split(".")[1]; const sg = S.surges[i]; const sh = SHAPE[sg.shape]; if (sh && EFFECT[sg.effect] && EFFECT[sg.effect].kind !== sh.kind) sg.effect = ""; sg.twists = (sg.twists || []).filter(x => twistFits(TWIST[x], sh)); }
+  if (k === "form" && v !== prevForm) {
+    // New Form: keep nodes/Materials only in trees the new Form also has; dump choice resets.
+    const f = FORM[v]; S.dumpZero = ""; S.migrated = false;
+    S.nodes = S.nodes.filter(id => f && f.trees.includes(NODE_TREE[id]));
+    for (const tr in S.trees) if (!f || !f.trees.includes(tr)) delete S.trees[tr];
+  }
+  if (/^(surges|signatures)\.\d+\.shape$/.test(k)) { const [a, i] = k.split("."); const sg = S[a][+i]; const sh = SHAPE[sg.shape]; if (sh && EFFECT[sg.effect] && EFFECT[sg.effect].kind !== sh.kind) sg.effect = ""; sg.twists = (sg.twists || []).filter(x => twistFits(TWIST[x], sh)); }
   if (k.startsWith("buyWeapons.") && k.endsWith(".frame")) { const i = +k.split(".")[1]; S.buyWeapons[i].mod = ""; }
   if (k === "kit") S.kitMods = {};
   if (rerender) render(); else { const d = derive(S); document.getElementById("summary").innerHTML = summary(d); document.getElementById("printArea").innerHTML = sheet(d); storageOk = store("autosave", S); }
 }
 // "Fit to level": remove picks the current level doesn't allow (after lowering the level).
 function trimToLevel() {
-  const L = lvl(S.level), maxT = D.twistsByRank(L.rank);
-  for (const b in S.boosts) if (+b > S.level) delete S.boosts[b];
-  const apexOk = id => S.level >= D.apexLevel && S.nodes.filter(x => NODE_TREE[x] === NODE_TREE[id] && x !== id).length >= D.apexNeeds;
-  let guard = 0;
-  while (guard++ < 50) {
-    const badApex = S.nodes.find(id => NODE[id].apex && !apexOk(id));
-    if (badApex) { S.nodes = S.nodes.filter(x => x !== badApex); continue; }
-    if (S.nodes.length <= L.nodes) break;
-    const usedTrees = new Set(); S.surges.forEach(sg => { if (sg.sample) return; [SHAPE[sg.shape], EFFECT[sg.effect]].forEach(p => p && p.unlock && usedTrees.add(p.unlock)); });
-    const lone = id => NODE[id].root && S.nodes.filter(x => NODE_TREE[x] === NODE_TREE[id]).length === 1;
-    const pick = test => { for (let j = S.nodes.length - 1; j >= 0; j--) if (test(S.nodes[j])) return j; return -1; };
-    let idx = pick(id => !NODE[id].root); if (idx < 0) idx = pick(id => lone(id) && !usedTrees.has(NODE_TREE[id])); if (idx < 0) idx = pick(lone);
-    const gone = S.nodes.splice(idx, 1)[0]; if (NODE[gone].root) delete S.trees[NODE_TREE[gone]];
+  const L = lvl(S.level), maxT = D.twistsByRank(L.rank), f = FORM[S.form], P = picks(S.level);
+  if (f) {
+    let guard = 0;
+    while (guard++ < 80) {
+      const bad = S.nodes.slice().reverse().find(id => gate(id, S.nodes, f, S.level) && !NODE[id].root);
+      if (bad) { S.nodes = S.nodes.filter(x => x !== bad); continue; }
+      const c = countRoles(S.nodes, f);
+      // newest non-Root node of a role over its count (secondary keeps 2, tertiary keeps 1)
+      const drop = test => { for (let j = S.nodes.length - 1; j >= 0; j--) if (!NODE[S.nodes[j]].root && test(roleOf(f, NODE_TREE[S.nodes[j]]))) { S.nodes.splice(j, 1); return true; } return false; };
+      if (c.primary > P.prim && drop(r => r === "primary")) continue;
+      if (c.secondary + c.tertiary > P.secTert && drop(r => (r === "secondary" && c.secondary > 2) || (r === "tertiary" && c.tertiary > 1))) continue;
+      break;
+    }
   }
-  const ownedT = new Set(S.nodes.map(x => NODE_TREE[x]));
-  S.surges = S.surges.filter(sg => sg.sample || [SHAPE[sg.shape], EFFECT[sg.effect]].every(p => !p || !p.unlock || ownedT.has(p.unlock)));
+  const ownedT = new Set(S.nodes.filter(x => NODE[x].root).map(x => NODE_TREE[x]));
+  const okSg = sg => [SHAPE[sg.shape], EFFECT[sg.effect]].every(p => !p || !p.unlock || ownedT.has(p.unlock));
+  S.surges = S.surges.filter(sg => sg.sample || okSg(sg));
+  S.signatures = S.signatures.filter(okSg).slice(0, L.sigs);
   const d = derive(S);
   S.surges.forEach(sg => { sg.twists = (sg.twists || []).slice(0, maxT); });
+  S.signatures.forEach(sg => { sg.twists = (sg.twists || []).slice(0, maxT); });
   for (let j = S.surges.length - 1; j >= 0 && S.surges.filter(x => !x.sample).length > d.known; j--) if (!S.surges[j].sample) S.surges.splice(j, 1);
   if (S.surges.length > d.slots) S.surges.length = d.slots;
   const room = Math.max(0, d.knReq - 1); if (S.knacks.length > room) S.knacks = S.knacks.filter(k => k.trim()).slice(0, room);
@@ -964,13 +1179,16 @@ function act(a, el) {
   const i = el.dataset.i !== undefined ? +el.dataset.i : -1;
   const d = derive(S);
   switch (a) {
-    case "autostats": STAT_IDS.forEach((id, j) => S.stats[id] = D.statArray[j]); break;
     case "rollorigin": S.origin = D.origins[rnd(6)].id; break;
     case "addknack": S.knacks.push(""); break;
     case "addsurge": S.surges.push({ name: "", shape: "", effect: "", twists: [] }); break;
+    case "addsig": if (S.signatures.length < d.sigMax) S.signatures.push({ name: "", shape: "", effect: "", twists: [] }); break;
+    case "delsig": S.signatures.splice(i, 1); break;
+    case "dismissmig": S.migrated = false; break;
     case "addsample": S.surges.push({ name: "Sample", shape: "", effect: "", twists: [], sample: true }); break;
-    case "randsurges": { const owned = d.owned; const okPart = p => !p.unlock || owned.includes(p.unlock);
-      while (S.surges.filter(x => !x.sample).length < d.known && S.surges.length < d.slots) { const sh = pick(D.shapes.filter(p => okPart(p) && D.effects.some(e => okPart(e) && e.kind === p.kind))); const ef = pick(D.effects.filter(e => okPart(e) && e.kind === sh.kind)); S.surges.push({ name: ef.name + " " + pick(D.surgeWords[sh.id]), shape: sh.id, effect: ef.id, twists: [] }); } break; }
+    case "randsurges": { const owned = d.owned;
+      while (S.surges.filter(x => !x.sample).length < d.known && S.surges.length < d.slots) { const x = randomSurge(owned, 0); S.surges.push(x); }
+      while (S.signatures.length < d.sigMax) { const x = randomSurge(owned, 0); x.name = "Signature " + x.name.split(" ").pop(); S.signatures.push(x); } break; }
     case "up": if (i > 0) [S.surges[i - 1], S.surges[i]] = [S.surges[i], S.surges[i - 1]]; break;
     case "down": if (i < S.surges.length - 1) [S.surges[i + 1], S.surges[i]] = [S.surges[i], S.surges[i + 1]]; break;
     case "del": S.surges.splice(i, 1); break;
@@ -1005,6 +1223,7 @@ function init() {
   if (auto) { try { S = normalize(auto); } catch (e) { S = blank(); } }
   const hs = stepFromHash(); if (hs !== null) step = hs;
   document.getElementById("lvlTop").innerHTML = levelOpts.map(o => `<option value="${o[0]}">${o[1]}</option>`).join("");
+  document.getElementById("exSel").innerHTML = `<option value="">Example\u2026</option>` + Object.keys(D.examples).map(k => `<option value="${k}">${esc(D.examples[k].label || k)}</option>`).join("");
   window.addEventListener("popstate", () => { const h = stepFromHash(); if (h !== null && h !== step) { step = h; render(); } });
   const app = document.getElementById("app");
   app.addEventListener("input", e => { if (e.target.matches("input[type=text],input:not([type]),textarea")) onField(e, false); });
@@ -1014,8 +1233,8 @@ function init() {
     if (t.id === "loadSel") { const l = load("saves") || {}; if (l[t.value]) replaceState(l[t.value], "That save is damaged and couldn't be loaded."); t.value = ""; return; }
     if (t.id === "exSel") { if (t.value) { S = fromExample(t.value); step = 7; render(); } t.value = ""; return; }
     if (t.id === "importFile") { const f = t.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { let o = null; try { o = JSON.parse(r.result); } catch (err) {} if (!looksLikeCharacter(o)) alert("That file isn't a Mutagen character (expected an exported .mutagen.json)."); else replaceState(o); }; r.readAsText(f); t.value = ""; return; }
-    if (t.dataset.node) { const id = t.dataset.node; if (t.checked) S.nodes.push(id); else { S.nodes = S.nodes.filter(x => x !== id); if (NODE[id].root) { const tr = NODE_TREE[id]; S.nodes = S.nodes.filter(x => NODE_TREE[x] !== tr); delete S.trees[tr]; } } if (t.checked && NODE[id].root && !S.trees[NODE_TREE[id]]) S.trees[NODE_TREE[id]] = "bio"; render(); return; }
-    if (t.dataset.twist !== undefined) { const sg = S.surges[+t.dataset.twist]; sg.twists = sg.twists || []; if (t.checked) sg.twists.push(t.value); else sg.twists = sg.twists.filter(x => x !== t.value); render(); return; }
+    if (t.dataset.node) { const id = t.dataset.node; if (t.checked) { if (!S.nodes.includes(id)) S.nodes.push(id); } else { S.nodes = S.nodes.filter(x => x !== id); if (NODE[id].root) { const tr = NODE_TREE[id]; S.nodes = S.nodes.filter(x => NODE_TREE[x] !== tr); delete S.trees[tr]; } } if (t.checked && NODE[id].root && !S.trees[NODE_TREE[id]]) S.trees[NODE_TREE[id]] = "bio"; render(); return; }
+    if (t.dataset.twist !== undefined) { const tk = t.dataset.twist, sg = tk[0] === "s" ? S.signatures[+tk.slice(1)] : S.surges[+tk]; if (!sg) return; sg.twists = sg.twists || []; if (t.checked) sg.twists.push(t.value); else sg.twists = sg.twists.filter(x => x !== t.value); render(); return; }
     if (t.dataset.scar) { if (t.checked) S.scars.push(t.dataset.scar); else S.scars = S.scars.filter(x => x !== t.dataset.scar); render(); return; }
     if (t.dataset.inj) { if (t.checked) S.injuries.push(t.dataset.inj); else S.injuries = S.injuries.filter(x => x !== t.dataset.inj); render(); return; }
     if (t.dataset.act === "samplepick") { const x = D.sampleSurges[+t.value]; if (x) S.surges.push({ name: x[0], shape: x[1], effect: x[2], twists: x[3].slice() }); render(); return; }
@@ -1036,7 +1255,7 @@ function init() {
   document.getElementById("btnExport").onclick = exportJSON;
   refreshSaves(); render();
 }
-window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render, normalize, trimToLevel };
+window.MutagenBuilder = { derive, randomChar, fromExample, estimateScrip, blank, picks, gate, formStats, get state() { return S; }, set state(v) { S = normalize(v); render(); }, goto(i) { step = i; render(); }, render, normalize, trimToLevel };
 if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init); else init();
 })();
 

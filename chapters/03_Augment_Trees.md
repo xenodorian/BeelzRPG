@@ -26,6 +26,8 @@ Your Augments are what you've done to your body. Your **Base Form** ([chapter 2A
 | **Apex** | **Level 7+**, **6 other nodes** in that tree, and it must be your **primary or secondary** tree |
 | **Evolution node** | Your Form, at level 4 (Evolution I) or level 7 (Evolution II). Granted automatically. |
 
+"Nodes in that tree" counts your standard nodes (Root, Tier I, Tier II); **Evolution nodes don't count toward a gate.**
+
 - **Scaling.** Nodes scale with your **Rank**; you never need a "greater" version. A node is taken once.
 - **Push.** Some nodes say **Push**: you may gain **1 Flux** to get the extra effect ([Chapter 5](05_Flux_and_Overload.md)).
 - **Unlocks.** Each tree unlocks **Surge parts** ([Chapter 4](04_Surges.md)) the moment you take its Root. Since you take all three Roots at level 1, your Form fixes your Surge parts.
