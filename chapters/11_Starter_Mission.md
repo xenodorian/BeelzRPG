@@ -28,7 +28,7 @@ A three-storey hall of rusting turbines, waist-deep green water on the lower flo
 
 ## Scene 3: The Intake
 A flooded concrete cathedral where the river pipe meets the pumps. Glowing roots of flesh cover the walls. In the middle, fused to the intake grate, is the **Brood Matriarch** with **two Spill Rats** already crawling on her.
-- **Fight (Hard, budget 5):** the Matriarch (cost 4) + 2 Spill Rats (cost 1). See [Threats](10_Threats.md#boss-the-brood-matriarch).
+- **Fight (Hard, budget 5):** the Matriarch (cost 4) + 2 Spill Rats (cost 1). See [Threats](10_Threats.md#boss-the-brood-matriarch-t1).
 - **The Valve:** A huge manual valve stands 20 ft from the Matriarch. **Three successful Grit or Gumption checks (DC 13, Action each)** close it. When it closes, she shrieks, is **Dazed** until the end of the next Enemy Phase, and can't Birth for the rest of the fight. Closing the valve also completes the mission objective, even if she survives.
 - **The Sample:** Harvest with Gumption DC 12 after she dies: *Brood Web* (Burst + Snare).
 

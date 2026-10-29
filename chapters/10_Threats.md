@@ -83,6 +83,7 @@ T runs 1–10, matching the party level it's meant for.
 - Enemies **2+ levels below** the party cost **half**. Enemies **2+ above** cost **double**. Avoid T more than 3 above the party.
 - Plan **2–3 Standard fights between Breathers**. The party has two Breathers per Lockdown.
 - **After an Evolution,** let the party enjoy it for one mission: run the fights at Standard and watch them tear through. From the next mission on, use Hard fights for set pieces, and add an enemy that can hurt the new body (a Purger squad, a Shock-heavy machine for Chrome, a Swarm for Strike-heavy Forms).
+- **From Evolution II, lone big targets melt.** Four L7 freelancers can deal 150+ damage in a round, more than a T7 Elite or Brute has. Spend at least half the budget on **3+ bodies** (Mooks, Soldiers, Skirmishers), and give a centrepiece Elite a damage gate like the Feral Evolved's (it stops at half HP the first time and changes).
 - **Final Form** (level 10) makes one fight per Lockdown a rout. Save the finale's real threat for the Boss's Shift, *after* the party has spent it, or let them spend it and enjoy the show.
 - Terrain, objectives ("hold the pump for 3 rounds"), and fleeing enemies matter more than numbers. Use them.
 
@@ -140,7 +141,7 @@ All stat blocks use the v0.2 table. They're grouped by stage: **Base** (T1–3),
 
 ### Evolution II stage (T7–10)
 **Feral Evolved** — T7 Elite · Guard 17 · TN 16 · HP 144 · Speed 40  
-**Attack ×2:** Wrong Claws (Dodge, Single, melee) — 18. **Traits:** Regenerating, Mutagenic 2, Sample (*Strike + Toxin*). **Special:** At half HP it **Emerges** like a freelancer: +2 Guard, +3 Damage, and it Shakes everyone within 30 ft (Resist vs its TN). **Tactics:** A freelancer whose second Evolution went wrong. It remembers your names.
+**Attack ×2:** Wrong Claws (Dodge, Single, melee) — 18. **Traits:** Regenerating, Mutagenic 2, Sample (*Strike + Toxin*). **Special:** The first time it would drop below half HP, it stops at half (the extra damage is lost) and **Emerges** like a freelancer: +2 Guard, +3 Damage, and it Shakes everyone within 30 ft (Resist vs its TN). **Tactics:** A freelancer whose second Evolution went wrong. It remembers your names.
 
 **Gutter Leviathan** — T7 Brute · Guard 16 · TN 16 · HP 144 · Speed 20 (swim 40)  
 **Attack:** Swallow (Endure, Single, reach 15 ft) — 27, Held (inside it: Blinded, and 9 Toxin at the start of each Enemy Phase until freed). **Traits:** Huge, Mover (swim), Grabby, Armored (3). **Tactics:** Lives in the flooded subway. Surfaces, swallows, dives.

@@ -3,7 +3,7 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-28)
-**v0.2 in progress: Base Forms & Evolution.** The owner dropped the compactness rule. 5 Base Forms, 10-node trees, Evolutions at L4/L7 and a rebalanced threat table. The spec is *v0.2 Design* below. v0.1.1 history (sanity checks, builder) is kept further down for reference.
+**v0.2 done (2026-10-28): Base Forms & Evolution.** The owner dropped the compactness rule. Five Base Forms, 10-node trees, Evolutions at L4/L7, Signature Surges, a Final Form stage and a rebalanced threat table. Every chapter, the sheets, the builder (v0.2) and the tools are updated. The spec is *v0.2 Design* below; results are in *Balance v0.2* and *Playtest v0.2*. The v0.1.1 history (sanity checks, builder) is kept further down for reference.
 
 ## v0.2 Design: Base Forms & Evolution (2026-10-28)
 **Owner request (verbatim summary):** drop "keep it simple". 5 Base Forms, each fixing a primary (+3), secondary (+2) and tertiary (+1) stat, with the +0 and −1 going to the dump stats. Evolution 1: +2 primary and +1 to all others. Evolution 2: +3 primary and +1 to all others. Trees of 10 nodes each. A Form grants 3 primary-tree nodes, 2 secondary and 1 tertiary. Each level adds 1 primary node automatically, plus a choice of a secondary or tertiary node. Form-exclusive unlocks on the primary tree at levels 4 and 7. Each Evolution: +1 Prime, a jump in Sequence die size, and one always-ready Surge. Rebalance all challenges. Update the builder too.
@@ -91,6 +91,70 @@ Guard and TN are now separate columns. **Guard** tracks player attack bonuses, w
 
 The role multipliers and encounter budget are unchanged. Results are in **Balance v0.2** below.
 
+## Balance v0.2 (2026-10-28)
+`tools/balance_sim.py` (seed 7; 4 freelancers: Juggernaut, Skitter, Oracle, Siren; 2,000 fights per cell, starting each fight at 35% Flux; it ignores riders, healing, Wild Surges and tactics, so treat it as a floor for the players). Read each pair of columns as **before → after** an Evolution: L3 → L4 (Evolution I), L6 → L7 (Evolution II), L9 → L10 (Final Form).
+
+| | L1 | L3 | **L4** | L6 | **L7** | L9 | L10 | L10 + Final Form |
+|---|---|---|---|---|---|---|---|---|
+| Primary attack vs same-T Guard (hit %) | +4 vs 12 (68%) | +5 vs 14 (63%) | **+7 vs 14 (72%)** | +8 vs 16 (68%) | **+12 vs 17 (81%)** | +13 vs 19 (77%) | +13 vs 20 (72%) | +15 vs 20 (82%) |
+| Defense success vs TN | 55% | 55% | **62%** | 58% | **64%** | 59% | 60% | 60% |
+| 4 Soldiers (Standard): rounds / party HP lost | 3.2 / 20% | 3.9 / 24% | **3.4 / 15%** | 4.1 / 24% | **3.3 / 13%** | 4.0 / 23% | 4.5 / 29% | — |
+| Boss alone (Standard) | 2.6 / 18% | 3.4 / 21% | **3.1 / 15%** | 3.8 / 22% | **3.0 / 13%** | 3.6 / 20% | 4.1 / 25% | — |
+| Brute + 2 Soldiers (Standard) | 2.9 / 16% | 3.6 / 20% | **3.2 / 13%** | 3.9 / 21% | **3.1 / 11%** | 3.7 / 20% | 4.2 / 24% | — |
+| Elite + Soldier + 4 Mooks (Hard) | 4.0 / 35% | 4.6 / 37% | **3.9 / 22%** | 4.5 / 31% | **3.6 / 18%** | 4.2 / 28% | 4.7 / 35% | — |
+| Boss + 4 Mooks (Deadly) | 4.7 / 39% (TPK 2%) | 5.5 / 41% | **4.5 / 25%** | 5.4 / 35% | **4.2 / 21%** | 4.9 / 32% | 5.5 / 39% | 4.7 / 29% |
+| 6 Soldiers (Deadly) | 5.4 / 56% (TPK 13%) | 6.5 / 61% (TPK 10%) | **5.2 / 37%** | 6.8 / 61% (TPK 12%) | **4.9 / 32%** | 6.4 / 57% (TPK 5%) | 7.3 / 69% (TPK 10%) | — |
+
+*v0.1 for comparison (4 Soldiers): 3.7 / 25% (L1), 4.0 / 24% (L5), 4.3 / 26% (L10).*
+
+- **The shape is a sawtooth by design.** Each Evolution drops the cost of a Standard fight by about 40% (24% → 15% at L4, 24% → 13% at L7). The threat table then climbs faster than the party inside a stage (T4 and T7 Guard stall, T5–6 and T8–10 rise 1 per T), so by the end of the stage fights cost what they did before. Hit chance follows the same sawtooth (63% → 72%, 68% → 81%).
+- **Final Form** turns the hardest L10 fight from 39% into 29% HP lost: one rout per Lockdown.
+- **Deadly is really deadly late in a stage** (6 Soldiers at L6: TPK 12%). The ch 10 budget table says so.
+
+**Per-Form model** (`tools/tree_compare.py`, one freelancer vs one same-T Soldier per round; DPR / HP lost per 4-round fight / Flux Limit):
+
+| Form | L1 | L3 | **L4** | L6 | **L7** | L10 |
+|---|---|---|---|---|---|---|
+| Juggernaut | 11 / 48% (7) | 14 / 45% | **20 / 40% (9)** | 23 / 44% | **34 / 34% (12)** | 36 / 51% (13) |
+| Skitter | 10 / 68% (5) | 12 / 60% | **21 / 45% (7)** | 24 / 54% | **50 / 28% (10)** | 51 / 41% |
+| Oracle | 10 / 110% (8) | 12 / 83% | **20 / 66% (11)** | 22 / 73% | **38 / 60% (16)** | 42 / 77% |
+| Alembic | 10 / 50% (6) | 13 / 45% | **22 / 30% (8)** | 26 / 41% | **41 / 0% (11)** | 42 / 0% |
+| Siren | 7 / 90% (4) | 9 / 73% | **17 / 60% (6)** | 20 / 69% | **46 / 59% (9)** | 53 / 76% |
+
+- The Oracle and Siren are fragile by design (dump Grit / low Limit); the Siren's early DPR doesn't count Haste/Rally support. Alembic's 0% counts Panacea's party healing as personal. Skitter's L7 jump is Lightning Step (after the half-dice fix).
+
+## Playtest v0.2 (2026-10-28)
+Written playtests with real dice (seeded, `/tmp/pt/play.py` during the session) using builder-verified characters: the ch 11 pregens at L1, then Rook, Vex, Juno and Dree rebuilt at L4 and L7 in the builder (all legal; numbers below come from `derive()`). Simplifications: players act first; no riders, healing, Knit, Purger or Swallow; each PC takes its best Surge, Signature or weapon. 400-seed averages are given after each narrated run.
+
+### L1 — *Pumpstation 9* Pump Hall: Rook, Vex, Juno, Mags vs 2 Scrapjack Pickers + 4 Spill Rats (Standard 4)
+- **Numbers:** Rook HP 20, Armor 2, Sledge +4 2d10+3 (Extra Arm); Vex HP 14, Dodge +4, *Mantis Lunge* +4 3d10+3; Juno HP 10, Limit 8, rifle +4; Mags HP 12, Limit 4, *Nightmare* +4 2d8+3.
+- **Round 1:** Rook Unleashes *Piston Slam* (22 vs 13): 24 damage, Picker A dead. Vex's *Mantis Lunge* (22 vs 13) kills Picker B. Juno's *Neural Spike* misses the Rats (stays Primed). Mags's *Nightmare* kills a Rat. Rats bite: one hits Rook for 3 − 2 Armor = 1.
+- **Rounds 2–3:** weapons mop up the Rats. **3 rounds, 2% HP lost.** 400-seed average: **2.8 rounds / 9%** (a soft Standard: the four Mooks die to any hit). Spill Rats' Mutagenic Flux isn't modelled.
+- **Read:** L1 Surges feel like a big deal: a Strike Surge one-shots a Picker (13 HP). Mags at Limit 4 used one Surge and stopped, as designed.
+
+### L4 — first fight after Evolution I: Rook (Rampart), Vex (Mantis), Juno (Argus), Dree (Diva) vs Mirrormaw (T4 Elite) + 2 Cleaner Hounds (Standard 4)
+- **Numbers (builder):** Rook HP 45, Armor 3/6 (Siege Hide), Endure +7, *Wall Slam* Signature +7 3d10+5 Held; Vex HP 31, Dodge +7, Mantis Reflex; Juno HP 27, Limit 11, Resist +7, *Lockdown Shot* Signature +7 3d8+5 Blinded, Foresight; Dree HP 27, Limit 6, *The Broadcast* Signature +7 3d6 Psychic (Wave, Area).
+- **Emergence:** everyone gains 8 temp HP; the Mirrormaw and both Hounds are Shaken; each first Signature is Amped.
+- **Round 1:** Rook's *Ram* (15 vs 15) deals 30: Hound 1 dead. Juno's Amped *Lockdown Shot* takes Hound 2 to 12. Vex and Dree miss. The Shaken enemies hit Dree once (11, mostly temp HP) and Rook once (9).
+- **Round 2:** Rook's *Wall Slam* kills Hound 2. Juno's *Lockdown Shot* hits the Mirrormaw again (61 left).
+- **Rounds 3–4:** Vex's Overcharged *Overclock Lunge* lands for 38, Juno for 14, Rook finishes it in round 4. **4 rounds, 14% HP lost**; Dree ended at 13/27 with Flux 6/6.
+- **400-seed averages:** with Emergence **3.0 rounds / 3%**; without Emergence (a later fight) **3.0 / 13%** (the sim says 3.4 / 15%).
+- **Read:** the Evolution lands. Every PC has a reliable once-per-round big hit, the Signature is what everyone reaches for, and Emergence makes the first fight a victory lap. Dree (Siren) hits her Limit by round 3: the Siren's weak point shows up exactly as designed.
+
+### L7 — first fight after Evolution II: Rook (Colossus), Vex (Wraith), Juno (Seraph), Dree (Choir) vs Feral Evolved (T7 Elite) + Gutter Leviathan (T7 Brute) (Standard 4)
+- **Numbers (builder):** Rook HP 72, Armor 4/6, Endure +12, Rend claws +12 4d12+8 (+1 die Extra Arm), Fortress; Vex HP 48, Dodge +12, *Thunderclap* Signature (Strike + Kinetic + Overcharge) +12 8d10+8; Juno HP 44, Limit 16, rifle Crit 17–20 (Deadeye + Thousand Eyes), *Headshot* Signature +12 8d8+8; Dree HP 44, Limit 9, *Blackout* +12 7d8+8.
+- **Round 1:** Rook's *Riot Cap* (47), Vex's Amped *Thunderclap* (53), Juno's Amped *Headshot* (35) and Dree's *Blackout* (50): the Feral Evolved (144 HP) dies before it acts, so it never Emerges.
+- **Round 2:** the Leviathan's Swallow misses Rook (Endure 24 vs TN 16). Rook (38 after Armor 3), Vex (54), Juno (44) and a Dree Crit (69) kill it. **2 rounds, 0% HP lost.**
+- **400-seed averages:** with Emergence **2.6 rounds / 1%**; without **2.6 / 5%**. With Signatures limited to no Twists: 2.7 / 5%, so Twist-heavy Signatures aren't the cause.
+- **Read: the alpha strike is the risk at Evolution II.** Four optimised L7 freelancers deal ~150–185 a round, more than any single T7 Elite or Brute (144). This isn't new in v0.2: a focused Elite dies in 1–2 rounds at every level. But at L7 the overkill is largest, and "two big targets" encounters give the enemy only 3 attacks a round. **Fix applied (no threat-table change):** ch 10 now tells GMs that from Evolution II lone Elites and Brutes melt, so they should spend at least half the budget on 3+ bodies. The Feral Evolved got a **damage gate**: the first time it would drop below half HP it stops at half and Emerges, so it can't die before it acts. Logged as Open Question 15 for live play.
+
+### Findings
+1. **Evolution feels huge.** In every L4/L7 fight the Signature was the most-used action, and Emergence's temp HP + Shaken made the first fight a rout. This is the owner's "drastic power increase", working as asked.
+2. **The Siren's Limit** (4 / 6 / 9) runs out on round 3 at every stage. That's intended (she Overloads), but it's the most common "nothing to do" moment. See Open Question 13.
+3. **Builder validation caught two of my own test-build errors** (Weak Spot before 3 Senses nodes; a Pulse Surge with no Hide tree), and Fit-to-level repaired L7 → L4 and L7 → L1 builds. The gates are easy to break by hand, so the builder earns its keep.
+4. **Signature riders every round** (*Lockdown Shot* re-Blinds the same Elite each round) can lock one non-Boss for a whole fight. Bosses shed a condition each Enemy Phase. See Open Question 14.
+5. **L7 alpha strike** vs lone big targets (above): guidance added to ch 10.
+
 ## How to Contribute (for AI and humans)
 1. Read this file, then [README.md](README.md), then [chapters/12_Quick_Reference.md](chapters/12_Quick_Reference.md). That's the whole system in ~15 minutes.
 2. Pick an **unchecked task** in the Backlog. Add `(claimed: <your name/agent>, <date>)` next to it and commit that first, so others skip it.
@@ -106,31 +170,33 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 | `Current_Work.md` | This hub | Everyone appends |
 | `chapters/00_Introduction.md` | Pitch, setting, factions, tone, chapter map | |
 | `chapters/01_Core_Rules.md` | The roll, Rank, DCs, Knacks, Adv/Dis, crits, Juice, rest, distance | Core numbers live here |
-| `chapters/02_Character_Creation.md` | Steps, derived numbers, stats, Origins, example PC | |
-| `chapters/03_Augment_Trees.md` | Bio/Chrome/Splice forms, 6 trees × 6 nodes | Biggest balance surface |
+| `chapters/02_Character_Creation.md` | Steps (Base Form first), derived numbers, stats, Origins, example PC (Vex, Skitter) | |
+| `chapters/02A_Forms_and_Evolution.md` | The five Base Forms, stage table, Evolution, Signature Surges, Emergence, Final Form, stage looks (Bio/Chrome) | v0.2 core |
+| `chapters/03_Augment_Trees.md` | Tree summary (primary/secondary/tertiary of), gates, picks per level, Materials (Bio/Chrome/Splice), Evolution nodes at a glance | Biggest balance surface |
+| `chapters/03_Trees/{Hide,Limbs,Senses,Glands,Wiring,Mind}.md` | One file per tree: Root, Tier I, Tier II, Apex, Evolution nodes | The checker parses these |
 | `chapters/04_Surges.md` | Surge parts, Sequence, Priming, Churn, Wild table, samples | Signature mechanic |
 | `chapters/05_Flux_and_Overload.md` | Flux, Overload, Bloom/Glitch tables, Scars/Faults, Last Gasp | |
 | `chapters/06_Combat.md` | Initiative, phases, actions, defense, damage, conditions, Down, Injuries | |
-| `chapters/07_Advancement.md` | Level table, Final Form, Samples, pay | |
+| `chapters/07_Advancement.md` | Level table (stage, stats, nodes, die, Prime, Signatures), Evolve, Final Form, respec, Samples, pay | |
 | `chapters/08_Gear.md` | Weapon frames + mods, armor, kit, starting kits | |
 | `chapters/09_Running_the_Game.md` | GM advice, missions, Spill Clock, downtime, factions, generator | |
-| `chapters/10_Threats.md` | Threat table, roles, traits, budget, 12 threats + 1 boss | |
-| `chapters/11_Starter_Mission.md` | *Pumpstation 9* + 4 pregens | |
+| `chapters/10_Threats.md` | Threat table v0.2 (Guard/TN split), roles, traits, budget by stage, 21 threats + 3 Bosses grouped by stage | |
+| `chapters/11_Starter_Mission.md` | *Pumpstation 9* + 5 pregens (one per Form) | Pregens are builder examples |
 | `chapters/12_Quick_Reference.md` | One-page cheat sheet | Update when rules change |
-| `chapters/13_Character_Building_Guide.md` | Step-by-step build (L1), leveling 1–10, archetypes, common mistakes, worked example (Dree, L1 + L5) | Player-facing summary; rules chapters win on conflict. Update its tables if ch 2–8 numbers change |
+| `chapters/13_Character_Building_Guide.md` | Step-by-step build (L1), leveling 1–10, Evolution checklist, builds by Form, common mistakes, worked example (Dree, Siren, L1 / L4 / L7) | Player-facing summary; rules chapters win on conflict. Update its tables if ch 2–8 numbers change |
 | `sheets/Character_Sheet.md` / `.html` | Fillable/printable sheet | |
 | `art/*.jpg` | AI-generated placeholder art (8 images) | Replace freely |
-| `tools/balance_sim.py` | Monte Carlo combat sim | Re-run after number changes |
+| `tools/balance_sim.py` | Monte Carlo combat sim (v0.2 Forms and stages) | Re-run after number changes |
 | `builder/index.html` | Character builder web app (single offline file; GitHub Pages: https://xenodorian.github.io/BeelzRPG/builder/) | **Game data lives in the `MUTAGEN` object in the first `<script>`**; update it with any rule change in ch 2–8 |
-| `tools/builder_test.js` | Headless builder test (jsdom), incl. regression tests R1–R14 | Run after editing the builder or its data (`npm i jsdom`) |
-| `tools/check_builder_data.js` | Cross-checks the builder data block against chapter tables (320 checks) | Run after any rules change; no dependencies |
+| `tools/builder_test.js` | Headless builder test (jsdom): 8 examples, 3,000 random characters, v0.2 gates/Evolution/Signature/migration tests, R1–R14 (255 checks) | Run after editing the builder or its data (`npm i jsdom`) |
+| `tools/check_builder_data.js` | Cross-checks the builder data block against ch 2, 2A, 3 (+ tree files), 4, 5, 7, 8, 11, 13 (493 checks) | Run after any rules change; no dependencies |
 | `tools/builder_flows.js` | Real-browser flow tests (Playwright + Chrome) | `npm i playwright-core`; set `CHROME=/path/to/chrome` |
-| `tools/tree_compare.py` | Per-tree expected DPR / HP lost / Flux per fight at L1, L5, L10 | Re-run after node changes |
+| `tools/tree_compare.py` | Per-Form expected DPR / HP lost / Flux per fight at L1, 3, 4, 6, 7, 10 | Re-run after node changes |
 
 ## Style Guide
 - **Format:** GitHub-flavoured Markdown, one chapter per file, numeric prefixes (`NN_Name.md`). Images via relative paths (`../art/x.jpg`).
 - **Voice:** second person ("you"), plain and punchy, a little wry. Short sentences. The owner's homebrew uses a direct, conversational voice; match it.
-- **Compactness first:** prefer one scaling rule over several near-duplicate abilities; prefer mix-and-match parts (Shape + Effect + Twist, T + Role + Traits, Frame + Mod) over long lists.
+- **Coherence first** (v0.2: the owner dropped "keep it simple"): depth is welcome, but every rule must be unambiguous, balanced and playable at the table. Still prefer one scaling rule over near-duplicates, and mix-and-match parts (Shape + Effect + Twist, T + Role + Traits, Frame + Mod) over long lists.
 - **Game terms are Capitalized** and defined in the Glossary below. Don't invent synonyms (it's always *Flux*, never "instability points").
 - **Numbers:** write dice as `d8`, `2d6`, `(Rank+1)d10`. Use "Rank × die" for weapon damage. Round down unless the rule says otherwise.
 - **Every rule states its timing** (Action / Quick / Reaction / Move / passive) and **duration** (default: until the end of the affected creature's next turn).
@@ -146,11 +212,12 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 | **Advantage / Disadvantage** | Roll 2d20, keep higher/lower | Ch 1 |
 | **Amped** | A Primed Surge rolled as doubles; costs 0 Flux | Ch 4 |
 | **Analyze** | Gumption action: learn stats, target Exposed | Ch 6 |
-| **Apex** | Capstone node of a tree; level 7+, needs 3 nodes in tree | Ch 3 |
+| **Apex** | Capstone node of a tree; level 7+, 6 other nodes in the tree, primary or secondary tree only | Ch 3 |
 | **Area / Single** | Attack types; Area deals half on a successful defense or miss | Ch 6 |
-| **Armor** | Flat reduction per hit, max 4 | Ch 6, 8 |
-| **Augment / Node / Root / Tree** | Your skill-tree abilities; Root unlocks a tree | Ch 3 |
-| **Bio / Chrome / Splice** | Form of a tree; Splice = you have both | Ch 3 |
+| **Armor** | Flat reduction per hit, max 4 (5 with Unbreakable, 6 with Siege Hide) | Ch 6, 8 |
+| **Augment / Node / Root / Tree** | Your skill-tree abilities; Root unlocks a tree; 10 standard nodes per tree | Ch 3 |
+| **Base Form** | One of five body plans (Juggernaut, Skitter, Oracle, Alembic, Siren): sets your +3/+2/+1 stats and your primary/secondary/tertiary trees | Ch 2A |
+| **Bio / Chrome / Splice** | **Material** of a tree (grown / installed); Splice = you have both | Ch 3 |
 | **Bloom / Glitch** | Overload tables for Bio / Chrome | Ch 5 |
 | **Breather / Lockdown** | Short rest (½ HP, Flux 0, 2 per Lockdown) / full rest | Ch 1 |
 | **Churn** | Quick action: +1 Flux, roll one more Prime; not on a turn you Unleash | Ch 4 |
@@ -159,11 +226,14 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 | **Defense** | Dodge (Moxie), Endure (Grit), Resist (Nerve), + Rank | Ch 1, 6 |
 | **Down** | At 0 HP | Ch 6 |
 | **Effect / Shape / Twist** | Surge building parts | Ch 4 |
-| **Final Form** | Level 10 capstone | Ch 7 |
-| **Firmware / Knit** | Chrome / Bio form perks | Ch 3 |
+| **Emergence** | The on-screen moment after an Evolution: temp HP 2 × level, nearby enemies Shaken, first Signature Amped | Ch 2A |
+| **Evolution (I / II)** | The metamorphosis at level 4 / 7: new stats, +1 Prime, bigger die, an Evolution node, a Signature Surge, a new look | Ch 2A |
+| **Evolution node** | A Form-exclusive node on its primary tree, granted at L4 and L7 | Ch 3 |
+| **Final Form** | Level 10 third stage: Final look; once per Lockdown primary +2, Prime two extra, every Surge Amped | Ch 2A, 7 |
+| **Firmware / Knit** | Chrome / Bio Material perks | Ch 3 |
 | **Flux / Flux Limit** | Instability; Limit = 4 + Rank + Nerve | Ch 5 |
 | **GRAFT** | The players' employer | Ch 0 |
-| **Guard** | Number players attack against (default = TN) | Ch 10 |
+| **Guard** | Number players attack against; from v0.2 its own column in the threat table (stalls at T4, T7) | Ch 10 |
 | **Injury** | Temporary harm from going Down (d6) | Ch 6 |
 | **Juice** | Reward token: reroll, choose a Prime, or end a condition | Ch 1 |
 | **Knack** | Narrow trained specialty; adds Rank to checks | Ch 1 |
@@ -172,18 +242,24 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 | **Origin** | Background: a Knack + a Perk | Ch 2 |
 | **Overload** | Exceeding Flux Limit: damage + table roll, Flux → 0 | Ch 5 |
 | **Patch / Rally / Taunt / Brace / Help** | Baseline actions | Ch 6 |
-| **Prime / Primed** | Surges rolled ready at combat start (2, or 3 at L5+) | Ch 4 |
+| **Material** | Bio or Chrome, chosen per tree (formerly "Form") | Ch 3 |
+| **Omen** | Foresight's set-aside d20 (Oracle, Evolution I) | Ch 3 (Senses) |
+| **Prime / Primed** | Surges rolled ready at combat start (2; 3 from L4; 4 from L7) | Ch 4 |
+| **Primary / Secondary / Tertiary** | Your Form's three stats (+3/+2/+1) and three trees | Ch 2A, 3 |
 | **Push** | Gain 1 Flux for a node's extra effect | Ch 3 |
 | **Rank** | ⌈level/2⌉, 1–5; added to attacks, defenses, Knack checks; scales everything | Ch 1 |
 | **Role / Trait / T (Threat level)** | Enemy-building parts | Ch 10 |
 | **Sample** | Harvested Boss/Elite part, spliced in as a Surge | Ch 7 |
 | **Scar / Fault** | Permanent Bio / Chrome Overload quirk | Ch 5 |
 | **Scrip** | Money | Ch 8 |
-| **Sequence / Sequence die** | Your numbered Surge list; d4→d12 by level; empty slots are Wild | Ch 4 |
+| **Sequence / Sequence die** | Your numbered Surge list; d4 / d6 / d8 / d12; empty slots are Wild | Ch 4 |
+| **Signature Surge** | Always-ready Surge (once per round), one per Evolution; not on the Sequence | Ch 4, 2A |
+| **Stage** | Base / Evolution I / Evolution II / Final | Ch 2A |
 | **Spill / Spill Clock** | The disaster; the GM's 6-segment mission timer | Ch 0, 9 |
-| **Stats** | Grit, Moxie, Nerve, Gumption, Chutzpah | Ch 2 |
+| **Stats** | Grit, Moxie, Nerve, Gumption, Chutzpah; set by Form and stage | Ch 2, 2A |
+| **Tier I / Tier II** | Node tiers: Tier I needs the Root; Tier II needs level 4+ and 3 nodes in the tree | Ch 3 |
 | **Surge / Unleash** | Random combat power / the action that uses it | Ch 4 |
-| **TN (Threat Number)** | Enemy's Attack DC (players defend vs it) | Ch 10 |
+| **TN (Threat Number)** | Enemy's Attack DC (players defend vs it); separate from Guard in v0.2 | Ch 10 |
 | **Upkeep** | 25 Scrip per Chrome tree per mission | Ch 3 |
 | **Wild / Wild Surge** | Empty Sequence slot; rolls on the d12 Wild table | Ch 4 |
 | Conditions: **Blinded, Burning, Dazed, Exposed, Held, Poisoned, Prone, Shaken, Veiled** | | Ch 6 |
@@ -214,6 +290,14 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 - [x] Guide sanity check (2026-10-28; see *Guide Sanity Check*)
 - [x] HTML character builder (`builder/index.html`, 2026-10-28; see *Character Builder*)
 
+### v0.2: Base Forms & Evolution (2026-10-28)
+- [x] Spec (v0.2 Design above)
+- [x] Ch 2A Forms & Evolution (new); ch 3 split into six 10-node tree files
+- [x] Ch 0, 1, 2, 4, 5, 6, 7, 8, 9, 10 (threat table v0.2 + 9 new threats + 2 Bosses), 11 (5 pregens), 12, 13 (rewritten), README, sheets (md + html)
+- [x] Balance sim + per-Form model rerun; Balance v0.2 tables
+- [x] Builder v0.2 + tests (jsdom, data check, browser flows), screenshots
+- [x] Consistency pass (137 links, 0 broken after one fix) and written playtests at L1 / L4 / L7
+
 ### Quality
 - [x] Math pass: hit/defense odds per level, damage vs HP, encounter budget (see Balance)
 - [x] Glossary: every capitalized game term defined
@@ -223,7 +307,7 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 - [ ] **Live playtest** with real players (needs humans)
 
 ### Backlog (unclaimed — pick one!)
-- [ ] More threats: 2–3 per T band, especially T6–T10, plus two more Bosses (T5, T10)
+- [x] More threats: 2–3 per T band, especially T6–T10, plus two more Bosses (T5, T10) *(done in v0.2: 21 threats, Bosses at T1, T5, T10)*
 - [ ] Second and third missions (the five pumpstations hook from *Pumpstation 9*)
 - [ ] Optional rules: vehicles/chases, hacking mini-game, mass combat
 - [ ] Halcyon gazetteer: 6 districts, 1 paragraph + 1 d6 table each
@@ -249,7 +333,23 @@ The role multipliers and encounter budget are unchanged. Results are in **Balanc
 11. **Conditions have one default duration** (end of the affected creature's next turn) and Bosses shed one per Enemy Phase, so control Surges stay strong without locking down bosses.
 12. **Markdown, one chapter per file**: renders on GitHub, diffs cleanly, and lets several contributors work at once without merge conflicts.
 
-## Balance (math pass)
+### v0.2 decisions (2026-10-28, owner request: Base Forms & Evolution)
+13. **Five Forms over six trees; Limbs is the shared tree.** Forms are a Latin square: every stat is primary once, secondary once and tertiary once, and each Form's tertiary stat is the one *before* its primary in the stat order. The first square (tertiary = the next stat) dumped both the Oracle's Grit and Moxie (147% HP lost per fight) and gave the Alembic Limit 4, so it was rotated. Limbs is never primary, so it has no exclusive nodes. It is secondary for Juggernaut and Skitter and tertiary for Siren.
+14. **Stat values by stage**, exactly as the owner asked: Base +3/+2/+1/+0/−1; Evolution I = +2 primary, +1 others (+5/+3/+2/+1/+0); Evolution II = +3 primary, +1 others (+8/+4/+3/+2/+1). The only choice is which dump gets +0. **The stat boosts at 3/6/9 are gone** (stats change only when the body does). Those levels give a Knack instead (Knacks at L1 ×3, L3, L6, L9). There's no +5 cap.
+15. **Trees have 10 standard nodes**: Root, 4 Tier I, 4 Tier II, Apex. The two **Evolution nodes** sit on the Form's primary tree as extras and are granted automatically at L4/L7 (the owner's "exclusive unlock", read as automatic). Gates: Tier II = L4+ and 3 nodes in the tree; Apex = L7+, 6 other nodes, primary or secondary tree only. Evolution nodes don't count toward gates.
+16. **Picks:** L1 = 3 primary, 2 secondary, 1 tertiary (each tree's Root first). Each later level = 1 primary pick (automatic, but you choose *which* node) + 1 secondary-or-tertiary pick. The primary tree fills at L8, so at L9–10 the primary pick **overflows** into secondary/tertiary. Totals 2L+4 (+ Evolution nodes). **Respec** swaps one node of the same pick type per level-up.
+17. **Sequence die d4 / d6 / d8 / d12** (L1 / 2–3 / 4–6 / 7–10). The owner asked for "a jump in die size" per Evolution; d8 → d12 skips d10 so Evolution II is the bigger jump (and leaves 3 Wild slots, "powers you don't understand yet"). Prime 2 → 3 → 4 (the old "Prime 3 at L5" is removed).
+18. **Signature Surges** (one at each Evolution) are always Primed and re-Prime at the start of your next turn after use, so once per round. They cost normal Flux (Flux is the throttle), don't count toward Surges known, Prime or the Primed maximum, can't be Amped by doubles (only Emergence's first use and Final Form), and Firmware can't swap them. You may rebuild one per level-up. The Lab Escapee perk never adds Signatures.
+19. **Emergence** is a one-time on-screen moment in the first combat after Evolving: temp HP = 2 × level, enemies within 30 ft are Shaken (not Bosses), and the first Signature use is Amped. The numbers change at level-up; Emergence is the payoff scene. There's an optional Chrysalis downtime scene.
+20. **Final Form is the third stage** (L10): a permanent Final look, plus once per Lockdown primary +2, Prime two extra, and every Surge Amped (Signatures too).
+21. **Surge attack stat** = the Shape's stat **or** the stat of the tree that unlocked the Effect (Hide Grit, Limbs Grit/Moxie, Senses Nerve, Glands Gumption, Wiring Moxie, Mind Chutzpah). This replaces "Dread may use Chutzpah", so every Form can attack with its primary stat. Kinetic uses the Shape's stat only.
+22. **"Form (Bio/Chrome)" renamed to Material**, to free "Form" for Base Forms. Knit, Firmware, Upkeep and Splice are unchanged.
+23. **Threat table v0.2 splits Guard from TN.** Guard stalls at T4 and T7 so each Evolution feels like a jump; HP and damage were raised to match (see D6). Role Guard modifiers: Mook/Brute −1, Skirmisher/Boss +1. New DCs 25 (Monstrous) and 28 (Mythic); DCs don't scale with level.
+24. **Node fixes found by the sims:** Lightning Step's extra attack uses half damage dice (the Skitter was ~65% ahead at L7). Siren Song sends Taunted enemies at the Siren *or one named ally* (it was pulling all fire onto the most fragile Form). Hive Mind = "one ally Primes one extra" (no longer +1 Prime for you). Unbreakable = Armor max 5 (its no-Prone part moved to Anchor). Bloom #12 renamed *Flowering* (it clashed with Bloom the table).
+25. **The Oracle and Siren are fragile by design** (dump Grit; the Siren also has the lowest Limit: 4 / 6 / 9). The Juggernaut and Alembic are the durable Forms.
+26. **v0.1 saves migrate** in the builder: identity, Origin, Knacks, gear, Surges, Drive and notes are kept; stats, nodes and Materials are reset, and a banner asks for a Form. Signatures and Evolution nodes are never stored in old saves, so nothing else needs mapping.
+
+## Balance (math pass, v0.1 — superseded by Balance v0.2 above)
 Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party level.
 
 | L | Rank | Atk | Hit% vs Guard | Good defense % | Weak defense (−1) % | Weapon (d8) avg | Bolt Surge avg | Soldier HP | PC HP (Grit +2) | Enemy dmg | Failed defenses to drop PC |
@@ -274,7 +374,7 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 
 - **Tuning history:** enemy damage raised from 5+T to 6+1.5T (Standard fights cost only ~20% HP before). Mook cost raised from ¼ to ½ (4 Mooks hit as hard as one Soldier). "Missed Surge deals half" was tested and rejected (fights got ~25% shorter, HP loss fell 28%→16%); "missed Surge stays Primed" adopted instead (negligible balance shift, fixes the feel-bad).
 
-## Playtest Walkthroughs
+## Playtest Walkthroughs (v0.1 — kept for history; see Playtest v0.2 above)
 ### Level 1 — *Pumpstation 9*, Pump Hall (Vex, Juno, Ozzie, Rook vs 2 Scrapjack Pickers + 4 Spill Rats)
 - **Initiative:** group Moxie vs TN 12 (Rook's Quickened gives advantage). Vex 14 ✓, Juno 5 ✗, Ozzie 12 ✓, Rook ✗ → 2/4 = success, players first.
 - **Prime (d4 ×2):** Vex 1,1 → *Mantis Lunge* **Amped**. Juno 3,1 → *Hive Whisper*, *Neural Spike*. Ozzie 2,1 → *Acid Bloom*, *Field Dressing*. Rook 1,4 → *Arc Punch* + **Wild** (d12 = 10, *Feedback*).
@@ -296,6 +396,14 @@ Assumes primary stat +3 rising to +5 (stat boosts at 3/6/9), enemy T = party lev
 - **Findings:** Wild rule gap, Spore Bloom self-hit, and Blood Price spike fixed. Single-target burst at L5+ (Strike + Kinetic + Overcharge ≈ 7d10+stat for 2 Flux, ~42) is high but can't one-shot a same-level Soldier (46 HP) on average; **watch in live play.** Brutes melt fast under focused Surges. That's intended as the payoff, but GMs can add Shielded/Armored.
 
 ## Issues Log
+- 2026-10-28 — **v0.2 rewrite** (owner: Base Forms & Evolution). Files touched: every chapter, README, sheets, builder, all tools. Commits df621ff (spec), 97d77a8 (trees), 5213118 (Forms/Surges/Flux/Advancement), 1e861cc (threats, pregens, GM guidance, sims), 842c78c (guide, quick ref, intro, sheets), b07f1e0 (builder + tests) and this hub update.
+- 2026-10-28 — v0.2: the first Forms Latin square left the Oracle with two dump stats in its defenses (147% HP lost) and the Alembic at Limit 4. Rotated (tertiary = previous stat); ch 2A, ch 2 example and sims updated.
+- 2026-10-28 — v0.2 sims: Lightning Step full-dice → half dice (Skitter ~65% ahead at L7); Siren Song now redirects to the Siren *or a named ally*; tree_compare overstated HP loss (1.0 attack/round, 1.6 while Taunting).
+- 2026-10-28 — v0.2 ruling: Evolution nodes **don't count** toward Tier II/Apex gates ("nodes in that tree" = standard nodes). Added to ch 3; the builder implements it. (It never changes an outcome on the primary tree, but it had to be stated.)
+- 2026-10-28 — v0.2 consistency pass: one broken anchor (ch 11 → `#boss-the-brood-matriarch-t1`, the heading gained "(T1)"). Fixed. No other stale v0.1 rules text found (stat boosts, Prime 3 at L5, "three other nodes", "Dread may use Chutzpah", Knacks at 4/8).
+- 2026-10-28 — v0.2 playtest: L7 alpha strike melts lone Elites/Brutes before they act. Added ch 10 guidance and a damage gate on the Feral Evolved (stops at half HP the first time, then Emerges). No threat-table change; see Open Question 15.
+- 2026-10-28 — Builder: headless Chrome now launches in this environment; `tools/builder_flows.js` ran for the first time: **33/33 flows pass**.
+- 2026-10-28 — Builder: the 4 ch 11 pregens + Mags are now examples (backlog item done).
 - 2026-10-28 — **Rules gap found by the builder's random generator:** there is no base Infuse Effect, so a character whose only trees are Limbs can't build any Infuse Surge (every Infuse Effect is unlocked by Hide, Senses, Glands, Wiring, or Mind). Legal as written; ch 13 now says so. Open question: add a base Infuse Effect?
 - 2026-10-28 — **Guide (ch 13) rules calls** where chapters 2–8 were ambiguous; ch 13 now states them, the builder implements them: (a) Flux Limit minimum 4 applies *before* the Splice −1 (a Splice can have Limit 3). (b) A Splice keeps each tree's Form rules: Knit counts Bio trees, Firmware counts Chrome-tree parts, Chrome trees still cost Upkeep and give disadvantage vs Shock. (c) You wear one armor (Light *or* Heavy) plus an optional Shield. (d) Natural Weapons are a Frame and can take a Mod; Spit and Mind Spike can't. (e) Knacks: 3 at L1, +1 at L4 and L8 (5 total), plus Blossoms. (f) Thick = +2 × level total.
 - 2026-10-28 — `git commit` failed: no author identity on the box. Set the repo-local identity to the owner's GitHub noreply address.
@@ -377,9 +485,27 @@ A single self-contained HTML file (inline CSS/JS, no CDNs, no build step). Works
 
 **Updating it when rules change.** All game data is in one object, `const MUTAGEN = {...}`, in the **first `<script>` block**, between the `MUTAGEN GAME DATA` and `END OF GAME DATA` banners: stat array, level table, Origins, Forms, trees and nodes (text + `fx` keys), Shapes, Effects, Twists, Wild table, sample Surges, gear frames/mods/armor/items/kits, Scars/Faults, and the ch 13 worked example with its expected numbers. Node text supports tokens `{R}`, `{2R}`, `{R1}`, `{GUM}`, `{GRIT}`, `{ADR}`. Numbers that need logic (HP, Armor, Speed, Limit, attack lines, Surge dice) are computed in `derive()` / `surgeCalc()` / `attackLine()` in the second script; `fx` keys they read are listed in the data block's header comment. If you add a node whose effect changes a derived number, add an `fx` key and handle it in `derive()`. Keep ids stable (saved characters store them).
 
-**Features:** 8-step wizard following ch 13 (Start, Stats, Origin & Knacks, Augments, Surges, Gear, Extras & Drive, Sheet) with per-step error/warning badges; level 1–10 selector driving Rank, HP, defenses, Limit, Sequence die, Prime, Surges known, node picks, Twist count, Apex gating, Plating, Knack count, stat boosts, Final Form; stat array validation; Origin cards (+ d6 roll) and Knacks with examples; tree picker enforcing Root-first, Apex rules, Bio/Chrome per tree, Splice detection, Knit/Firmware/Upkeep; Surge builder limited to unlocked parts with Twist compatibility, live Flux, dice, attack and rider text, Firmware (⚙) marking, reorder/remove, sample list, harvested Samples, Wild slots; gear with kits, kit weapon choices, Mods (100), buying weapons/items/armor/Shield, Scrip ledger with mission-pay estimate, Upkeep; Scars/Faults (with number effects), Patch Applied, Drive, notes; live summary panel; printable sheet laid out like `sheets/Character_Sheet.html` (print hides the app); autosave + named saves in localStorage, JSON export/import; Random legal character at any level; Example menu (Dree L1/L5).
+**v0.2 (2026-10-28, Base Forms & Evolution).** The steps are now Start, **Form & Stats**, Origin & Knacks, Augments, Surges, Gear, Extras & Drive, Sheet.
+- **Form & Stats** shows five Form cards (primary/secondary/tertiary stats and trees, dumps, exclusives). A radio picks which dump gets +0. There is a stat table by stage (Base / Evo I / Evo II / Final) and a table of stage looks per Material, copied verbatim from ch 2A.
+- **Augments** shows only the Form's three trees, tagged primary/secondary/tertiary, with Tier I / Tier II / Apex headers. It enforces the v0.2 gates (Tier II L4+ and 3 standard nodes; Apex L7+, 6 others, primary or secondary only) and the pick budget (primary min(10, L+2); secondary + tertiary L+2 + overflow, secondary ≥ 2, tertiary ≥ 1). Evolution nodes appear as ★ *Granted* / *Level N* and are added automatically (never stored). Bio/Chrome is chosen per tree.
+- **Surges** has a Signature section (1 at L4, 2 at L7) built from the same parts, with its own Twists. Signatures are kept off the Sequence and out of the Surges-known count.
+- **Numbers:** d4/d6/d8/d12, Prime 2/3/4, Knacks 3/4/5/6, stage stats, Final Form (+2 primary) and Emergence on the sheet. There are no stat boosts. Armor max is 4/5/6. The Surge attack stat is the Shape's stat or the stat of the tree that unlocked the Effect.
+- **Sheet:** adds Form, Stage, Look, a trees table with roles and Materials, Evolution nodes, a Signature table and a Final Form box.
+- **Example menu:** Dree L1 / L4 / L7 (ch 13) and the five ch 11 pregens (Vex, Juno, Ozzie, Rook, Mags), all checked against the chapter numbers.
+- **Import:** v0.1 saves are **migrated**, not rejected (see Decision 26). The save version is `v:2`.
+- `window.MutagenBuilder` exposes `derive`, `randomChar(level, formId)`, `fromExample`, `picks`, `gate`, `formStats`, `normalize` and `trimToLevel` for the tests.
 
-**Tested 2026-10-28:** `tools/builder_test.js` (jsdom): 0 JS errors; Dree L1 and L5 match ch 13 exactly (HP 12/34, Armor 1, Speed 40, Dodge/Endure/Resist +4/+1/+3 and +6/+4/+6, Limit 6/9, Scrip 25 at L1, d4/d8, Prime 2/3, 1 Wild); 3,000 random characters (300 per level) all legal; 13 illegal builds correctly rejected; Sample and Lab Escapee slot rules; Splice Limit floor; DOM events (node click, stat select, Random, Save). Headless Chrome from `file://`: no console errors, localStorage works, print-to-PDF produces only the sheet (2 pages for a level 5 character), mobile layout at 390 px.
+**Tested v0.2 (2026-10-28):**
+- `tools/check_builder_data.js`: **493 checks, 0 mismatches.** It now also parses ch 2A and the six `chapters/03_Trees/*.md` files (node name, tier, Push), the ch 3 Evolution table and the ch 11 pregen numbers. Deliberately planted mismatches are caught.
+- `tools/builder_test.js` (jsdom): **255 checks, ALL PASSED, 0 JS errors.** It covers the 8 examples, 3,000 random characters (all Forms, all levels) plus per-Form runs, 25 illegal builds rejected, Evolution stats, nodes and Signatures at L3→L4 and L6→L7, migration of a v0.1 save, DOM flows, and R1–R14 adapted to v0.2.
+- `tools/builder_flows.js` (Playwright + headless Chrome, `file://`): **33/33 flows pass**, the first successful run of this suite. Print is 2 pages at L1, L4, L7 and L10. A v0.2 sheet carries more (Signatures, the Form box), so the L1 print went from 1 page to 2.
+- Screenshots: `/workspace/mutagen_builder_v2_{form,augments,surges,sheet}.png` (on the build box, not in the repo).
+
+*(v0.1 description below, kept for history.)*
+
+**Features (v0.1):** 8-step wizard following ch 13 (Start, Stats, Origin & Knacks, Augments, Surges, Gear, Extras & Drive, Sheet) with per-step error/warning badges; level 1–10 selector driving Rank, HP, defenses, Limit, Sequence die, Prime, Surges known, node picks, Twist count, Apex gating, Plating, Knack count, stat boosts, Final Form; stat array validation; Origin cards (+ d6 roll) and Knacks with examples; tree picker enforcing Root-first, Apex rules, Bio/Chrome per tree, Splice detection, Knit/Firmware/Upkeep; Surge builder limited to unlocked parts with Twist compatibility, live Flux, dice, attack and rider text, Firmware (⚙) marking, reorder/remove, sample list, harvested Samples, Wild slots; gear with kits, kit weapon choices, Mods (100), buying weapons/items/armor/Shield, Scrip ledger with mission-pay estimate, Upkeep; Scars/Faults (with number effects), Patch Applied, Drive, notes; live summary panel; printable sheet laid out like `sheets/Character_Sheet.html` (print hides the app); autosave + named saves in localStorage, JSON export/import; Random legal character at any level; Example menu (Dree L1/L5).
+
+**Tested v0.1, 2026-10-28:** `tools/builder_test.js` (jsdom): 0 JS errors; Dree L1 and L5 match ch 13 exactly (HP 12/34, Armor 1, Speed 40, Dodge/Endure/Resist +4/+1/+3 and +6/+4/+6, Limit 6/9, Scrip 25 at L1, d4/d8, Prime 2/3, 1 Wild); 3,000 random characters (300 per level) all legal; 13 illegal builds correctly rejected; Sample and Lab Escapee slot rules; Splice Limit floor; DOM events (node click, stat select, Random, Save). Headless Chrome from `file://`: no console errors, localStorage works, print-to-PDF produces only the sheet (2 pages for a level 5 character), mobile layout at 390 px.
 
 **GitHub Pages:** enabled 2026-10-28 (branch `main`, root, legacy Jekyll build). Live at https://xenodorian.github.io/BeelzRPG/builder/ and verified in headless Chrome (loads, art loads, example legal, no errors). On Pages, the builder's chapter links point to GitHub's rendered `.md`; offline they're relative. The first Pages build errored (it overlapped a second push) and the next one succeeded; if a build fails, check `gh api repos/xenodorian/BeelzRPG/pages/builds`.
 
@@ -416,14 +542,14 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 
 **UX improvements:** a plain-language intro on step 1, tooltips on every summary number giving its formula, the Fit-to-level button, a Heavy armor/Shield cost and speed note in the picker and on the sheet, and export files tagged `app`/`rules` version. Checked and fine: 375 px mobile (no horizontal overflow on any step), performance (~1 ms per full render), switching Bio/Chrome and Splice on/off (Limit, Upkeep and ⚙ Firmware marks update), removing a Root (its nodes go and Surges using its parts are flagged), reordering, and overspending (flagged).
 
-**Tests:** `tools/builder_test.js` (jsdom) adds regression tests R1–R14 above, on top of the earlier suite (worked example, 3,000 random characters, 13 illegal builds). `tools/check_builder_data.js` checks the rules against the data block. `tools/builder_flows.js` (Playwright + Chrome) covers real user flows: keyboard focus, level down + fit, Root removal, Form switching, reordering, overspending, hostile imports, reload persistence, Back button, long names, 375 px layout, storage disabled/full, unlabelled controls, print page counts at L1/L5/L10, and console errors. **Status:** the jsdom suite and the data check pass (ALL TESTS PASSED, 0 JS errors; 320 checks, 0 mismatches). The flow probe ran in Chrome *before* the fixes and found bugs 1–2, 5–8 and 19. `builder_flows.js` was written afterwards, but the build sandbox then blocked Chrome launches, so it has **not yet been run against this build**. Next contributor with a browser: run it and log the result here. Any failures are more likely selector drift than app bugs.
+**Tests:** `tools/builder_test.js` (jsdom) adds regression tests R1–R14 above, on top of the earlier suite (worked example, 3,000 random characters, 13 illegal builds). `tools/check_builder_data.js` checks the rules against the data block. `tools/builder_flows.js` (Playwright + Chrome) covers real user flows: keyboard focus, level down + fit, Root removal, Form switching, reordering, overspending, hostile imports, reload persistence, Back button, long names, 375 px layout, storage disabled/full, unlabelled controls, print page counts at L1/L5/L10, and console errors. **Status:** the jsdom suite and the data check pass (ALL TESTS PASSED, 0 JS errors; 320 checks, 0 mismatches). The flow probe ran in Chrome *before* the fixes and found bugs 1–2, 5–8 and 19. `builder_flows.js` was written afterwards, but the build sandbox then blocked Chrome launches, so it has **not yet been run against this build**. Next contributor with a browser: run it and log the result here. Any failures are more likely selector drift than app bugs. *(Update v0.2: it has now been run in headless Chrome: 33/33 pass; see above.)*
 
 ### Builder backlog (bigger ideas, not done)
 - [ ] **Play mode:** Prime/Churn roller, Flux tracker with Overload prompts, HP/Juice/Death-mark counters on the saved character.
 - [ ] **Level history:** record which node and Surge came at which level, so respecs and "level down" are exact instead of newest-first.
 - [ ] **Shareable link:** compress the character into the URL hash (no server).
 - [ ] **Hands check:** warn on a two-handed weapon plus Shield, or more held items than hands (Extra Arm adds one).
-- [ ] **Pregens as examples:** add the four ch 11 pregens to the Example menu (and test their numbers like Dree's).
+- [x] **Pregens as examples:** done in v0.2: all five ch 11 pregens, plus Dree at L1/L4/L7, are in the Example menu and tested.
 - [ ] **Single data source:** move the `MUTAGEN` block to `data/mutagen.json`, used by the builder (inlined at release), `tree_compare.py`, and the checker, so rules live in one place.
 - [ ] **Party view:** load several saves side by side for the GM (defenses, Limits, roles).
 - [ ] **Undo/redo** and a "changes since last save" indicator.
@@ -441,7 +567,13 @@ A skeptical second pass over `builder/index.html`: a rules cross-check script, r
 9. **Nerve** is the most loaded stat (ranged attacks, Bolt/Burst Surges, Resist, Flux Limit). Should Flux Limit use the higher of Nerve or Grit?
 10. **Glands unlocks 4 Surge parts** (incl. the only Mend and the only ranged area Shape) vs 2 for Limbs/Senses/Mind. Move Burst elsewhere, or keep Glands as the "toolkit" tree?
 11. **Mind** has the lowest personal damage (Mind Spike ignoring Armor is its edge). Is a support tree with high utility enough, or should Mind Spike scale better?
-12. **No base Infuse Effect.** A Limbs-only freelancer can't build an Infuse Surge. Fine (Limbs is the melee tree), or add a base Infuse Effect (e.g. a weak *Steady*: +Rank to the target's next roll)?
+12. ~~**No base Infuse Effect.**~~ *Closed in v0.2: every Form has a tree with an Infuse Effect, and nodes now come only from your Form's trees.*
+13. **Siren Limit (4 / 6 / 9).** She runs dry by round 3 at every stage. That's intended (the Overload Form), but it's the most common "nothing to do" moment in playtests. Option: let Commanding Voice's Rally lose 1 Flux once per combat.
+14. **Signature riders every round.** An always-ready Signature with a condition rider (Blinded, Dazed, Held) can re-apply it every round and lock one non-Boss all fight. Option: "a creature that ends a condition from your Signature can't get it again from that Signature until the end of its next turn."
+15. **L7 alpha strike.** Four optimised L7 freelancers deal ~150–185 a round, more than one T7 Elite or Brute has (144). This is handled by encounter guidance and a damage gate on the Feral Evolved. If live play shows Hard fights at L7–8 are still routs, raise T7–8 HP; untested, so re-run `tools/balance_sim.py` before changing anything.
+16. **Foresight / Thousand Eyes strength.** The Omen (replace any nearby d20 once a round) is the strongest Evolution I node on paper, and Thousand Eyes is the one explicit exception to non-stacking Crit ranges (17–20 with Deadeye). Watch the Oracle at L7+.
+17. **Haste Signatures.** *Live Feed* (Infuse + Haste) gives an ally an extra Move + Action every round for 1 Flux. It is strong in a party with one big hitter. Fine as the Siren's identity, or limit Haste Signatures to once per combat?
+
 
 ## Hosting (GitHub Pages)
 
