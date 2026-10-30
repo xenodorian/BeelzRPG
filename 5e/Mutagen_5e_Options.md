@@ -31,7 +31,7 @@ You signed a waiver you didn't read, took a number and walked into the Spill. GR
 These feats suit any class, but describe the Mutagen working on a non-Mutant (or a Mutant leaning further in).
 
 **Mutagenic Initiate.** *Prerequisite: Constitution 13 or higher.* The Mutagen has started on you.
-- You learn one Surge built from a base Shape and a base Effect. You have a Flux Limit of 2 and use the Surge rules as a Mutant (Surge dice 1d8, 2d8 at 5th character level, 3d8 at 11th, 4d8 at 17th; Constitution is your Surge ability). You don't Prime; your Flux resets on a short or long rest. If you are a Mutant, instead your Flux Limit increases by 1 and you learn one extra Surge.
+- You learn one Surge built from a base Shape and a base Effect. You have a Flux Limit of 1 and use the Surge rules as a Mutant (Surge dice 1d6, 2d6 at 5th character level, 3d6 at 11th, 4d6 at 17th; Constitution is your Surge ability). You don't Prime; your Flux resets on a short or long rest. If you are a Mutant, instead your Flux Limit increases by 1 and you learn one extra Surge.
 - You can use Regeneration (1d8 + your Constitution modifier) once per long rest.
 
 **Chrome Graft.** You install one implant. Choose a Mutation tree: you gain its Root and one of its Tier I Mutations. A non-Mutant doesn't gain the Root's Surge parts and uses Constitution for any save DC (8 + proficiency bonus + Constitution modifier). Increase one ability score of your choice by 1.

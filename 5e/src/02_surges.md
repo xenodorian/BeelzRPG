@@ -8,7 +8,7 @@ A Surge is **one Shape + one Effect**. Damaging Effects pair with Strike, Bolt, 
 |:--|:--|:--|:--|
 | **Strike** | base | none (part of a hit) | When you hit a creature with a weapon attack, Unleash: the target takes **Surge dice** extra damage of the Effect's type and suffers its rider |
 | **Bolt** | base | one attack of the Attack action, or an action | Ranged Surge attack, range 60 ft: **Surge dice + Surge ability modifier** damage and the rider |
-| **Wave** | base | action | 15-ft cone. Each creature in it makes a saving throw (Dexterity, or the Effect's listed save): on a failure **Surge dice + 1d8** damage and the rider; on a success half damage and no rider |
+| **Wave** | base | action | 15-ft cone. Each creature in it makes a saving throw (Dexterity, or the Effect's listed save): on a failure **Surge dice + 1 Surge die** damage and the rider; on a success half damage and no rider |
 | **Burst** | Glands | action | 10-ft-radius sphere centred on a point within 60 ft; save as Wave |
 | **Pulse** | Hide | action | Each creature of your choice within 10 ft of you; Constitution save instead of Dexterity, otherwise as Wave |
 | **Infuse** | base | bonus action | You or a creature you can see within 30 ft gains the Infuse Effect |
@@ -33,7 +33,7 @@ A rider that calls for a saving throw uses your Surge save DC; for Wave, Burst a
 
 | Effect | Source | Boon |
 |:--|:--|:--|
-| **Mend** | Glands | The target regains **Surge dice + Surge ability modifier** hit points |
+| **Mend** | Glands | The target can spend one of its unspent Hit Dice: it regains hit points equal to the roll + its Constitution modifier + your Surge ability modifier. A creature with no Hit Dice left regains only your Surge ability modifier |
 | **Shell** | Hide | The target gains **Surge dice + Surge ability modifier** temporary hit points and +1 AC until the start of your next turn |
 | **Haste** | Wiring | Another creature (not you) can immediately use its reaction to move up to half its speed without provoking opportunity attacks and make one weapon attack |
 | **Veil** | Senses | The target is **invisible** until the start of your next turn, or until it attacks or casts a spell |
@@ -45,7 +45,7 @@ Each Twist adds **1 Flux** to the Surge's cost. A Surge can carry one Twist (two
 
 | Twist | Effect |
 |:--|:--|
-| **Overcharge** | The Surge deals **2 extra Surge dice** of damage (or heals/grants 2 extra dice) |
+| **Overcharge** | The Surge deals **1 extra Surge die** of damage (Shell: 1 extra die of temporary hit points; Mend: the target can spend 1 more Hit Die) |
 | **Chain** | Strike or Bolt: a second creature within 15 ft of the target takes half the Surge's damage and suffers the rider (it saves separately if the rider allows one) |
 | **Reach** | Double the Surge's range, or its area's size (15-ft cone → 30-ft; 10-ft radius → 20-ft). Infuse reaches 60 ft |
 | **Linger** | Wave, Burst or Pulse: the area stays until the start of your next turn. A creature that enters it or starts its turn there takes damage equal to your Surge ability modifier and must save against the rider |

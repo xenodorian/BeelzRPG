@@ -54,7 +54,7 @@ Five trees and one open list. A Mutation's **prerequisites** are in its tier hea
 **Root: Keen.** New eyes and pits along your face. You gain darkvision out to 60 ft (or +30 ft if you already have it), you have advantage on Wisdom (Perception) checks that rely on sight or hearing, and you can't be blinded by bright light. *Unlocks Glare and Veil.*
 
 **Tier I** *(prerequisite: Keen)*
-- **Target Lock.** As a bonus action, mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
+- **Target Lock.** As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
 - **Threat Sense.** You can't be surprised while you're conscious. **Push:** when a creature you can see within 30 ft makes a saving throw, use your reaction to add your Wisdom modifier (minimum +1) to it.
 - **Analyzer.** As a bonus action, choose a creature you can see within 60 ft. You learn its AC, its current hit points, and its damage resistances, immunities and vulnerabilities.
 - **Echolocation.** You have blindsight out to 10 ft (30 ft from 11th level).
@@ -80,7 +80,7 @@ Five trees and one open list. A Mutation's **prerequisites** are in its tier hea
 
 **Tier II** *(prerequisites: 6th level, Spit and two other Glands Mutations)*
 - **Regenerative Tissue.** At the start of each of your turns, if you have at least 1 hit point and no more than half your hit point maximum, you regain hit points equal to your proficiency bonus.
-- **Catalyst.** Your Burst and Mend Surges use d10s for their Surge dice.
+- **Catalyst.** Your Burst Surges use d8s for their Surge dice, and your Mend lets the target spend one extra Hit Die.
 - **Spore Cloud.** As an action, you exhale spores: a 15-ft-radius sphere centred on you is heavily obscured for 1 minute (it moves with you; you can see through it). Once you do this, you can't again until you finish a short or long rest. **Push:** do it again without the rest.
 - **Purge.** As a bonus action, lower your Flux by an amount up to your proficiency bonus; you take 1d6 poison damage per point lowered (ignoring resistance). Once per short or long rest.
 

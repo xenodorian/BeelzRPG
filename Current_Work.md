@@ -3,7 +3,7 @@
 > **Start here.** This is the shared task list, design log, style guide, and glossary for anyone (human or AI) contributing to **Mutagen**. Check boxes when a task is done, add a dated line to the **Issues Log** when you hit a problem or make a call, and keep edits to *your* chapter file to avoid merge conflicts.
 
 ## Status (2026-10-30)
-**Mutagen 5e in progress (2026-10-30, owner request):** the game rebuilt as a 5e class in `5e/` (see *Mutagen 5e* at the end of this file). Steps 1–4 done (SRD research, homebrew format, workflow, build); balance check (5) and community gaps (6) follow.
+**Mutagen 5e in progress (2026-10-30, owner request):** the game rebuilt as a 5e class in `5e/` (see *Mutagen 5e* at the end of this file). Steps 1–5 done (SRD research, homebrew format, workflow, build, balance check); community gaps (6) follow.
 
 **Rules audit + compiled rulebook done (2026-10-29, owner request):** every mechanic in the arcade engine and the simulators was checked against the text. Real mechanics became rules (the grid is now an equal option to theatre of the mind), arcade conveniences moved to a new appendix (ch 14), and simulator bugs were fixed. The chapters are compiled into one numbered book, `rulebook/Mutagen_Rulebook.md` + a print-ready PDF. See *Rules Audit 2026-10-29* and *Rulebook* below.
 
@@ -953,4 +953,5 @@ Owner request: a version of the system on the 5e ruleset, the Forms as subclasse
 
 **Log**
 - 2026-10-30 step 4: class (Mutant, d10, Con/Str saves, five Forms at 1/3/6/10/14), Surge parts, Mutation trees (Limbs cannibalised into the chassis and the Body list; no Form cut), Overload tables, Options (background, 5 feats, gear), 20-creature bestiary with DMG-method CRs (½–23). Fonts: the box has Alegreya/Alegreya SC/Alegreya Sans, used instead of DejaVu (research 02 said DejaVu/Liberation).
+- 2026-10-30 step 5 (balance, `5e/research/05_balance_check.md`): the step-4 draft ran 1.31–1.66× the SRD martial Day DPR, the Alembic out-healed a Life Cleric and Mend could print 135–1,518 HP/day. 17 changes (d6 Surge dice, Flux Limit = ½ level, Prime 1 at 1st–2nd, Overcharge +1 die, Hit-Dice Mend, Alembic d10s instead of extra uses, Target Lock costs 1 Flux, Skitter d10 blades and no free attack at 14th, …). After: every Form 0.82–1.16× martial, nova below Paladin from 2nd, Regeneration between Lay on Hands and Bard/Druid, Alembic ≈ Druid < Life Cleric.
 

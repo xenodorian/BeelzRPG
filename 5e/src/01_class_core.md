@@ -46,26 +46,26 @@ You start with the following equipment, in addition to the equipment granted by 
 
 | Level | Proficiency Bonus | Features | Surge Dice | Surges Known | Flux Limit | Sequence Die | Prime | Mutations Known |
 |:-:|:-:|:--|:-:|:-:|:-:|:-:|:-:|:-:|
-| 1st | +2 | Mutant Body, Surges, Flux, Regeneration, Material, Form | 1d8 | 2 | 2 | d4 | 2 | — |
-| 2nd | +2 | Mutations, Churn | 1d8 | 2 | 3 | d4 | 2 | 2 |
-| 3rd | +2 | Form feature, Deeper Sequence | 1d8 | 3 | 3 | d6 | 2 | 2 |
-| 4th | +2 | Ability Score Improvement | 1d8 | 3 | 4 | d6 | 2 | 2 |
-| 5th | +3 | Extra Attack, Surge Dice | 2d8 | 4 | 5 | d6 | 2 | 3 |
-| 6th | +3 | Evolution I (Form feature) | 2d8 | 4 | 6 | d8 | 3 | 3 |
-| 7th | +3 | Last Gasp | 2d8 | 5 | 6 | d8 | 3 | 4 |
-| 8th | +3 | Ability Score Improvement | 2d8 | 5 | 7 | d8 | 3 | 4 |
-| 9th | +4 | Improved Regeneration | 2d8 | 6 | 8 | d8 | 3 | 5 |
-| 10th | +4 | Form feature | 2d8 | 6 | 9 | d8 | 3 | 5 |
-| 11th | +4 | Saturated Strikes, Surge Dice | 3d8 | 7 | 9 | d8 | 3 | 5 |
-| 12th | +4 | Ability Score Improvement | 3d8 | 7 | 10 | d8 | 3 | 6 |
-| 13th | +5 | Adaptive Biology | 3d8 | 8 | 11 | d8 | 3 | 6 |
-| 14th | +5 | Evolution II (Form feature) | 3d8 | 8 | 12 | d12 | 4 | 6 |
-| 15th | +5 | Controlled Overload, Apex Mutations | 3d8 | 9 | 12 | d12 | 4 | 7 |
-| 16th | +5 | Ability Score Improvement | 3d8 | 9 | 13 | d12 | 4 | 7 |
-| 17th | +6 | Surge Dice | 4d8 | 10 | 14 | d12 | 4 | 8 |
-| 18th | +6 | Perfect Organism | 4d8 | 10 | 15 | d12 | 4 | 8 |
-| 19th | +6 | Ability Score Improvement | 4d8 | 11 | 15 | d12 | 4 | 9 |
-| 20th | +6 | Final Form | 4d8 | 11 | 16 | d12 | 4 | 9 |
+| 1st | +2 | Mutant Body, Surges, Flux, Regeneration, Material, Form | 1d6 | 2 | 1 | d4 | 1 | — |
+| 2nd | +2 | Mutations, Churn | 1d6 | 2 | 1 | d4 | 1 | 2 |
+| 3rd | +2 | Form feature, Deeper Sequence | 1d6 | 3 | 2 | d6 | 2 | 2 |
+| 4th | +2 | Ability Score Improvement | 1d6 | 3 | 2 | d6 | 2 | 2 |
+| 5th | +3 | Extra Attack, Surge Dice | 2d6 | 4 | 3 | d6 | 2 | 3 |
+| 6th | +3 | Evolution I (Form feature) | 2d6 | 4 | 3 | d8 | 3 | 3 |
+| 7th | +3 | Last Gasp | 2d6 | 5 | 4 | d8 | 3 | 4 |
+| 8th | +3 | Ability Score Improvement | 2d6 | 5 | 4 | d8 | 3 | 4 |
+| 9th | +4 | Improved Regeneration | 2d6 | 6 | 5 | d8 | 3 | 5 |
+| 10th | +4 | Form feature | 2d6 | 6 | 5 | d8 | 3 | 5 |
+| 11th | +4 | Saturated Strikes, Surge Dice | 3d6 | 7 | 6 | d8 | 3 | 5 |
+| 12th | +4 | Ability Score Improvement | 3d6 | 7 | 6 | d8 | 3 | 6 |
+| 13th | +5 | Adaptive Biology | 3d6 | 8 | 7 | d8 | 3 | 6 |
+| 14th | +5 | Evolution II (Form feature) | 3d6 | 8 | 7 | d12 | 4 | 6 |
+| 15th | +5 | Controlled Overload, Apex Mutations | 3d6 | 9 | 8 | d12 | 4 | 7 |
+| 16th | +5 | Ability Score Improvement | 3d6 | 9 | 8 | d12 | 4 | 7 |
+| 17th | +6 | Surge Dice | 4d6 | 10 | 9 | d12 | 4 | 8 |
+| 18th | +6 | Perfect Organism | 4d6 | 10 | 9 | d12 | 4 | 8 |
+| 19th | +6 | Ability Score Improvement | 4d6 | 11 | 10 | d12 | 4 | 9 |
+| 20th | +6 | Final Form | 4d6 | 11 | 10 | d12 | 4 | 9 |
 
 </div>
 
@@ -89,7 +89,7 @@ A **Surge** is a burst of mutation you build from parts, the way a chef builds a
 
 **Parts available.** At 1st level you have the **base** parts (Strike, Bolt, Wave and Infuse Shapes; Kinetic and Snare Effects) plus the parts unlocked by the Root of your Form's primary tree. Each other tree's Root you take as a Mutation unlocks its parts too.
 
-**Surge Dice.** Surge damage is measured in **Surge dice**, shown in the Surge Dice column: 1d8, 2d8 at 5th, 3d8 at 11th, 4d8 at 17th.
+**Surge Dice.** Surge damage is measured in **Surge dice**, which are d6s, shown in the Surge Dice column: 1d6, 2d6 at 5th, 3d6 at 11th, 4d6 at 17th.
 
 **Surge Ability.** Your Surge ability is **Constitution**, unless your Form says otherwise (Oracle: Wisdom; Alembic: Intelligence; Siren: Charisma).
 
@@ -103,7 +103,7 @@ A **Surge** is a burst of mutation you build from parts, the way a chef builds a
 
 Write your Surges in a numbered list, your **Sequence**, with one numbered slot for each face of your **Sequence die** (d4 at 1st level; it grows as shown in the table). Put each Surge you know in a slot; slots left over are empty. Rearrange the list whenever you finish a long rest.
 
-**Priming.** When you roll initiative, roll your Sequence die a number of times equal to your **Prime** number (2 at 1st level). Each Surge whose slot comes up is **Primed** for this combat:
+**Priming.** When you roll initiative, roll your Sequence die a number of times equal to your **Prime** number (1 at 1st level; see the table). Each Surge whose slot comes up is **Primed** for this combat:
 - The **first** time you Unleash a Primed Surge in this combat, it costs **1 less Flux** (its basic cost of 1 becomes 0).
 - If the same slot comes up twice, that Surge is **Amped**: its first Unleash costs **no Flux at all, even for its Twists**, and it rolls **one extra Surge die**.
 - If the roll lands on an **empty** slot, your body improvises: roll on the **Wild Surge** table (after *Surge Parts*) and Unleash that result as a free action at the start of your first turn. It costs no Flux and counts as your Surge for that turn.
@@ -123,7 +123,7 @@ You can always Unleash a Surge that isn't Primed; it just costs its full Flux. T
 You can't Overload more than once per turn. A creature who Overloads while at 1 hit point or fewer suffers no further damage from it.
 
 > ##### Reading Flux at the Table
-> A 1st-level Mutant with a Flux Limit of 2 and two Primed Surges can Unleash **four Surges** before Overloading. Track Flux with a d20 or tally marks next to your Sequence. Most Mutants Overload once per hard fight; that's the point.
+> A 1st-level Mutant has a Flux Limit of 1 and Primes once per fight, so between rests (two fights) they can Unleash about **three Surges** before Overloading: two Primed ones for free and one paid. By 11th level (Flux Limit 6, Prime 3) they can Surge almost every turn and add Twists. Track Flux with a d20 or tally marks next to your Sequence. Overloading once in a hard fight is normal; that's the point.
 
 ### Regeneration
 *1st-level Mutant feature*
@@ -137,7 +137,7 @@ You can use this feature a number of times equal to your **proficiency bonus**, 
 The healing grows as you level: **2d8** at 5th level, **3d8** at 9th, **4d8** at 13th and **5d8** at 17th.
 
 > ##### Regeneration vs. Healing Spells
-> *Cure Wounds* heals 1d8 + modifier as an action; *Healing Word* heals 1d4 + modifier as a bonus action at range. Regeneration heals like *Cure Wounds* with *Healing Word*'s action cost, but only by touch, and its uses (2 at 1st level) match a 1st-level Cleric's, Bard's or Druid's two spell slots. Its dice rise in step with a support caster upcasting *Cure Wounds* into their best slot. Over a day it heals more than a Paladin's *Lay on Hands* and less than a Druid or Life Cleric who spend all their slots on healing (balance check, research 05).
+> *Cure Wounds* heals 1d8 + modifier as an action; *Healing Word* heals 1d4 + modifier as a bonus action at range. Regeneration heals like *Cure Wounds* with *Healing Word*'s action cost, but only by touch, and its uses (2 at 1st level) match a 1st-level Cleric's, Bard's or Druid's two spell slots. Its dice rise in step with a support caster upcasting *Cure Wounds* into their best slot. Over a day it heals more than a Paladin's *Lay on Hands* (15 vs 5 at 1st level, 65 vs 25 at 5th) and less than a Bard who spends every slot on *Healing Word* or a Druid on *Cure Wounds* (see *Design Notes*).
 
 ### Material
 *1st-level Mutant feature*
@@ -156,7 +156,7 @@ Your body takes the Mutagen in one of three ways. Choose one.
 
 **Splice.** You're both.
 - You gain **Knit** and **Firmware**.
-- Your Flux Limit is **1 lower** than the table shows.
+- Your Flux Limit is **1 lower** than the table shows (minimum 1).
 - When you Overload, choose the Bloom or Glitch table before you roll.
 
 ![Bio, Chrome and Splice Mutants](../../art/char_bio.jpg)
@@ -192,7 +192,7 @@ As a **bonus action** on your turn in combat, you can force your body to reshuff
 ### Deeper Sequence
 *3rd-level Mutant feature*
 
-Your body's repertoire widens. Your Sequence die becomes a **d6** (two more slots), and you gain proficiency in one skill from the Mutant's list.
+Your body's repertoire widens. Your Sequence die becomes a **d6** (two more slots), your **Prime** rises to 2, and you gain proficiency in one skill from the Mutant's list. Additionally, you regain one expended use of Regeneration when you finish a short rest.
 
 ### Ability Score Improvement
 *4th-level Mutant feature*
@@ -221,12 +221,12 @@ When you are reduced to 0 hit points but not killed outright, you can drop to 1 
 ### Improved Regeneration
 *9th-level Mutant feature*
 
-Your Regeneration can now reach a creature you can see within **30 feet** (a spray of tissue, a stim dart, a nanite cloud), and you regain one expended use of it when you finish a short rest.
+Your Regeneration can now reach a creature you can see within **30 feet** (a spray of tissue, a stim dart, a nanite cloud), and you can use it one additional time per long rest (proficiency bonus + 1).
 
 ### Saturated Strikes
 *11th-level Mutant feature*
 
-The Mutagen bleeds into every blow. Once on each of your turns when you hit a creature with a weapon attack, it takes an extra **1d8** damage of the type of any damaging Effect you know. This doesn't count as Unleashing a Surge and costs no Flux.
+The Mutagen bleeds into every blow. Once on each of your turns when you hit a creature with a weapon attack, it takes an extra **1d6** damage of the type of any damaging Effect you know. This doesn't count as Unleashing a Surge and costs no Flux.
 
 ### Adaptive Biology
 *13th-level Mutant feature*

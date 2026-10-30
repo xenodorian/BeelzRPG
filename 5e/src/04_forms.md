@@ -72,15 +72,15 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Primary Tree: Wiring.** You gain the Quickened Root for free.
 
-**Hair-Trigger Nerves** *(1st level).* You have advantage on initiative rolls. While you aren't wearing medium or heavy armor or using a shield, your AC equals 10 + your Dexterity modifier + your Constitution modifier.
+**Hair-Trigger Nerves** *(1st level).* Your natural weapons are mantis blades: their damage die is **1d10** (it doesn't increase at 11th level). You have advantage on initiative rolls. While you aren't wearing medium or heavy armor or using a shield, your AC equals 10 + your Dexterity modifier + your Constitution modifier.
 
-**Reflex Spike** *(3rd level).* When a creature misses you with a melee attack, you can use your reaction to make one melee weapon attack against it. If it hits, you can Unleash a Strike Surge through it even if you've already Unleashed one this turn. You can use this a number of times equal to your Surge ability modifier (minimum 1), regaining all uses when you finish a short or long rest.
+**Reflex Spike** *(3rd level).* When a creature misses you with a melee attack, you can use your reaction to make one melee weapon attack against it. If it hits, you can Unleash a Strike Surge through it even if you've already Unleashed one this turn. You can use this a number of times equal to your proficiency bonus, regaining all uses when you finish a long rest.
 
 **Mantis Reflex** *(6th level, Evolution I).* You gain **Evasion**: when an effect lets you make a Dexterity save for half damage, you take no damage on a success and half on a failure. Additionally, you get a second reaction each round, which you can use only for Reflex Spike or an opportunity attack.
 
 **Slip Through** *(10th level).* You don't provoke opportunity attacks, and difficult terrain doesn't cost you extra movement. When you take the Dash action, you can make one weapon attack as part of it.
 
-**Lightning Step** *(14th level, Evolution II).* Your speed increases by another 10 ft. Once on each of your turns when you Unleash a Surge, you can make one weapon attack as part of that same action or bonus action (no extra action needed).
+**Lightning Step** *(14th level, Evolution II).* Your speed increases by another 10 ft. Once on each of your turns when you Unleash a Surge, you can teleport up to 30 ft to an unoccupied space you can see, before or after its effect. When you finish a short rest, you regain one expended use of Reflex Spike.
 
 **Finale (Final Form).** *Afterburn:* while you're transformed, you can take one additional action on each of your turns (Attack, Dash, Disengage or Use an Object only).
 
@@ -111,7 +111,7 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Oracle Sight** *(1st level).* You can use Wisdom instead of Strength or Dexterity for the attack and damage rolls of your natural weapons and of ranged weapons with which you're proficient.
 
-**Target Lock** *(1st level).* As a bonus action, mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage (1d8 from 10th level) of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action. You count as having the Target Lock Mutation.
+**Target Lock** *(1st level).* As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action without raising your Flux. You count as having the Target Lock Mutation.
 
 **Analyst** *(3rd level).* When you Target Lock a creature, you also learn its AC, its current hit points and its damage resistances, immunities and vulnerabilities. You gain proficiency in Insight and Investigation, or expertise in one if you already have it.
 
@@ -148,15 +148,15 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Primary Tree: Glands.** You gain the Spit Root for free. Your Surge ability is **Intelligence**. You gain proficiency with the herbalism kit and the poisoner's kit.
 
-**Field Medic** *(1st level).* Your Regeneration can reach a creature you can see within **30 ft** (a dart, a spray, a lob of gel), and you can use it a number of additional times equal to your Intelligence modifier (minimum 1) per long rest. You can stabilise a dying creature within 30 ft as a bonus action.
+**Field Medic** *(1st level).* Your Regeneration can reach a creature you can see within **30 ft** (a dart, a spray, a lob of gel), and its healing dice are **d10s** instead of d8s. You can stabilise a dying creature within 30 ft as a bonus action.
 
 **Stim Gland** *(3rd level).* When you use Regeneration, the creature also gains temporary hit points equal to your Intelligence modifier, and it can end one of these conditions on itself instead of you choosing poisoned: blinded, deafened or frightened.
 
-**Transmute** *(6th level, Evolution I).* Your healing Surges and Regeneration add your proficiency bonus to the hit points they restore. When you Unleash a Toxin Surge, you can apply the Corrode rider as well (and vice versa).
+**Transmute** *(6th level, Evolution I).* Your Mend Surges restore extra hit points equal to your proficiency bonus, and your Regeneration can end the paralyzed condition. When you Unleash a Toxin Surge, you can apply the Corrode rider as well (and vice versa).
 
 **Miasma** *(10th level).* Your poison and acid damage ignores resistance, and treats immunity to poison damage as resistance. Creatures poisoned by you also have disadvantage on Constitution saves.
 
-**Panacea** *(14th level, Evolution II).* As an action, you release a cloud of healing compounds: every creature of your choice within 30 ft regains hit points equal to **6d8 + your Intelligence modifier** and is cured of one disease and any number of these conditions: blinded, deafened, paralyzed, poisoned, stunned. Once you use Panacea, you can't again until you finish a long rest.
+**Panacea** *(14th level, Evolution II).* As an action, you release a cloud of healing compounds: up to six creatures of your choice within 30 ft each regain hit points equal to **5d8 + your Intelligence modifier** and is cured of one disease and any number of these conditions: blinded, deafened, paralyzed, poisoned, stunned. Once you use Panacea, you can't again until you finish a long rest.
 
 **Finale (Final Form).** *Elixir of Life:* while you're transformed, at the start of each of your turns you and each ally within 30 ft regain hit points equal to your Intelligence modifier, and an ally who drops to 0 hit points within 30 ft of you drops to 1 instead (once per ally).
 
@@ -191,7 +191,7 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Siren Song** *(6th level, Evolution I).* As a bonus action, you sing: each creature of your choice within 30 ft that can hear you must succeed on a Wisdom save against your Surge save DC or be **charmed** by you until the end of your next turn; a charmed creature can only target you with attacks (it can still attack you) and has disadvantage doing so. You can do this a number of times equal to your proficiency bonus per long rest.
 
-**Psychic Scream** *(10th level).* As an action, each creature of your choice within 30 ft that can hear you must make an Intelligence save against your Surge save DC. On a failure it takes **Surge dice + 2d8** psychic damage and is frightened of you until the end of its next turn; on a success it takes half damage. Once you use this, you can't again until you finish a short or long rest.
+**Psychic Scream** *(10th level).* As an action, each creature of your choice within 30 ft that can hear you must make an Intelligence save against your Surge save DC. On a failure it takes psychic damage equal to **twice your Surge dice** (roll them twice) and is frightened of you until the end of its next turn; on a success it takes half damage. Once you use this, you can't again until you finish a short or long rest.
 
 **Crown of Will** *(14th level, Evolution II).* As an action, one creature you can see within 60 ft must succeed on a Wisdom save against your Surge save DC or be charmed by you for 1 minute (concentration). While charmed, it obeys your telepathic commands as *dominate monster*. It repeats the save each time it takes damage. Once you use this, you can't again until you finish a long rest.
 
