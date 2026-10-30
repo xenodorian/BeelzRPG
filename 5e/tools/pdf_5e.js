@@ -24,7 +24,7 @@ ul { margin: 2pt 0 5pt; padding-left: 13pt; }
 li { margin: 0 0 1.5pt; }
 em { color: inherit; }
 a { color: #1f5135; text-decoration: none; }
-img { max-width: 100%; display: block; margin: 4pt auto 8pt; border-radius: 3pt; box-shadow: 0 1pt 4pt rgba(0,0,0,.35); }
+img { max-width: 100%; max-height: 2.9in; object-fit: contain; display: block; margin: 4pt auto 8pt; border-radius: 3pt; box-shadow: 0 1pt 4pt rgba(0,0,0,.35); }
 table { width: 100%; border-collapse: collapse; margin: 4pt 0 8pt; font: 8.1pt/1.25 'Alegreya Sans', 'DejaVu Sans', sans-serif; break-inside: avoid; }
 th { text-align: left; font-weight: 800; color: #1f5135; padding: 2pt 3pt; border-bottom: 1pt solid #7aa33d; }
 td { padding: 2pt 3pt; vertical-align: top; }
