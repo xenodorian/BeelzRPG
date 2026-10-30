@@ -54,7 +54,7 @@ Five trees and one open list. A Mutation's **prerequisites** are in its tier hea
 **Root: Keen.** New eyes and pits along your face. You gain darkvision out to 60 ft (or +30 ft if you already have it), you have advantage on Wisdom (Perception) checks that rely on sight or hearing, and you can't be blinded by bright light. *Unlocks Glare and Veil.*
 
 **Tier I** *(prerequisite: Keen)*
-- **Target Lock.** As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
+- **Target Lock.** As a bonus action, or as part of hitting a creature with an attack, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
 - **Threat Sense.** You can't be surprised while you're conscious. **Push:** when a creature you can see within 30 ft makes a saving throw, use your reaction to add your Wisdom modifier (minimum +1) to it.
 - **Analyzer.** As a bonus action, choose a creature you can see within 60 ft. You learn its AC, its current hit points, and its damage resistances, immunities and vulnerabilities.
 - **Echolocation.** You have blindsight out to 10 ft (30 ft from 11th level).

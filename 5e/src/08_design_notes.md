@@ -31,17 +31,36 @@ Measured with `tools/bench.py` against the twelve SRD classes (full tables in `r
 | Level | 1 | 3 | 5 | 8 | 11 | 14 | 17 | 20 |
 |:--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | SRD martial average, Day DPR | 8.0 | 11.3 | 21.4 | 24.1 | 29.6 | 30.7 | 34.6 | 38.6 |
-| Mutant (greatsword + Strike), Day DPR | 8.7 | 10.6 | 22.9 | 25.7 | 33.4 | 33.4 | 36.8 | 39.5 |
+| Mutant (greatsword + Strike), Day DPR | 8.7 | 11.2 | 23.6 | 26.5 | 33.4 | 33.4 | 36.8 | 39.5 |
 | Paladin, Day DPR | 7.8 | 10.2 | 23.1 | 26.1 | 36.7 | 38.1 | 42.1 | 43.5 |
 | Druid, Day DPR | 3.6 | 6.7 | 11.9 | 16.3 | 18.0 | 19.8 | 24.0 | 25.3 |
 
 | Healing per long rest | L1 | L3 | L5 | L11 | L17 |
 |:--|:-:|:-:|:-:|:-:|:-:|
 | Paladin, *Lay on Hands* | 5 | 15 | 25 | 55 | 85 |
-| Mutant, Regeneration | 15 | 30 | 65 | 130 | 248 |
+| Mutant, Regeneration | 18 | 36 | 75 | 147 | 270 |
 | Bard, *Healing Word* (all slots) | 11 | 38 | 76 | 198 | 272 |
-| Alembic, Regeneration + Panacea | 17 | 46 | 95 | 186 | 448 |
+| Alembic, Regeneration + Panacea | 20 | 46 | 95 | 186 | 448 |
 | Druid, *Cure Wounds* (all slots) | 15 | 62 | 116 | 310 | 438 |
 | Life Cleric, *Cure Wounds* (all slots) | 21 | 74 | 142 | 370 | 524 |
 
-Every Form stays within 0.82–1.16× the martial average's sustained damage; the Mutant's best single round is below a Paladin's from 2nd level on.
+Every Form stays within 0.82–1.15× the martial average's sustained damage, with or without short rests; the Mutant's best single round is below a Paladin's from 2nd level on.
+
+## Community Gaps Addressed
+
+Common complaints about 5e classes (sources in `research/06_community_gaps.md`) and the Mutant's answer:
+
+| Complaint | Answer |
+|:--|:--|
+| Martials have nothing to do outside combat | **Adaptations** (2nd level) and utility Mutations; Surges work outside combat |
+| Martials can't control groups | Area Surges with riders; Siren Song, Psychic Scream, Crown of Will |
+| Repetitive turns | A new Sequence every fight; Surges built from parts; Churn, Overload and Instinct choices |
+| Bonus-action crowding | Regeneration can replace an attack; Target Lock on a hit; Emergence on initiative; Command dice with a Surge |
+| Dead levels | A feature at every level; ASI levels also add a Mutation |
+| Tables skip short rests | **Settle** halves Flux at each initiative, so the class plays the same with or without short rests |
+| Yo-yo healing | Regeneration gives temporary hit points to a creature that's still standing |
+| Subclass arrives late | Form at 1st level |
+| Random features fizzle or punish | Primed Surges are discounts, never lock-outs; Wild Surges are always good; Instinct and Controlled Overload |
+| Multiple-ability dependence | Oracle, Alembic and Siren attack with their Surge ability |
+| Situational picks are stuck | Swap one Mutation every long rest |
+| Most campaigns end by 10th level | Form features at 1/3/6/10; Evolution I at 6th |

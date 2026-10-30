@@ -244,9 +244,13 @@ def wizard(L):
 MUT = dict(die=6, sd=lambda L: 1 + (L >= 5) + (L >= 11) + (L >= 17),
            flux=lambda L: (L + 1) // 2, prime=lambda L: 1 if L < 3 else 2 if L < 6 else 3 if L < 14 else 4, oc=1, wave_bonus=1,
            sat=3.5, tl=lambda L: 3.5, ls_uses=lambda L: 0, spike=lambda L: pb(L) / 3, skitter_die=lambda L: 5.5)
+MUT_V2 = None   # set below: MUT before the step-6 Settle rule
 MUT_V1 = dict(die=8, sd=lambda L: 1 + (L >= 5) + (L >= 11) + (L >= 17),
               flux=lambda L: pb(L) + L // 2, prime=lambda L: 2 if L < 6 else 3 if L < 14 else 4, oc=2, wave_bonus=1,
               sat=4.5, tl=lambda L: 3.5 if L < 10 else 4.5, ls_uses=lambda L: 6, spike=lambda L: max(1, mod(L) - 1), skitter_die=lambda L: 4.5)
+
+MUT_V2 = dict(MUT)
+MUT = dict(MUT, settle=True)                                   # step 6: Settle (Flux drops to half at initiative)
 
 def mutant(L, P=MUT, form='core'):
     """Strike build. core: greatsword (2d6, no fighting style). Oracle: longbow + Target Lock (1 Flux per fight).
@@ -255,6 +259,7 @@ def mutant(L, P=MUT, form='core'):
     Primed Surges are free (min(3, Prime) per fight), then Flux pays; spare Flux buys Overcharge on hit turns.
     Overload is never used in Day (it costs hit points); Nova = an Amped Strike with Overcharge."""
     m = mod(L); bonus = pb(L) + m; n = 1 + (L >= 5)
+    k = P.get('fights', 2)                                     # fights per short-rest window (2 = two short rests a day)
     dieavg = (P['die'] + 1) / 2; sd = P['sd'](L) * dieavg
     weapon = {'core': 7, 'oracle': 4.5, 'juggernaut': 4.5, 'skitter': P['skitter_die'](L)}[form]
     p, pc = p_hit(L, bonus); pany = 1 - (1 - p) ** n; pcany = 1 - (1 - pc) ** n
@@ -268,19 +273,21 @@ def mutant(L, P=MUT, form='core'):
         extra += on_hit(P['tl'](L))                            # Target Lock
         if L >= 10: extra += n * p_hit(L, bonus)[1] * (weapon + 3.5)   # Weak Spot: crit on 19 too (approx +1 crit face)
     if form == 'juggernaut':
-        uses = max(1, m - 1); extra += min(6, uses) / 6 * on_hit(dieavg)   # Challenge: +1 Surge die, (Con mod) per rest
+        uses = max(1, m - 1); extra += min(6, uses) / 6 * on_hit(dieavg) * (2 / k if k > 2 else 1)   # Challenge: Con-mod uses per short rest
     if form == 'skitter':
-        extra += min(6, P['spike'](L)) / 6 * atk(L, bonus, weapon, m)    # Reflex Spike reactions
-    free = 2 * min(3, P['prime'](L))
-    hits = 6 * pany
+        extra += min(6, P['spike'](L)) / 6 * atk(L, bonus, weapon, m)    # Reflex Spike reactions (per long rest)
+    if P.get('settle'): flux = flux + (k - 1) * (flux - math.ceil(flux / 2))   # Settle: Flux drops to half at each initiative
+    free = k * min(3, P['prime'](L))
+    hits = 3 * k * pany
     paid = min(flux, max(0, hits - free)); spare = flux - paid
     used = min(hits, free + paid)
     oc_dice = P['oc']
+    W = 3 * k                                                  # rounds per window
     if form == 'skitter' and L >= 14:                          # Lightning Step: spare Flux buys a bonus-action attack
-        ls = min(spare, P['ls_uses'](L)); spare -= ls; extra += ls / 6 * atk(L, bonus, weapon, m)
+        ls = min(spare, P['ls_uses'](L)); spare -= ls; extra += ls / W * atk(L, bonus, weapon, m)
     oc_uses = min(spare, used)
     # used counts Unleashes, each made on a hit: expected damage per Unleash = sd (+crit share)
-    strike_day = (used / 6) * sd * (1 + pcany / max(pany, 1e-9)) + (oc_uses / 6) * oc_dice * dieavg * (1 + pcany / max(pany, 1e-9))
+    strike_day = (used / W) * sd * (1 + pcany / max(pany, 1e-9)) + (oc_uses / W) * oc_dice * dieavg * (1 + pcany / max(pany, 1e-9))
     at = base + extra
     day = base + extra + strike_day
     amp = 1 if P['prime'](L) >= 2 else 0                       # Amped needs a double on the Prime roll
@@ -291,21 +298,22 @@ def mutant(L, P=MUT, form='core'):
         nova += bolt
     return at, day, nova
 
-def mutant_healing(L, P=MUT, alembic=False, bio=False, version=2):
+def mutant_healing(L, P=MUT, alembic=False, bio=False, version=3):
     """Regeneration per long rest (every use spent). v1 = step-4 draft (Alembic: +Int uses, d8s; Panacea 6d8 on everyone).
     v2 = tuned (Alembic: d10s, no extra uses; Panacea 5d8 on up to six, four counted). Mend is Hit-Dice-based in v2 and
     adds only the Surge modifier per use on top of healing the party already owns, so it isn't counted."""
     m = mod(L)
     k = 1 if L < 5 else 2 if L < 9 else 3 if L < 13 else 4 if L < 17 else 5
-    if version == 2: uses = pb(L) + (2 if L >= 3 else 0) + (1 if L >= 9 else 0)   # 3rd: +1 per short rest; 9th: +1 use
+    if version >= 2: uses = pb(L) + (2 if L >= 3 else 0) + (1 if L >= 9 else 0)   # 3rd: +1 per short rest; 9th: +1 use
     else: uses = pb(L) + (2 if L >= 9 else 0)
-    die = 10 if (alembic and version == 2) else 8
+    die = 10 if (alembic and version >= 2) else 8
     per = D(k, die) + m + (pb(L) if bio else 0)
+    if version >= 3 and (not alembic or L < 3): per += 0.5 * m             # step 6: temp HP = Surge mod on a conscious target (half the uses)
     if alembic:
         uses += m if version == 1 else 0
         per += (m if L >= 3 else 0) + (pb(L) if (L >= 6 and version == 1) else 0)   # Stim Gland temp HP (v1: Transmute on Regeneration)
     tot = uses * per
-    if alembic and L >= 14: tot += 4 * (D(5 if version == 2 else 6, 8) + m)   # Panacea on four allies
+    if alembic and L >= 14: tot += 4 * (D(5 if version >= 2 else 6, 8) + m)   # Panacea on four allies
     if version == 1 and not alembic: pass
     return tot
 
@@ -354,6 +362,8 @@ if __name__ == '__main__':
         print('| **Martial average** | ' + ' | '.join(mart) + ' |')
         for f in ('core', 'juggernaut', 'skitter', 'oracle'):
             print('| *Mutant (%s)* | ' % f + ' | '.join('%.1f' % mutant(L, MUT, f)[idx] for L in show) + ' |')
+        print('| *Mutant (core), no short rests* | ' + ' | '.join('%.1f' % mutant(L, dict(MUT, fights=6), 'core')[idx] for L in show) + ' |')
+        print('| *Mutant step-5 (core), before Settle* | ' + ' | '.join('%.1f' % mutant(L, MUT_V2, 'core')[idx] for L in show) + ' |')
         print('| *Mutant step-4 draft (core)* | ' + ' | '.join('%.1f' % mutant(L, MUT_V1, 'core')[idx] for L in show) + ' |')
     print('\n### Healing per long rest (all healing resources spent on healing)\n')
     hs = [1, 3, 5, 11, 17, 20]

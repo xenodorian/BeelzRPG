@@ -111,7 +111,7 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Oracle Sight** *(1st level).* You can use Wisdom instead of Strength or Dexterity for the attack and damage rolls of your natural weapons and of ranged weapons with which you're proficient.
 
-**Target Lock** *(1st level).* As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action without raising your Flux. You count as having the Target Lock Mutation.
+**Target Lock** *(1st level).* As a bonus action, or as part of hitting a creature with an attack, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action without raising your Flux. You count as having the Target Lock Mutation.
 
 **Analyst** *(3rd level).* When you Target Lock a creature, you also learn its AC, its current hit points and its damage resistances, immunities and vulnerabilities. You gain proficiency in Insight and Investigation, or expertise in one if you already have it.
 
@@ -140,13 +140,15 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 | Mutant Level | Feature |
 |:-:|:--|
-| 1st | Glands Root (Spit), Field Medic |
+| 1st | Glands Root (Spit), Field Medic, Clinical Precision |
 | 3rd | Stim Gland |
 | 6th | Transmute (Evolution I) |
 | 10th | Miasma |
 | 14th | Panacea (Evolution II) |
 
-**Primary Tree: Glands.** You gain the Spit Root for free. Your Surge ability is **Intelligence**. You gain proficiency with the herbalism kit and the poisoner's kit.
+**Primary Tree: Glands.** You gain the Spit Root for free. Your Surge ability is **Intelligence**.
+
+**Clinical Precision** *(1st level).* You gain proficiency with the herbalism kit and the poisoner's kit, and you can use Intelligence instead of Strength or Dexterity for the attack and damage rolls of your natural weapons and Spit.
 
 **Field Medic** *(1st level).* Your Regeneration can reach a creature you can see within **30 ft** (a dart, a spray, a lob of gel), and its healing dice are **d10s** instead of d8s. You can stabilise a dying creature within 30 ft as a bonus action.
 
@@ -185,9 +187,9 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Primary Tree: Mind.** You gain the Uplink Root for free. Your Surge ability is **Charisma**.
 
-**Voice of the Hive** *(1st level).* You gain proficiency in one of Deception, Intimidation, Performance or Persuasion. As a bonus action, you can give one creature other than you within 60 ft that can hear you a **Command die**, a d6: once within the next 10 minutes, it can roll the die and add it to an attack roll, ability check or saving throw. You can do this a number of times equal to your Charisma modifier (minimum 1) per long rest, regaining all uses on a short rest from 6th level. The die becomes a d8 at 6th level, a d10 at 10th and a d12 at 14th.
+**Voice of the Hive** *(1st level).* You gain proficiency in one of Deception, Intimidation, Performance or Persuasion, and you can use Charisma instead of Strength or Dexterity for the attack and damage rolls of your natural weapons. As a bonus action, or as part of the action or bonus action you use to Unleash a Surge, you can give one creature other than you within 60 ft that can hear you a **Command die**, a d6: once within the next 10 minutes, it can roll the die and add it to an attack roll, ability check or saving throw. You can do this a number of times equal to your Charisma modifier (minimum 1) per long rest, regaining all uses on a short rest from 6th level. The die becomes a d8 at 6th level, a d10 at 10th and a d12 at 14th.
 
-**Command Signal** *(3rd level).* When you Unleash a Surge, you can also let one ally who can hear you use its reaction to move up to half its speed without provoking opportunity attacks. You can use Charisma instead of Strength or Dexterity for the attack and damage rolls of your natural weapons.
+**Command Signal** *(3rd level).* When you Unleash a Surge, you can also let one ally who can hear you use its reaction to move up to half its speed without provoking opportunity attacks. Allies who hear your Uplink telepathy gain a +1 bonus to initiative while you're conscious.
 
 **Siren Song** *(6th level, Evolution I).* As a bonus action, you sing: each creature of your choice within 30 ft that can hear you must succeed on a Wisdom save against your Surge save DC or be **charmed** by you until the end of your next turn; a charmed creature can only target you with attacks (it can still attack you) and has disadvantage doing so. You can do this a number of times equal to your proficiency bonus per long rest.
 

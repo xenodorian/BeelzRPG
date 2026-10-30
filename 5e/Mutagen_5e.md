@@ -30,6 +30,7 @@
     - [Form](#form)
     - [Mutations](#mutations)
     - [Churn](#churn)
+    - [Adaptations](#adaptations)
     - [Deeper Sequence](#deeper-sequence)
     - [Ability Score Improvement](#ability-score-improvement)
     - [Extra Attack](#extra-attack)
@@ -79,6 +80,7 @@
   - [From Mutagen to 5e](#from-mutagen-to-5e)
   - [Balance Targets](#balance-targets)
   - [Balance Check Results](#balance-check-results)
+  - [Community Gaps Addressed](#community-gaps-addressed)
 
 # The Mutant
 
@@ -129,13 +131,13 @@ You start with the following equipment, in addition to the equipment granted by 
 | Level | Proficiency Bonus | Features | Surge Dice | Surges Known | Flux Limit | Sequence Die | Prime | Mutations Known |
 |:-:|:-:|:--|:-:|:-:|:-:|:-:|:-:|:-:|
 | 1st | +2 | Mutant Body, Surges, Flux, Regeneration, Material, Form | 1d6 | 2 | 1 | d4 | 1 | — |
-| 2nd | +2 | Mutations, Churn | 1d6 | 2 | 1 | d4 | 1 | 2 |
+| 2nd | +2 | Mutations, Churn, Adaptations | 1d6 | 2 | 1 | d4 | 1 | 2 |
 | 3rd | +2 | Form feature, Deeper Sequence | 1d6 | 3 | 2 | d6 | 2 | 2 |
-| 4th | +2 | Ability Score Improvement | 1d6 | 3 | 2 | d6 | 2 | 2 |
+| 4th | +2 | Ability Score Improvement | 1d6 | 3 | 2 | d6 | 2 | 3 |
 | 5th | +3 | Extra Attack, Surge Dice | 2d6 | 4 | 3 | d6 | 2 | 3 |
 | 6th | +3 | Evolution I (Form feature) | 2d6 | 4 | 3 | d8 | 3 | 3 |
 | 7th | +3 | Last Gasp | 2d6 | 5 | 4 | d8 | 3 | 4 |
-| 8th | +3 | Ability Score Improvement | 2d6 | 5 | 4 | d8 | 3 | 4 |
+| 8th | +3 | Ability Score Improvement | 2d6 | 5 | 4 | d8 | 3 | 5 |
 | 9th | +4 | Improved Regeneration | 2d6 | 6 | 5 | d8 | 3 | 5 |
 | 10th | +4 | Form feature | 2d6 | 6 | 5 | d8 | 3 | 5 |
 | 11th | +4 | Saturated Strikes, Surge Dice | 3d6 | 7 | 6 | d8 | 3 | 5 |
@@ -143,7 +145,7 @@ You start with the following equipment, in addition to the equipment granted by 
 | 13th | +5 | Adaptive Biology | 3d6 | 8 | 7 | d8 | 3 | 6 |
 | 14th | +5 | Evolution II (Form feature) | 3d6 | 8 | 7 | d12 | 4 | 6 |
 | 15th | +5 | Controlled Overload, Apex Mutations | 3d6 | 9 | 8 | d12 | 4 | 7 |
-| 16th | +5 | Ability Score Improvement | 3d6 | 9 | 8 | d12 | 4 | 7 |
+| 16th | +5 | Ability Score Improvement | 3d6 | 9 | 8 | d12 | 4 | 8 |
 | 17th | +6 | Surge Dice | 4d6 | 10 | 9 | d12 | 4 | 8 |
 | 18th | +6 | Perfect Organism | 4d6 | 10 | 9 | d12 | 4 | 8 |
 | 19th | +6 | Ability Score Improvement | 4d6 | 11 | 10 | d12 | 4 | 9 |
@@ -204,6 +206,8 @@ You can always Unleash a Surge that isn't Primed; it just costs its full Flux. T
 
 You can't Overload more than once per turn. A creature who Overloads while at 1 hit point or fewer suffers no further damage from it.
 
+**Settle.** Between fights your blood cools a little even without a rest. When you roll initiative, if your Flux is higher than half your Flux Limit (rounded up), it drops to that number.
+
 > ##### Reading Flux at the Table
 > A 1st-level Mutant has a Flux Limit of 1 and Primes once per fight, so between rests (two fights) they can Unleash about **three Surges** before Overloading: two Primed ones for free and one paid. By 11th level (Flux Limit 6, Prime 3) they can Surge almost every turn and add Twists. Track Flux with a d20 or tally marks next to your Sequence. Overloading once in a hard fight is normal; that's the point.
 
@@ -213,6 +217,8 @@ You can't Overload more than once per turn. A creature who Overloads while at 1 
 Your cells knit faster than anyone's should, and you can share that. As a **bonus action**, touch yourself or a willing creature and choose one:
 - The creature regains hit points equal to **1d8 + your Surge ability modifier** (minimum 1).
 - You end the **poisoned** condition or one **disease** affecting the creature.
+
+If the creature had at least 1 hit point when you touched it, it also gains temporary hit points equal to your Surge ability modifier: your tissue is better at keeping someone up than at dragging them back.
 
 You can use this feature a number of times equal to your **proficiency bonus**, and regain all expended uses when you finish a long rest. It has no effect on undead or constructs.
 
@@ -262,7 +268,7 @@ Each tree has a **Root**, **Tier I** Mutations, **Tier II** Mutations and an **A
 - **Apex:** needs 15th level, your **primary** tree, the Root and four other Mutations of that tree.
 - **Body** Mutations (the open list) have no Root; some need a level.
 
-When you gain a level in this class, you can replace one Mutation you know with another you qualify for.
+When you gain a level in this class or finish a long rest, you can replace one Mutation you know with another you qualify for (your body reshapes overnight). A Mutation that another depends on can't be replaced until the dependent one is.
 
 **Push.** Some Mutations have a **Push** option. You can use it by raising your Flux by 1 (this can make you Overload). You can Push each Mutation only once per turn.
 
@@ -270,6 +276,26 @@ When you gain a level in this class, you can replace one Mutation you know with 
 *2nd-level Mutant feature*
 
 As a **bonus action** on your turn in combat, you can force your body to reshuffle: raise your Flux by 1 and roll your Sequence die once. The Surge in that slot is Primed (or Amped, if it already was Primed and its discount is unused). An empty slot gives you a Wild Surge as normal, which you can Unleash immediately as part of this bonus action.
+
+### Adaptations
+*2nd-level Mutant feature*
+
+Your body solves problems a spell would. When you finish a short or long rest, you can grow one **Adaptation** from the list below; it lasts until you grow a different one. You can maintain two Adaptations from 6th level and three from 14th. Growing one takes 10 minutes of visible, uncomfortable change (Chrome: printing and fitting a part).
+
+| Adaptation | Effect |
+|:--|:--|
+| **Gill Slits** | You can breathe water and have a swimming speed equal to your walking speed. |
+| **Sticky Pads** | You have a climbing speed equal to your walking speed. |
+| **Night Eyes** | You have darkvision out to 60 ft (or +30 ft). |
+| **Bloodhound** | You have advantage on Wisdom (Perception) and Wisdom (Survival) checks that rely on smell, and you can track by scent. |
+| **Chromatophores** | You can change your skin's colour and texture; you have advantage on Dexterity (Stealth) checks to hide while you don't move. |
+| **Polyglot Gland** | You understand one spoken language of your choice that you've heard in the last day (you can't speak it). |
+| **Pressure Lung** | You can hold your breath for 1 hour and are immune to inhaled poisons and gases. |
+| **Long Bones** | Your reach for grapples and for interacting with objects is 10 ft, and your jump distances are doubled. |
+| **Pliant Frame** | You can squeeze through a space as narrow as 6 inches and have advantage on checks to escape a grapple or restraints. |
+| **Echo Skull** | You have blindsight out to 10 ft. |
+| **Fever Glands** | You're comfortable in extreme heat or cold and have resistance to fire or cold damage (choose when you grow it). |
+| **Mimic Throat** | You can mimic any voice or sound you've heard; a listener sees through it with a successful Wisdom (Insight) check against your Surge save DC. |
 
 ### Deeper Sequence
 *3rd-level Mutant feature*
@@ -284,7 +310,7 @@ When you reach 4th level, and again at 8th, 12th, 16th and 19th level, you can i
 ### Extra Attack
 *5th-level Mutant feature*
 
-You can attack twice, instead of once, whenever you take the Attack action on your turn. A **Bolt** Surge can replace one of these attacks.
+You can attack twice, instead of once, whenever you take the Attack action on your turn. A **Bolt** Surge can replace one of these attacks, and so can a use of **Regeneration** (so healing an ally doesn't cost you your bonus action).
 
 ### Evolution I
 *6th-level Mutant feature*
@@ -292,7 +318,8 @@ You can attack twice, instead of once, whenever you take the Attack action on yo
 The Mutagen finishes its first rewrite of you. Your appearance changes (see your Form's *Looks* table), and:
 - Your **Prime** rises to 3 and your **Sequence die** becomes a **d8**.
 - **Signature Surge.** Choose one Surge you know as your Signature. It carries one Twist of your choice for free, every time (choose the Twist when you choose the Signature). Being Primed doesn't change that.
-- **Emergence.** As a bonus action, you can show what you've become. You gain temporary hit points equal to your Mutant level + your Surge ability modifier, each creature of your choice within 30 feet that can see you must succeed on a Wisdom saving throw against your Surge save DC or be frightened of you until the end of your next turn, and your Signature Surge becomes Amped if it wasn't already. Once you use Emergence, you can't do so again until you finish a long rest.
+- **Emergence.** When you roll initiative, or as a bonus action, you can show what you've become. You gain temporary hit points equal to your Mutant level + your Surge ability modifier, each creature of your choice within 30 feet that can see you must succeed on a Wisdom saving throw against your Surge save DC or be frightened of you until the end of your next turn, and your Signature Surge becomes Amped if it wasn't already. Once you use Emergence, you can't do so again until you finish a long rest.
+- **Instinct.** Once per long rest, when you roll your Sequence die to Prime, you can choose the result instead of rolling.
 - You gain your Form's **Evolution I** feature.
 
 ### Last Gasp
@@ -500,7 +527,7 @@ Five trees and one open list. A Mutation's **prerequisites** are in its tier hea
 **Root: Keen.** New eyes and pits along your face. You gain darkvision out to 60 ft (or +30 ft if you already have it), you have advantage on Wisdom (Perception) checks that rely on sight or hearing, and you can't be blinded by bright light. *Unlocks Glare and Veil.*
 
 **Tier I** *(prerequisite: Keen)*
-- **Target Lock.** As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
+- **Target Lock.** As a bonus action, or as part of hitting a creature with an attack, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra 1d6 damage of the weapon's type, and you always know its location while it's within 120 ft. (The Oracle's version, if you have it, replaces this.)
 - **Threat Sense.** You can't be surprised while you're conscious. **Push:** when a creature you can see within 30 ft makes a saving throw, use your reaction to add your Wisdom modifier (minimum +1) to it.
 - **Analyzer.** As a bonus action, choose a creature you can see within 60 ft. You learn its AC, its current hit points, and its damage resistances, immunities and vulnerabilities.
 - **Echolocation.** You have blindsight out to 10 ft (30 ft from 11th level).
@@ -680,7 +707,7 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Oracle Sight** *(1st level).* You can use Wisdom instead of Strength or Dexterity for the attack and damage rolls of your natural weapons and of ranged weapons with which you're proficient.
 
-**Target Lock** *(1st level).* As a bonus action, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action without raising your Flux. You count as having the Target Lock Mutation.
+**Target Lock** *(1st level).* As a bonus action, or as part of hitting a creature with an attack, raise your Flux by 1 and mark a creature you can see within 120 ft for 1 minute (concentration, as if concentrating on a spell). Once per turn when you hit it with an attack, it takes an extra **1d6** damage of the weapon's or Surge's type, and you always know its location while it's within 120 ft. If it drops to 0 hit points, you can move the mark to a new creature as a bonus action without raising your Flux. You count as having the Target Lock Mutation.
 
 **Analyst** *(3rd level).* When you Target Lock a creature, you also learn its AC, its current hit points and its damage resistances, immunities and vulnerabilities. You gain proficiency in Insight and Investigation, or expertise in one if you already have it.
 
@@ -709,13 +736,15 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 | Mutant Level | Feature |
 |:-:|:--|
-| 1st | Glands Root (Spit), Field Medic |
+| 1st | Glands Root (Spit), Field Medic, Clinical Precision |
 | 3rd | Stim Gland |
 | 6th | Transmute (Evolution I) |
 | 10th | Miasma |
 | 14th | Panacea (Evolution II) |
 
-**Primary Tree: Glands.** You gain the Spit Root for free. Your Surge ability is **Intelligence**. You gain proficiency with the herbalism kit and the poisoner's kit.
+**Primary Tree: Glands.** You gain the Spit Root for free. Your Surge ability is **Intelligence**.
+
+**Clinical Precision** *(1st level).* You gain proficiency with the herbalism kit and the poisoner's kit, and you can use Intelligence instead of Strength or Dexterity for the attack and damage rolls of your natural weapons and Spit.
 
 **Field Medic** *(1st level).* Your Regeneration can reach a creature you can see within **30 ft** (a dart, a spray, a lob of gel), and its healing dice are **d10s** instead of d8s. You can stabilise a dying creature within 30 ft as a bonus action.
 
@@ -754,9 +783,9 @@ Your Form is the shape the Mutagen is pushing you toward. Each Form names a **pr
 
 **Primary Tree: Mind.** You gain the Uplink Root for free. Your Surge ability is **Charisma**.
 
-**Voice of the Hive** *(1st level).* You gain proficiency in one of Deception, Intimidation, Performance or Persuasion. As a bonus action, you can give one creature other than you within 60 ft that can hear you a **Command die**, a d6: once within the next 10 minutes, it can roll the die and add it to an attack roll, ability check or saving throw. You can do this a number of times equal to your Charisma modifier (minimum 1) per long rest, regaining all uses on a short rest from 6th level. The die becomes a d8 at 6th level, a d10 at 10th and a d12 at 14th.
+**Voice of the Hive** *(1st level).* You gain proficiency in one of Deception, Intimidation, Performance or Persuasion, and you can use Charisma instead of Strength or Dexterity for the attack and damage rolls of your natural weapons. As a bonus action, or as part of the action or bonus action you use to Unleash a Surge, you can give one creature other than you within 60 ft that can hear you a **Command die**, a d6: once within the next 10 minutes, it can roll the die and add it to an attack roll, ability check or saving throw. You can do this a number of times equal to your Charisma modifier (minimum 1) per long rest, regaining all uses on a short rest from 6th level. The die becomes a d8 at 6th level, a d10 at 10th and a d12 at 14th.
 
-**Command Signal** *(3rd level).* When you Unleash a Surge, you can also let one ally who can hear you use its reaction to move up to half its speed without provoking opportunity attacks. You can use Charisma instead of Strength or Dexterity for the attack and damage rolls of your natural weapons.
+**Command Signal** *(3rd level).* When you Unleash a Surge, you can also let one ally who can hear you use its reaction to move up to half its speed without provoking opportunity attacks. Allies who hear your Uplink telepathy gain a +1 bonus to initiative while you're conscious.
 
 **Siren Song** *(6th level, Evolution I).* As a bonus action, you sing: each creature of your choice within 30 ft that can hear you must succeed on a Wisdom save against your Surge save DC or be **charmed** by you until the end of your next turn; a charmed creature can only target you with attacks (it can still attack you) and has disadvantage doing so. You can do this a number of times equal to your proficiency bonus per long rest.
 
@@ -1690,17 +1719,36 @@ Measured with `tools/bench.py` against the twelve SRD classes (full tables in `r
 | Level | 1 | 3 | 5 | 8 | 11 | 14 | 17 | 20 |
 |:--|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 | SRD martial average, Day DPR | 8.0 | 11.3 | 21.4 | 24.1 | 29.6 | 30.7 | 34.6 | 38.6 |
-| Mutant (greatsword + Strike), Day DPR | 8.7 | 10.6 | 22.9 | 25.7 | 33.4 | 33.4 | 36.8 | 39.5 |
+| Mutant (greatsword + Strike), Day DPR | 8.7 | 11.2 | 23.6 | 26.5 | 33.4 | 33.4 | 36.8 | 39.5 |
 | Paladin, Day DPR | 7.8 | 10.2 | 23.1 | 26.1 | 36.7 | 38.1 | 42.1 | 43.5 |
 | Druid, Day DPR | 3.6 | 6.7 | 11.9 | 16.3 | 18.0 | 19.8 | 24.0 | 25.3 |
 
 | Healing per long rest | L1 | L3 | L5 | L11 | L17 |
 |:--|:-:|:-:|:-:|:-:|:-:|
 | Paladin, *Lay on Hands* | 5 | 15 | 25 | 55 | 85 |
-| Mutant, Regeneration | 15 | 30 | 65 | 130 | 248 |
+| Mutant, Regeneration | 18 | 36 | 75 | 147 | 270 |
 | Bard, *Healing Word* (all slots) | 11 | 38 | 76 | 198 | 272 |
-| Alembic, Regeneration + Panacea | 17 | 46 | 95 | 186 | 448 |
+| Alembic, Regeneration + Panacea | 20 | 46 | 95 | 186 | 448 |
 | Druid, *Cure Wounds* (all slots) | 15 | 62 | 116 | 310 | 438 |
 | Life Cleric, *Cure Wounds* (all slots) | 21 | 74 | 142 | 370 | 524 |
 
-Every Form stays within 0.82–1.16× the martial average's sustained damage; the Mutant's best single round is below a Paladin's from 2nd level on.
+Every Form stays within 0.82–1.15× the martial average's sustained damage, with or without short rests; the Mutant's best single round is below a Paladin's from 2nd level on.
+
+## Community Gaps Addressed
+
+Common complaints about 5e classes (sources in `research/06_community_gaps.md`) and the Mutant's answer:
+
+| Complaint | Answer |
+|:--|:--|
+| Martials have nothing to do outside combat | **Adaptations** (2nd level) and utility Mutations; Surges work outside combat |
+| Martials can't control groups | Area Surges with riders; Siren Song, Psychic Scream, Crown of Will |
+| Repetitive turns | A new Sequence every fight; Surges built from parts; Churn, Overload and Instinct choices |
+| Bonus-action crowding | Regeneration can replace an attack; Target Lock on a hit; Emergence on initiative; Command dice with a Surge |
+| Dead levels | A feature at every level; ASI levels also add a Mutation |
+| Tables skip short rests | **Settle** halves Flux at each initiative, so the class plays the same with or without short rests |
+| Yo-yo healing | Regeneration gives temporary hit points to a creature that's still standing |
+| Subclass arrives late | Form at 1st level |
+| Random features fizzle or punish | Primed Surges are discounts, never lock-outs; Wild Surges are always good; Instinct and Controlled Overload |
+| Multiple-ability dependence | Oracle, Alembic and Siren attack with their Surge ability |
+| Situational picks are stuck | Swap one Mutation every long rest |
+| Most campaigns end by 10th level | Form features at 1/3/6/10; Evolution I at 6th |
