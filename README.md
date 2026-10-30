@@ -17,6 +17,8 @@
 
 **Everything in one file:** [Mutagen.html](https://xenodorian.github.io/BeelzRPG/Mutagen.html) ([download](https://github.com/xenodorian/BeelzRPG/raw/main/dist/Mutagen.html)): the whole rulebook with contents and search, the Character Builder, the Arcade and the printable sheet, in one offline HTML file (about 1.8 MB). See [Single-file edition](#single-file-edition).
 
+**New: Mutagen 5e.** The game rebuilt as a fifth-edition class, the **Mutant** (levels 1–20, five Forms as subclasses, Regeneration from 1st level, a 20-creature bestiary): [Mutagen_5e.pdf](https://xenodorian.github.io/BeelzRPG/5e/Mutagen_5e.pdf) · [Markdown](5e/Mutagen_5e.md). See [Mutagen 5e](#mutagen-5e).
+
 ## Read the Game
 
 | # | Chapter |
@@ -84,6 +86,13 @@ The rules live in **one place**: the chapter files in `chapters/` (and `chapters
 - All scripts, styles and art are inside the file (art downscaled to 900 px JPEG).
 - **Rebuild it** after changing chapters, the builder or the arcade: `python3 tools/build_single.py` (Python 3; Pillow optional, for smaller art). It writes `dist/Mutagen.html` and `Mutagen.html`.
 - **Test it:** `CHROME=/usr/bin/google-chrome node tools/single_test.js` (puppeteer-core) opens it from `file://` with the network cut off and checks every section: links, search, builder save, an arcade auto-run that uses the builder's save, share links and the phone layout.
+
+## Mutagen 5e
+A separate edition for the 5e ruleset, in `5e/`. The original game above is untouched.
+- **Read:** [Mutagen_5e.pdf](https://xenodorian.github.io/BeelzRPG/5e/Mutagen_5e.pdf) · [Mutagen_5e.md](5e/Mutagen_5e.md) (whole book) · parts: [Class](5e/Mutagen_5e_Class.md), [Options](5e/Mutagen_5e_Options.md), [Bestiary](5e/Mutagen_5e_Bestiary.md).
+- **Sources:** `5e/src/*.md` (edit these). `python3 5e/tools/bestiary.py` regenerates the stat blocks and audits CRs; `python3 5e/tools/build_5e.py` assembles the books (`--check` for staleness, links and images); `node 5e/tools/pdf_5e.js` prints the PDF (needs puppeteer-core and marked).
+- **Research and balance:** [SRD class analysis](5e/research/01_SRD_class_analysis.md), [homebrew format](5e/research/02_homebrew_format.md), [workflow](5e/WORKFLOW.md); `python3 5e/tools/bench.py` is the DPR/healing benchmark.
+- **SRD:** a full copy of the SRD 5.1 (CC-BY-4.0) in [`5e/srd/`](5e/srd/README.md); licensing in [5e/LICENSE.md](5e/LICENSE.md).
 
 ## Contributing
 Start with [Current_Work.md](Current_Work.md): task list, design log, style guide and known issues (the glossary is [chapter 15](chapters/15_Glossary.md)). After editing chapters, run `python3 tools/build_rulebook.py`, `node tools/rulebook_pdf.js` and `python3 tools/build_single.py`. One chapter per file, so you can work in parallel without conflicts.
